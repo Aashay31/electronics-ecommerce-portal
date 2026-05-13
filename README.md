@@ -1,23 +1,31 @@
 # Electronics Ecommerce Portal
 
+An ecommerce platform for electronic components and products.
+
+---
+
 ## Project Structure
 
+```bash
 electronics-ecommerce-portal/
 │
 ├── frontend/   # Frontend application
 ├── backend/    # Backend application
 └── README.md
+```
 
-## Tech Stack
-
-Frontend:
-
-Backend:
-- Node.js
-- Express.js
-
+---
 
 ## Features
+
+- Product Listings
+- Product Details
+- Authentication
+- Shopping Cart
+- Order Management
+- Admin Dashboard
+
+---
 
 ## References
 
