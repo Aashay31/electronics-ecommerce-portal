@@ -26,8 +26,3 @@ electronics-ecommerce-portal/
 - Admin Dashboard
 
 ---
-
-## References
-
-- https://www.flyrobo.in/
-- https://robu.in/
