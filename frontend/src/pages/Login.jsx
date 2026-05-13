@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 function Login() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
       <main className="relative mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -20,7 +20,7 @@ function Login() {
               EM
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-              ElectroMart
+              Electronics & Robotics Marketplace
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
               Sign in
