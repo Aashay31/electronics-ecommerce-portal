@@ -37,26 +37,7 @@ const savedAddressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const orderItemSchema = new mongoose.Schema(
-  {
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true,
-    },
-    quantity: { type: Number, required: true },
-    price: { type: Number, required: true },
-  },
-  { _id: false }
-);
-
-const orderSchema = new mongoose.Schema({
-  items: [orderItemSchema],
-  total: { type: Number, default: 0 },
-  status: { type: String, default: "Processing" },
-  deliveryStatus: { type: String, default: "Pending" },
-  orderedAt: { type: Date, default: Date.now },
-});
+// Removed embedded order schemas
 
 const userSchema = new mongoose.Schema(
   {
@@ -70,7 +51,6 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true, select: false },
-    profileImage: { type: String, default: "" },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     isBanned: { type: Boolean, default: false },
     address: addressSchema,
@@ -79,7 +59,6 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
     ],
     savedAddresses: [savedAddressSchema],
-    orderHistory: [orderSchema],
   },
   { timestamps: true }
 );

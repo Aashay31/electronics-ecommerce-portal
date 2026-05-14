@@ -8,7 +8,6 @@ const signup = async (req, res) => {
       email,
       phoneNumber,
       password,
-      profileImage,
       address,
     } = req.body;
 
@@ -59,7 +58,6 @@ const signup = async (req, res) => {
       email,
       phoneNumber,
       password,
-      profileImage,
       address,
     });
 

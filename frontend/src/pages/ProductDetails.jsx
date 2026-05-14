@@ -133,10 +133,11 @@ function ProductDetails() {
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto"
+                  disabled={product.stock === 0}
+                  className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
                 >
                   <FiShoppingCart className="h-5 w-5" />
-                  Add to Cart
+                  {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                 </button>
                 <button
                   type="button"

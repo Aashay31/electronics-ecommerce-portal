@@ -13,7 +13,7 @@ import { useAuth } from "./AuthContext";
 const ProfileContext = createContext(null);
 
 export function ProfileProvider({ children }) {
-  const { isAuthenticated, updateUser } = useAuth();
+  const { isAuthenticated, updateUser, logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [wishlist, setWishlist] = useState([]);
   const [addresses, setAddresses] = useState([]);
@@ -35,14 +35,18 @@ export function ProfileProvider({ children }) {
       setProfile(response.data.user);
       setWishlist(response.data.user?.wishlistItems || []);
       setAddresses(response.data.user?.savedAddresses || []);
-      setOrders(response.data.user?.orderHistory || []);
+      // Orders are now loaded on demand or explicitly fetched
       updateUser(response.data.user);
     } catch (error) {
-      toast.error("Unable to load profile");
+      if (error.response?.status === 401) {
+        logout();
+      } else {
+        toast.error("Unable to load profile");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, updateUser]);
+  }, [isAuthenticated, updateUser, logout]);
 
   useEffect(() => {
     refreshProfile();
@@ -64,7 +68,7 @@ export function ProfileProvider({ children }) {
   }, []);
 
   const loadOrders = useCallback(async () => {
-    const response = await api.get("/api/users/me/orders");
+    const response = await api.get("/api/orders/myorders");
     setOrders(response.data.orders || []);
     return response.data.orders || [];
   }, []);

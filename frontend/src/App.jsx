@@ -11,6 +11,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Orders from "./pages/Orders";
+import OrderDetails from "./pages/OrderDetails";
+import OrderSuccess from "./pages/OrderSuccess";
+import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Addresses from "./pages/Addresses";
 
@@ -54,6 +57,30 @@ function App() {
           element={
             <ProtectedRoute>
               <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order-success/:id"
+          element={
+            <ProtectedRoute>
+              <OrderSuccess />
             </ProtectedRoute>
           }
         />

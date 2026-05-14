@@ -32,15 +32,7 @@ function AdminNavbar() {
 
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
-            {user?.profileImage ? (
-              <img
-                src={user.profileImage}
-                alt={user.fullName}
-                className="h-9 w-9 rounded-full object-cover"
-              />
-            ) : (
-              initials
-            )}
+              {initials}
           </div>
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-slate-900">{user?.fullName}</p>

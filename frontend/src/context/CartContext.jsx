@@ -13,7 +13,7 @@ import { useAuth } from "./AuthContext";
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,11 +28,15 @@ export function CartProvider({ children }) {
       const response = await api.get("/api/cart");
       setItems(response.data.cartItems || []);
     } catch (error) {
-      toast.error("Unable to load cart");
+      if (error.response?.status === 401) {
+        logout();
+      } else {
+        toast.error("Unable to load cart");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, logout]);
 
   useEffect(() => {
     refreshCart();
@@ -111,8 +115,9 @@ export function CartProvider({ children }) {
       updateQuantity,
       cartTotal,
       itemCount,
+      refreshCart,
     }),
-    [items, isLoading, cartTotal, itemCount]
+    [items, isLoading, cartTotal, itemCount, refreshCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

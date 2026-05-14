@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
+const Order = require("../models/Order");
 
 // ─── Dashboard Stats ────────────────────────────────────────────────
 const getStats = async (req, res) => {
@@ -8,20 +9,13 @@ const getStats = async (req, res) => {
     const totalUsers = await User.countDocuments({ role: "user" });
     const lowStockProducts = await Product.countDocuments({ stock: { $lte: 5 } });
 
-    const users = await User.find().select("orderHistory");
-
-    let totalOrders = 0;
+    const totalOrders = await Order.countDocuments();
+    const pendingOrders = await Order.countDocuments({ orderStatus: "Pending" });
+    const orders = await Order.find();
+    
     let totalRevenue = 0;
-    let pendingOrders = 0;
-
-    users.forEach((user) => {
-      user.orderHistory.forEach((order) => {
-        totalOrders += 1;
-        totalRevenue += order.total || 0;
-        if (order.deliveryStatus === "Pending") {
-          pendingOrders += 1;
-        }
-      });
+    orders.forEach((order) => {
+      totalRevenue += order.totalAmount || 0;
     });
 
     return res.status(200).json({
@@ -137,46 +131,46 @@ const deleteProduct = async (req, res) => {
 const getOrders = async (req, res) => {
   try {
     const { status, search, page = 1, limit = 10 } = req.query;
-    const matchStage = {};
-
-    if (search) {
-      matchStage.$or = [
-        { fullName: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    const users = await User.find(matchStage)
-      .select("fullName email orderHistory")
-      .populate("orderHistory.items.product");
-
-    let allOrders = [];
-
-    users.forEach((user) => {
-      user.orderHistory.forEach((order) => {
-        const orderObj = order.toObject();
-        orderObj.userId = user._id;
-        orderObj.customerName = user.fullName;
-        orderObj.customerEmail = user.email;
-        allOrders.push(orderObj);
-      });
-    });
+    const query = {};
 
     if (status) {
-      allOrders = allOrders.filter(
-        (o) => o.deliveryStatus?.toLowerCase() === status.toLowerCase()
+      query.orderStatus = status;
+    }
+
+    // Populate user to allow searching by user name/email
+    let orders = await Order.find(query)
+      .populate("user", "fullName email")
+      .populate("items.product", "productName imageUrl")
+      .sort({ createdAt: -1 });
+
+    if (search) {
+      const s = search.toLowerCase();
+      orders = orders.filter((o) => 
+        o.user?.fullName.toLowerCase().includes(s) || 
+        o.user?.email.toLowerCase().includes(s)
       );
     }
 
-    allOrders.sort((a, b) => new Date(b.orderedAt) - new Date(a.orderedAt));
-
-    const total = allOrders.length;
+    const total = orders.length;
     const skip = (Number(page) - 1) * Number(limit);
-    const paginatedOrders = allOrders.slice(skip, skip + Number(limit));
+    const paginatedOrders = orders.slice(skip, skip + Number(limit));
+
+    // Map to expected frontend structure to maintain compatibility
+    const formattedOrders = paginatedOrders.map(o => {
+      const obj = o.toObject();
+      obj.customerName = o.user?.fullName;
+      obj.customerEmail = o.user?.email;
+      obj.userId = o.user?._id;
+      // Convert backend variables to frontend expected fields
+      obj.total = o.totalAmount;
+      obj.orderedAt = o.createdAt;
+      obj.deliveryStatus = o.orderStatus;
+      return obj;
+    });
 
     return res.status(200).json({
       success: true,
-      orders: paginatedOrders,
+      orders: formattedOrders,
       pagination: {
         total,
         page: Number(page),
@@ -190,23 +184,18 @@ const getOrders = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    const { userId, orderId } = req.params;
-    const { status, deliveryStatus } = req.body;
+    // Frontend passes /orders/:userId/:orderId but we only need orderId now
+    const { orderId } = req.params;
+    const { deliveryStatus } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    const order = user.orderHistory.id(orderId);
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (status) order.status = status;
-    if (deliveryStatus) order.deliveryStatus = deliveryStatus;
+    if (deliveryStatus) order.orderStatus = deliveryStatus;
 
-    await user.save();
+    await order.save();
 
     return res.status(200).json({ success: true, order });
   } catch (error) {

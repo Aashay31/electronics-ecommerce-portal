@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FiEye } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useProfile } from "../context/ProfileContext";
@@ -36,24 +38,30 @@ function Orders() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                      Order {index + 1}
+                      Order #{order._id.slice(-8).toUpperCase()}
                     </p>
                     <h2 className="mt-1 text-lg font-semibold text-slate-900">
-                      ₹{order.total}
+                      ₹{order.totalAmount?.toLocaleString() || 0}
                     </h2>
                     <p className="mt-1 text-sm text-slate-500">
-                      {order.orderedAt
-                        ? new Date(order.orderedAt).toLocaleDateString()
+                      {order.createdAt
+                        ? new Date(order.createdAt).toLocaleDateString()
                         : "-"}
                     </p>
                   </div>
-                  <div className="text-sm">
+                  <div className="flex items-center gap-3 text-sm">
                     <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700">
-                      {order.status}
+                      {order.paymentStatus}
                     </span>
-                    <span className="ml-2 rounded-full bg-emerald-100 px-3 py-1 font-semibold text-emerald-700">
-                      {order.deliveryStatus}
+                    <span className="rounded-full bg-indigo-100 px-3 py-1 font-semibold text-indigo-700">
+                      {order.orderStatus}
                     </span>
+                    <Link
+                      to={`/orders/${order._id}`}
+                      className="ml-2 flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1 font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      <FiEye className="h-4 w-4" /> Details
+                    </Link>
                   </div>
                 </div>
 

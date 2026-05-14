@@ -68,13 +68,7 @@ function Navbar() {
               onClick={() => setIsMenuOpen((open) => !open)}
               className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white transition hover:bg-white/20"
             >
-              {displayUser?.profileImage ? (
-                <img
-                  src={displayUser.profileImage}
-                  alt={displayUser.fullName}
-                  className="h-9 w-9 rounded-full object-cover"
-                />
-              ) : initials ? (
+              {initials ? (
                 initials
               ) : (
                 <FiUser className="h-4 w-4" />

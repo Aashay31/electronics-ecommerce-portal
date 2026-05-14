@@ -40,22 +40,14 @@ function Profile() {
               </h2>
               <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
                 <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100 text-2xl font-semibold text-slate-700">
-                  {profile?.profileImage ? (
-                    <img
-                      src={profile.profileImage}
-                      alt={profile.fullName}
-                      className="h-20 w-20 rounded-2xl object-cover"
-                    />
-                  ) : profile?.fullName ? (
-                    profile.fullName
-                      .split(" ")
-                      .map((part) => part[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()
-                  ) : (
-                    ""
-                  )}
+                  {profile?.fullName
+                    ? profile.fullName
+                        .split(" ")
+                        .map((part) => part[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()
+                    : ""}
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">

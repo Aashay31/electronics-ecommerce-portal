@@ -9,7 +9,6 @@ function buildFormData(profile) {
   return {
     fullName: profile?.fullName || "",
     phoneNumber: profile?.phoneNumber || "",
-    profileImage: profile?.profileImage || "",
     street: profile?.address?.street || "",
     city: profile?.address?.city || "",
     state: profile?.address?.state || "",
@@ -46,7 +45,6 @@ function EditProfileForm({ profile, updateProfile, updatePassword }) {
       await updateProfile({
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
-        profileImage: formData.profileImage,
         address: {
           street: formData.street,
           city: formData.city,
@@ -111,17 +109,6 @@ function EditProfileForm({ profile, updateProfile, updatePassword }) {
             <input
               name="phoneNumber"
               value={formData.phoneNumber}
-              onChange={handleChange}
-              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="text-sm font-medium text-slate-700">
-              Profile image URL
-            </label>
-            <input
-              name="profileImage"
-              value={formData.profileImage}
               onChange={handleChange}
               className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
             />

@@ -6,7 +6,6 @@ const getProfile = async (req, res) => {
     const user = await User.findById(req.user.id)
       .select("-password")
       .populate("wishlistItems")
-      .populate("orderHistory.items.product")
       .populate("cartItems.product");
 
     if (!user) {
@@ -30,7 +29,7 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { fullName, phoneNumber, profileImage, address } = req.body;
+    const { fullName, phoneNumber, address } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -53,10 +52,6 @@ const updateProfile = async (req, res) => {
 
     if (fullName) {
       user.fullName = fullName;
-    }
-
-    if (profileImage !== undefined) {
-      user.profileImage = profileImage;
     }
 
     if (address) {
@@ -128,23 +123,6 @@ const updatePassword = async (req, res) => {
   }
 };
 
-const getOrders = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).populate(
-      "orderHistory.items.product"
-    );
-
-    return res.status(200).json({
-      success: true,
-      orders: user?.orderHistory || [],
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 const getWishlist = async (req, res) => {
   try {
@@ -394,7 +372,6 @@ module.exports = {
   getProfile,
   updateProfile,
   updatePassword,
-  getOrders,
   getWishlist,
   addToWishlist,
   removeFromWishlist,

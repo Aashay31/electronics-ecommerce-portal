@@ -4,7 +4,6 @@ const {
   getProfile,
   updateProfile,
   updatePassword,
-  getOrders,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -21,7 +20,6 @@ router.get("/me", authMiddleware, getProfile);
 router.put("/me", authMiddleware, updateProfile);
 router.put("/me/password", authMiddleware, updatePassword);
 
-router.get("/me/orders", authMiddleware, getOrders);
 
 router.get("/me/wishlist", authMiddleware, getWishlist);
 router.post("/me/wishlist", authMiddleware, addToWishlist);
