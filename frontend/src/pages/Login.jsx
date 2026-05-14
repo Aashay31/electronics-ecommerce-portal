@@ -1,8 +1,46 @@
-import { FaGoogle } from "react-icons/fa";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
+  const [formData, setFormData] = useState({ identifier: "", password: "" });
+  const [loginMethod, setLoginMethod] = useState("email");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const payload =
+        loginMethod === "phone"
+          ? { phoneNumber: formData.identifier, password: formData.password }
+          : { email: formData.identifier, password: formData.password };
+      await login(payload);
+      toast.success("Welcome back!");
+      const redirectTo = location.state?.from?.pathname || "/home";
+      navigate(redirectTo);
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to sign in. Try again.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
@@ -30,19 +68,48 @@ function Login() {
             </p>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-slate-700"
-              >
-                Email address
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="identifier"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  {loginMethod === "phone" ? "Phone number" : "Email address"}
+                </label>
+                <div className="flex items-center gap-3 text-xs font-semibold text-slate-500">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="loginMethod"
+                      value="email"
+                      checked={loginMethod === "email"}
+                      onChange={() => setLoginMethod("email")}
+                    />
+                    Email
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="loginMethod"
+                      value="phone"
+                      checked={loginMethod === "phone"}
+                      onChange={() => setLoginMethod("phone")}
+                    />
+                    Phone
+                  </label>
+                </div>
+              </div>
               <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@electromart.com"
+                id="identifier"
+                name="identifier"
+                type={loginMethod === "phone" ? "tel" : "email"}
+                placeholder={
+                  loginMethod === "phone" ? "Enter phone number" : "you@electromart.com"
+                }
+                required
+                value={formData.identifier}
+                onChange={handleChange}
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
               />
             </div>
@@ -57,11 +124,22 @@ function Login() {
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
+                required
+                value={formData.password}
+                onChange={handleChange}
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
               />
-              <div className="mt-3 text-right">
+              <div className="mt-3 flex items-center justify-between">
+                <label className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                  <input
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={(event) => setShowPassword(event.target.checked)}
+                  />
+                  Show password
+                </label>
                 <a
                   className="text-xs font-semibold text-slate-500 transition hover:text-slate-900"
                   href="#"
@@ -72,37 +150,22 @@ function Login() {
             </div>
 
             <button
-              type="button"
+              type="submit"
+              disabled={isSubmitting}
               className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition duration-200 ease-out hover:-translate-y-1 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
             >
-              Login
+              {isSubmitting ? "Signing in..." : "Login"}
             </button>
           </form>
 
-          <div className="my-7 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
-            <span className="h-px flex-1 bg-slate-200" />
-            OR
-            <span className="h-px flex-1 bg-slate-200" />
-          </div>
-
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200">
-              <FaGoogle className="text-[18px] text-[#4285F4]" />
-            </span>
-            Continue with Google
-          </button>
-
           <p className="mt-7 text-center text-sm text-slate-500">
             New here?{" "}
-            <a
-              href="#"
+            <Link
+              to="/signup"
               className="font-semibold text-slate-900 transition hover:text-indigo-500"
             >
               Create Account
-            </a>
+            </Link>
           </p>
         </section>
       </main>

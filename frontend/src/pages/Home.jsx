@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
@@ -9,7 +9,7 @@ function Home() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://192.168.1.9:5000/api/products");
+      const response = await api.get("/api/products");
       setProducts(response.data.products);
     } catch (error) {
       console.log(error);

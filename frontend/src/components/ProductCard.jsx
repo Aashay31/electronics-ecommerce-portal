@@ -1,14 +1,60 @@
-import { Link } from "react-router-dom";
-import { FiShoppingCart } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
+import { useProfile } from "../context/ProfileContext";
+import { useAuth } from "../context/AuthContext";
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
-  const { showToast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const { wishlist, toggleWishlist } = useProfile();
+  const navigate = useNavigate();
+
+  const isWishlisted = wishlist.some((item) => item._id === product._id);
+
+  const handleAddToCart = async () => {
+    const added = await addToCart(product);
+    if (!added) {
+      return;
+    }
+
+    toast.custom((toastInstance) => (
+      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70">
+        <span>{product.productName} added to cart.</span>
+        <button
+          type="button"
+          onClick={() => {
+            navigate("/cart");
+            toast.dismiss(toastInstance.id);
+          }}
+          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          Open Cart
+        </button>
+      </div>
+    ));
+  };
 
   return (
-    <div className="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-md shadow-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="group relative flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-md shadow-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <button
+        type="button"
+        onClick={async () => {
+          if (!isAuthenticated) {
+            toast.error("Please login to save wishlist items");
+            return;
+          }
+          await toggleWishlist(product._id);
+        }}
+        className={`absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border text-sm transition ${
+          isWishlisted
+            ? "border-rose-200 bg-rose-50 text-rose-500"
+            : "border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500"
+        }`}
+      >
+        <FiHeart className={isWishlisted ? "fill-current" : ""} />
+      </button>
       <Link to={`/products/${product._id}`} className="flex flex-col">
         <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-50">
           <img
@@ -40,12 +86,7 @@ function ProductCard({ product }) {
         <span className="text-lg font-bold text-blue-600">₹{product.price}</span>
         <button
           type="button"
-          onClick={() => {
-            addToCart(product);
-            showToast(`${product.productName} added to cart.`, {
-              action: { label: "Open Cart", to: "/cart" },
-            });
-          }}
+          onClick={handleAddToCart}
           className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
         >
           <FiShoppingCart className="h-4 w-4" />

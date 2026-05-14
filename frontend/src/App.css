@@ -30,6 +30,14 @@ body {
   text-decoration: none;
 }
 
+.navbar button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+}
+
 /* Hero */
 
 .hero {

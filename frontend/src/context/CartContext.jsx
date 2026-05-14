@@ -1,51 +1,97 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import toast from "react-hot-toast";
+import api from "../utils/api";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
-function getInitialCart() {
-  return [];
-}
-
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(getInitialCart);
+  const { isAuthenticated } = useAuth();
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const addToCart = (product) => {
-    setItems((current) => {
-      const existing = current.find((entry) => entry.product._id === product._id);
-      if (existing) {
-        return current.map((entry) =>
-          entry.product._id === product._id
-            ? { ...entry, quantity: entry.quantity + 1 }
-            : entry
-        );
-      }
+  const refreshCart = useCallback(async () => {
+    if (!isAuthenticated) {
+      setItems([]);
+      return;
+    }
 
-      return [...current, { product, quantity: 1 }];
-    });
+    setIsLoading(true);
+    try {
+      const response = await api.get("/api/cart");
+      setItems(response.data.cartItems || []);
+    } catch (error) {
+      toast.error("Unable to load cart");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  const addToCart = async (product) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to cart");
+      return false;
+    }
+
+    const productId = typeof product === "string" ? product : product._id;
+
+    try {
+      const response = await api.post("/api/cart/add", {
+        productId,
+        quantity: 1,
+      });
+      setItems(response.data.cartItems || []);
+      return true;
+    } catch (error) {
+      toast.error("Unable to add to cart");
+      return false;
+    }
   };
 
-  const removeFromCart = (productId) => {
-    setItems((current) => current.filter((entry) => entry.product._id !== productId));
+  const removeFromCart = async (productId) => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    try {
+      const response = await api.delete(`/api/cart/${productId}`);
+      setItems(response.data.cartItems || []);
+    } catch (error) {
+      toast.error("Unable to remove item");
+    }
   };
 
-  const updateQuantity = (productId, nextQuantity) => {
-    setItems((current) => {
-      if (nextQuantity <= 0) {
-        return current.filter((entry) => entry.product._id !== productId);
-      }
+  const updateQuantity = async (productId, nextQuantity) => {
+    if (!isAuthenticated) {
+      return;
+    }
 
-      return current.map((entry) =>
-        entry.product._id === productId
-          ? { ...entry, quantity: nextQuantity }
-          : entry
-      );
-    });
+    try {
+      const response = await api.put(`/api/cart/${productId}`, {
+        quantity: nextQuantity,
+      });
+      setItems(response.data.cartItems || []);
+    } catch (error) {
+      toast.error("Unable to update quantity");
+    }
   };
 
   const cartTotal = useMemo(
     () =>
       items.reduce(
-        (total, entry) => total + entry.product.price * entry.quantity,
+        (total, entry) =>
+          total + (entry.product?.price || 0) * entry.quantity,
         0
       ),
     [items]
@@ -59,13 +105,14 @@ export function CartProvider({ children }) {
   const value = useMemo(
     () => ({
       items,
+      isLoading,
       addToCart,
       removeFromCart,
       updateQuantity,
       cartTotal,
       itemCount,
     }),
-    [items, cartTotal, itemCount]
+    [items, isLoading, cartTotal, itemCount]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

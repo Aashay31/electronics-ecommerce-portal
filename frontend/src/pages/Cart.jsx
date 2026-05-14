@@ -5,7 +5,8 @@ import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
 
 function Cart() {
-  const { items, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { items, cartTotal, removeFromCart, updateQuantity, isLoading } =
+    useCart();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -20,14 +21,18 @@ function Cart() {
             </p>
           </div>
           <Link
-            to="/"
+            to="/home"
             className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
             Continue Shopping
           </Link>
         </div>
 
-        {items.length === 0 ? (
+        {isLoading ? (
+          <div className="mt-10 rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md">
+            Loading your cart...
+          </div>
+        ) : items.length === 0 ? (
           <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
             <h2 className="text-lg font-semibold text-slate-800">
               Your cart is empty
@@ -41,26 +46,26 @@ function Cart() {
             <div className="space-y-6">
               {items.map((entry) => (
                 <div
-                  key={entry.product._id}
+                  key={entry.product?._id || entry.product}
                   className="flex flex-col gap-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-md sm:flex-row sm:items-center"
                 >
                   <div className="h-28 w-full overflow-hidden rounded-xl bg-slate-50 sm:h-24 sm:w-32">
                     <img
-                      src={entry.product.imageUrl}
-                      alt={entry.product.productName}
+                      src={entry.product?.imageUrl}
+                      alt={entry.product?.productName}
                       className="h-full w-full object-contain"
                     />
                   </div>
 
                   <div className="flex-1">
                     <h3 className="text-base font-semibold text-slate-900">
-                      {entry.product.productName}
+                      {entry.product?.productName}
                     </h3>
                     <p className="mt-1 text-sm text-slate-500">
-                      {entry.product.category}
+                      {entry.product?.category}
                     </p>
                     <p className="mt-3 text-lg font-semibold text-blue-600">
-                      ₹{entry.product.price}
+                      ₹{entry.product?.price}
                     </p>
                   </div>
 
@@ -71,11 +76,11 @@ function Cart() {
                         className="px-3 py-2 text-slate-600 transition hover:text-slate-900"
                         onClick={() =>
                           updateQuantity(
-                            entry.product._id,
+                            entry.product?._id || entry.product,
                             entry.quantity - 1
                           )
                         }
-                        disabled={entry.quantity <= 1}
+                        disabled={entry.quantity <= 1 || !entry.product}
                       >
                         <FiMinus className="h-4 w-4" />
                       </button>
@@ -87,10 +92,11 @@ function Cart() {
                         className="px-3 py-2 text-slate-600 transition hover:text-slate-900"
                         onClick={() =>
                           updateQuantity(
-                            entry.product._id,
+                            entry.product?._id || entry.product,
                             entry.quantity + 1
                           )
                         }
+                        disabled={!entry.product}
                       >
                         <FiPlus className="h-4 w-4" />
                       </button>
@@ -99,7 +105,10 @@ function Cart() {
                     <button
                       type="button"
                       className="inline-flex items-center gap-2 rounded-full border border-rose-200 px-4 py-2 text-xs font-semibold text-rose-600 transition hover:border-rose-300 hover:bg-rose-50"
-                      onClick={() => removeFromCart(entry.product._id)}
+                      onClick={() =>
+                        removeFromCart(entry.product?._id || entry.product)
+                      }
+                      disabled={!entry.product}
                     >
                       <FiTrash2 className="h-4 w-4" />
                       Remove

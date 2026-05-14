@@ -1,16 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { FiShoppingCart } from "react-icons/fi";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
+import { useProfile } from "../context/ProfileContext";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 
 function ProductDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
-  const { showToast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const { wishlist, toggleWishlist } = useProfile();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -20,9 +24,7 @@ function ProductDetails() {
       try {
         setIsLoading(true);
         setErrorMessage("");
-        const response = await axios.get(
-          `http://192.168.1.9:5000/api/products/${id}`
-        );
+        const response = await api.get(`/api/products/${id}`);
         setProduct(response.data.product);
       } catch (error) {
         setErrorMessage("Unable to load product details.");
@@ -33,6 +35,33 @@ function ProductDetails() {
 
     fetchProduct();
   }, [id]);
+
+  const handleAddToCart = async () => {
+    if (!product) {
+      return;
+    }
+
+    const added = await addToCart(product);
+    if (!added) {
+      return;
+    }
+
+    toast.custom((toastInstance) => (
+      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70">
+        <span>{product.productName} added to cart.</span>
+        <button
+          type="button"
+          onClick={() => {
+            navigate("/cart");
+            toast.dismiss(toastInstance.id);
+          }}
+          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          Open Cart
+        </button>
+      </div>
+    ));
+  };
 
   const specs = useMemo(() => {
     if (!product) {
@@ -46,6 +75,8 @@ function ProductDetails() {
       { label: "Shipping", value: "Ready to ship in 24-48 hrs" },
     ];
   }, [product]);
+
+  const isWishlisted = wishlist.some((item) => item._id === product?._id);
 
   return (
     <>
@@ -98,19 +129,34 @@ function ProductDetails() {
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  addToCart(product);
-                  showToast(`${product.productName} added to cart.`, {
-                    action: { label: "Open Cart", to: "/cart" },
-                  });
-                }}
-                className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto"
-              >
-                <FiShoppingCart className="h-5 w-5" />
-                Add to Cart
-              </button>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto"
+                >
+                  <FiShoppingCart className="h-5 w-5" />
+                  Add to Cart
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!isAuthenticated) {
+                      toast.error("Please login to save wishlist items");
+                      return;
+                    }
+                    await toggleWishlist(product._id);
+                  }}
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition sm:w-auto ${
+                    isWishlisted
+                      ? "border-rose-200 bg-rose-50 text-rose-500"
+                      : "border-slate-200 text-slate-700 hover:border-rose-200 hover:text-rose-500"
+                  }`}
+                >
+                  <FiHeart className={isWishlisted ? "fill-current" : ""} />
+                  {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
+                </button>
+              </div>
 
               <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-md">
                 <h2 className="text-lg font-semibold text-slate-900">
