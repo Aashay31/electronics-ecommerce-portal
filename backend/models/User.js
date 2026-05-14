@@ -50,16 +50,13 @@ const orderItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const orderSchema = new mongoose.Schema(
-  {
-    items: [orderItemSchema],
-    total: { type: Number, default: 0 },
-    status: { type: String, default: "Processing" },
-    deliveryStatus: { type: String, default: "Pending" },
-    orderedAt: { type: Date, default: Date.now },
-  },
-  { _id: false }
-);
+const orderSchema = new mongoose.Schema({
+  items: [orderItemSchema],
+  total: { type: Number, default: 0 },
+  status: { type: String, default: "Processing" },
+  deliveryStatus: { type: String, default: "Pending" },
+  orderedAt: { type: Date, default: Date.now },
+});
 
 const userSchema = new mongoose.Schema(
   {
@@ -74,6 +71,8 @@ const userSchema = new mongoose.Schema(
     phoneNumber: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true, select: false },
     profileImage: { type: String, default: "" },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    isBanned: { type: Boolean, default: false },
     address: addressSchema,
     cartItems: [cartItemSchema],
     wishlistItems: [

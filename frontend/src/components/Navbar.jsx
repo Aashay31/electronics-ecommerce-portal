@@ -83,6 +83,14 @@ function Navbar() {
 
             {isMenuOpen && (
               <div className="absolute right-0 z-50 mt-3 w-52 rounded-2xl border border-slate-200 bg-white p-2 text-sm text-slate-700 shadow-xl">
+                {displayUser?.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="block rounded-xl px-3 py-2 font-semibold text-indigo-600 no-underline transition hover:bg-indigo-50 hover:text-indigo-700"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <Link
                   to="/profile"
                   className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"

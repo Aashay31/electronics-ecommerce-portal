@@ -14,6 +14,13 @@ import Orders from "./pages/Orders";
 import Wishlist from "./pages/Wishlist";
 import Addresses from "./pages/Addresses";
 
+// Admin Imports
+import AdminProtectedRoute from "./admin/components/AdminProtectedRoute";
+import AdminLayout from "./admin/components/AdminLayout";
+import AdminDashboard from "./admin/pages/Dashboard";
+import AdminProducts from "./admin/pages/Products";
+import AdminOrders from "./admin/pages/Orders";
+import AdminUsers from "./admin/pages/Users";
 import "./App.css";
 
 function App() {
@@ -74,6 +81,21 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout />
+            </AdminProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema({
     "https://www.thingbits.in/_next/image?url=https%3A%2F%2Fimages.thingbits.net%2FeyJidWNrZXQiOiJ0aGluZ2JpdHMtbmV0Iiwia2V5IjoiMmc5dDAyY2FkYWdwZmp1c3NyeWUxd2t6aHIycCIsImVkaXRzIjp7InJlc2l6ZSI6eyJ3aWR0aCI6MTMwMCwiaGVpZ2h0Ijo5NzUsImZpdCI6ImNvdmVyIn19fQ%3D%3D&w=3840&q=75",
 },
 
+  featured: {
+    type: Boolean,
+    default: false,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
