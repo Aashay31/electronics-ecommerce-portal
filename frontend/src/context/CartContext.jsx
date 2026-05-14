@@ -39,7 +39,8 @@ export function CartProvider({ children }) {
   }, [isAuthenticated, logout]);
 
   useEffect(() => {
-    refreshCart();
+    const timeoutId = setTimeout(() => refreshCart(), 0);
+    return () => clearTimeout(timeoutId);
   }, [refreshCart]);
 
   const addToCart = async (product) => {
@@ -57,7 +58,7 @@ export function CartProvider({ children }) {
       });
       setItems(response.data.cartItems || []);
       return true;
-    } catch (error) {
+    } catch {
       toast.error("Unable to add to cart");
       return false;
     }
@@ -71,7 +72,7 @@ export function CartProvider({ children }) {
     try {
       const response = await api.delete(`/api/cart/${productId}`);
       setItems(response.data.cartItems || []);
-    } catch (error) {
+    } catch {
       toast.error("Unable to remove item");
     }
   };
@@ -86,7 +87,7 @@ export function CartProvider({ children }) {
         quantity: nextQuantity,
       });
       setItems(response.data.cartItems || []);
-    } catch (error) {
+    } catch {
       toast.error("Unable to update quantity");
     }
   };
@@ -123,6 +124,7 @@ export function CartProvider({ children }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) {

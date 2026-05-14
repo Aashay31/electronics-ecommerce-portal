@@ -49,7 +49,8 @@ export function ProfileProvider({ children }) {
   }, [isAuthenticated, updateUser, logout]);
 
   useEffect(() => {
-    refreshProfile();
+    const timeoutId = setTimeout(() => refreshProfile(), 0);
+    return () => clearTimeout(timeoutId);
   }, [refreshProfile]);
 
   const updateProfile = useCallback(
@@ -170,6 +171,7 @@ export function ProfileProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useProfile() {
   const context = useContext(ProfileContext);
   if (!context) {

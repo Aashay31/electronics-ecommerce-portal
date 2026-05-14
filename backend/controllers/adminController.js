@@ -193,7 +193,12 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (deliveryStatus) order.orderStatus = deliveryStatus;
+    if (deliveryStatus) {
+      order.orderStatus = deliveryStatus;
+      if (deliveryStatus === "Delivered" && order.paymentStatus === "Pending") {
+        order.paymentStatus = "Paid";
+      }
+    }
 
     await order.save();
 

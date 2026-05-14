@@ -50,10 +50,14 @@ function Orders() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700">
-                      {order.paymentStatus}
+                    <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700" title="Payment Status">
+                      Payment: {order.paymentStatus}
                     </span>
-                    <span className="rounded-full bg-indigo-100 px-3 py-1 font-semibold text-indigo-700">
+                    <span className={`rounded-full px-3 py-1 font-semibold ${
+                      order.orderStatus === "Delivered" ? "bg-emerald-100 text-emerald-700" :
+                      order.orderStatus === "Cancelled" ? "bg-rose-100 text-rose-700" :
+                      "bg-indigo-100 text-indigo-700"
+                    }`} title="Order Status">
                       {order.orderStatus}
                     </span>
                     <Link
