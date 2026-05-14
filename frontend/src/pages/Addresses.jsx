@@ -78,10 +78,10 @@ function Addresses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl px-6 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-slate-900">
             Saved Addresses

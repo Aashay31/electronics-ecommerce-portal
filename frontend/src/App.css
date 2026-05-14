@@ -20,17 +20,19 @@ body {
   color: white;
 }
 
-.navbar div {
+.navbar > div {
   display: flex;
+  align-items: center;
   gap: 20px;
 }
 
-.navbar a {
+.navbar > a,
+.navbar > div > a {
   color: white;
   text-decoration: none;
 }
 
-.navbar button {
+.navbar > div > button {
   background: none;
   border: none;
   color: white;

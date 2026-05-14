@@ -7,7 +7,7 @@ function Landing() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-16">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 px-6 py-16">
         <section className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">

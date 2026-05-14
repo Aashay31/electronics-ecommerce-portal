@@ -79,10 +79,10 @@ function ProductDetails() {
   const isWishlisted = wishlist.some((item) => item._id === product?._id);
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
 
-      <section className="mx-auto w-full max-w-6xl px-6 py-12">
+      <section className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
         {isLoading && (
           <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md">
             Loading product details...
@@ -182,7 +182,7 @@ function ProductDetails() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
