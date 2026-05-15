@@ -63,6 +63,13 @@ A full-featured e-commerce platform for browsing, purchasing, and managing elect
 - **Remove from Wishlist**: Manage saved items
 - **Wishlist View**: Dedicated page to view all wishlist items
 
+### 📱 Mobile Responsiveness & UI
+- **Fully Responsive Design**: Fluid layouts that adapt perfectly to mobile, tablet, and desktop screens
+- **Adaptive Navbar**: Navigation bar intelligently wraps and manages vertical space on smaller screens to prevent content overlap
+- **Dynamic Search Bar**: Search bar is context-aware and only visible to authenticated users to maintain a clean landing page
+- **Protected Browsing Experience**: Core shopping pages (Home, Shop, Product Details) are restricted to registered members, with elegant redirects and toast notifications for guests
+- **Local Network Testing Support**: API requests dynamically resolve to the host IP instead of localhost when testing on mobile devices via Wi-Fi
+
 ### 📊 Admin Dashboard
 Comprehensive analytics and management tools:
 
@@ -75,7 +82,8 @@ Comprehensive analytics and management tools:
 - **Low Stock Alert**: Products with 5 or fewer units
 
 #### 🏷️ Product Management
-- **Create Products**: Add new products with name, description, price, category, stock, image, and featured flag
+- **Create Products**: Add new products with name, description, price, category, stock, and featured flag
+- **Image Upload**: Upload actual product images directly from your device (stored locally) instead of just providing external URLs
 - **View Products**: Browse all products with pagination (10 per page)
 - **Search Products**: Find products by name
 - **Filter by Category**: Organize products by category
@@ -136,7 +144,8 @@ electronics-ecommerce-portal/
 │   │   └── userController.js        # User profile operations
 │   ├── middleware/
 │   │   ├── adminMiddleware.js       # Admin role verification
-│   │   └── authMiddleware.js        # Token validation
+│   │   ├── authMiddleware.js        # Token validation
+│   │   └── upload.js                # Multer image upload configuration
 │   ├── models/
 │   │   ├── User.js                  # User schema
 │   │   ├── Product.js               # Product schema
@@ -158,11 +167,16 @@ electronics-ecommerce-portal/
 │   ├── public/                       # Static assets
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── CategoryCard.jsx      # Category navigation card
+│   │   │   ├── FilterSidebar.jsx     # Shop filtering sidebar
 │   │   │   ├── Footer.jsx            # Application footer
 │   │   │   ├── GuestRoute.jsx        # Guest-only route protection
 │   │   │   ├── Navbar.jsx            # Navigation bar
 │   │   │   ├── ProductCard.jsx       # Product display card
-│   │   │   └── ProtectedRoute.jsx    # User route protection
+│   │   │   ├── ProductGrid.jsx       # Responsive grid for products
+│   │   │   ├── ProtectedRoute.jsx    # User route protection
+│   │   │   ├── SearchBar.jsx         # Search input component
+│   │   │   └── SortDropdown.jsx      # Product sorting component
 │   │   ├── admin/
 │   │   │   ├── components/
 │   │   │   │   ├── AdminLayout.jsx
@@ -179,7 +193,8 @@ electronics-ecommerce-portal/
 │   │   ├── context/
 │   │   │   ├── AuthContext.jsx       # Authentication state
 │   │   │   ├── CartContext.jsx       # Shopping cart state
-│   │   │   └── ProfileContext.jsx    # User profile state
+│   │   │   ├── ProfileContext.jsx    # User profile state
+│   │   │   └── SearchContext.jsx     # Global search state
 │   │   ├── pages/
 │   │   │   ├── Landing.jsx           # Welcome/landing page
 │   │   │   ├── Home.jsx              # Product listing
@@ -196,7 +211,8 @@ electronics-ecommerce-portal/
 │   │   │   ├── Addresses.jsx         # Address management
 │   │   │   └── Wishlist.jsx          # Wishlist page
 │   │   ├── utils/
-│   │   │   └── api.js                # API configuration
+│   │   │   ├── api.js                # API configuration
+│   │   │   └── imageUrl.js           # Dynamic image path resolver
 │   │   ├── App.jsx                   # Root component
 │   │   ├── main.jsx                  # Application entry
 │   │   ├── App.css                   # Global styles
@@ -230,15 +246,20 @@ cd backend
 npm install
 
 # Configure environment variables
-# Create a .env file with:
+# Create a .env file in the backend directory with:
 # MONGODB_URI=your_mongodb_connection_string
 # JWT_SECRET=your_secret_key
 # PORT=5000
 
-# Start the server
+# Create the uploads directory (required for product image uploads)
+mkdir uploads
+
+# Start the server (dev mode with nodemon if installed, or standard start)
+npm run dev
+# OR
 npm start
 
-# (Optional) Create an admin user
+# (Optional) Create an initial admin user
 node makeAdmin.js
 ```
 
@@ -251,10 +272,12 @@ cd frontend
 # Install dependencies
 npm install
 
-# Configure API base URL in src/utils/api.js
-# Update the API endpoint to match your backend URL
+# Configure environment variables
+# Create a .env file in the frontend directory with:
+# VITE_API_URL=http://localhost:5000
 
-# Start development server
+# Start the Vite development server
+# Note: The app automatically resolves local network IPs if you test on your mobile device!
 npm run dev
 
 # Build for production
