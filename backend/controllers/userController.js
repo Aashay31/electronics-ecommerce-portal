@@ -217,11 +217,13 @@ const getAddresses = async (req, res) => {
   }
 };
 
-const addAddress = async (req, res) => {
+  const addAddress = async (req, res) => {
   try {
-    const { label, street, city, state, pincode, country, isDefault } = req.body;
+    const { label, recipientName, phoneNumber, street, city, state, pincode, country, isDefault } = req.body;
+    const cleanRecipientName = (recipientName || "").trim();
+    const cleanPhoneNumber = (phoneNumber || "").toString().trim();
 
-    if (!street || !city || !state || !pincode || !country) {
+    if (!cleanRecipientName || !cleanPhoneNumber || !street || !city || !state || !pincode || !country) {
       return res.status(400).json({
         success: false,
         message: "Please fill all required address fields",
@@ -231,6 +233,8 @@ const addAddress = async (req, res) => {
     const user = await User.findById(req.user.id);
     const nextAddress = {
       label: label || "Address",
+      recipientName: cleanRecipientName,
+      phoneNumber: cleanPhoneNumber,
       street,
       city,
       state,
@@ -264,7 +268,7 @@ const addAddress = async (req, res) => {
 const updateAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
-    const { label, street, city, state, pincode, country, isDefault } = req.body;
+    const { label, recipientName, phoneNumber, street, city, state, pincode, country, isDefault } = req.body;
 
     const user = await User.findById(req.user.id);
     const address = user.savedAddresses.id(addressId);
@@ -277,11 +281,17 @@ const updateAddress = async (req, res) => {
     }
 
     if (label !== undefined) address.label = label;
-    if (street) address.street = street;
-    if (city) address.city = city;
-    if (state) address.state = state;
-    if (pincode) address.pincode = pincode;
-    if (country) address.country = country;
+    if (recipientName !== undefined) {
+      address.recipientName = (recipientName || "").trim();
+    }
+    if (phoneNumber !== undefined) {
+      address.phoneNumber = (phoneNumber || "").toString().trim();
+    }
+    if (street !== undefined) address.street = street;
+    if (city !== undefined) address.city = city;
+    if (state !== undefined) address.state = state;
+    if (pincode !== undefined) address.pincode = pincode;
+    if (country !== undefined) address.country = country;
 
     if (isDefault) {
       user.savedAddresses.forEach((entry) => {

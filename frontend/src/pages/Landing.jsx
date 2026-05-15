@@ -7,7 +7,7 @@ function Landing() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 px-6 py-16">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 px-6 pt-36 pb-16 md:pt-28">
         <section className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -22,7 +22,7 @@ function Landing() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                to="/home"
+                to="/shop"
                 className="rounded-full bg-slate-900 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
                 Explore Products

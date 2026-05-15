@@ -131,6 +131,13 @@ const cancelOrder = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
+    if (order.orderStatus === "Cancelled") {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Order is already cancelled" 
+      });
+    }
+
     if (!["Pending", "Confirmed"].includes(order.orderStatus)) {
       return res.status(400).json({ 
         success: false, 

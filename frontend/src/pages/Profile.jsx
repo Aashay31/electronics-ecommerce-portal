@@ -12,7 +12,7 @@ function Profile() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-slate-900">Profile</h1>

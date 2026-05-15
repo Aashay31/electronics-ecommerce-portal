@@ -3,6 +3,7 @@ import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function Cart() {
   const { items, cartTotal, removeFromCart, updateQuantity, isLoading } =
@@ -12,7 +13,7 @@ function Cart() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
 
-      <section className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <section className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-slate-900">Your Cart</h1>
@@ -51,7 +52,7 @@ function Cart() {
                 >
                   <div className="h-28 w-full overflow-hidden rounded-xl bg-slate-50 sm:h-24 sm:w-32">
                     <img
-                      src={entry.product?.imageUrl}
+                      src={resolveImageUrl(entry.product?.imageUrl)}
                       alt={entry.product?.productName}
                       className="h-full w-full object-contain"
                     />

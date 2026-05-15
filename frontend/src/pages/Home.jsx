@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -26,16 +27,19 @@ function Home() {
 
       <div className="flex-1">
         {/* Hero Section */}
-        <section className="hero text-center py-12 bg-gray-100">
-          <h1 className="text-4xl sm:text-5xl font-bold">
+        <section className="flex min-h-[50vh] flex-col items-center justify-center bg-gray-100 px-6 pb-12 pt-36 text-center md:min-h-[60vh] md:pt-28">
+          <h1 className="text-4xl font-bold sm:text-5xl">
             Welcome to ElectroMart
           </h1>
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4 text-slate-600">
             Explore the latest electronic products and components.
           </p>
-          <button className="mt-6 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800">
+          <Link
+            to="/shop"
+            className="mt-6 inline-flex rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
+          >
             Shop Now
-          </button>
+          </Link>
         </section>
 
         {/* Featured Products Section */}

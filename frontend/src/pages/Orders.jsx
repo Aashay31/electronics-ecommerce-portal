@@ -4,6 +4,7 @@ import { FiEye } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useProfile } from "../context/ProfileContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function Orders() {
   const { orders, loadOrders } = useProfile();
@@ -16,7 +17,7 @@ function Orders() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-slate-900">My Orders</h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -49,7 +50,7 @@ function Orders() {
                         : "-"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 text-sm">
+                  <div className="flex flex-wrap items-center gap-2 text-xs sm:gap-3 sm:text-sm">
                     <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700" title="Payment Status">
                       Payment: {order.paymentStatus}
                     </span>
@@ -78,7 +79,7 @@ function Orders() {
                       <div className="h-16 w-16 rounded-xl bg-white">
                         {item.product?.imageUrl && (
                           <img
-                            src={item.product.imageUrl}
+                            src={resolveImageUrl(item.product.imageUrl)}
                             alt={item.product.productName}
                             className="h-full w-full rounded-xl object-contain"
                           />

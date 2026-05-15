@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -6,6 +6,8 @@ import { useProfile } from "../context/ProfileContext";
 
 const emptyForm = {
   label: "",
+  recipientName: "",
+  phoneNumber: "",
   street: "",
   city: "",
   state: "",
@@ -21,10 +23,22 @@ function Addresses() {
     updateAddress,
     deleteAddress,
     setDefaultAddress,
+    selectedDeliveryAddressId,
+    setSelectedDeliveryAddressId,
+    refreshProfile,
   } = useProfile();
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState(emptyForm);
+  useEffect(() => {
+    if (!selectedDeliveryAddressId) {
+      return;
+    }
+    const exists = addresses.some((address) => address._id === selectedDeliveryAddressId);
+    if (!exists) {
+      setSelectedDeliveryAddressId("");
+    }
+  }, [addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId]);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -57,6 +71,8 @@ function Addresses() {
     setEditingId(address._id);
     setEditData({
       label: address.label || "",
+      recipientName: address.recipientName || "",
+      phoneNumber: address.phoneNumber || "",
       street: address.street || "",
       city: address.city || "",
       state: address.state || "",
@@ -70,6 +86,7 @@ function Addresses() {
     event.preventDefault();
     try {
       await updateAddress(editingId, editData);
+      await refreshProfile();
       setEditingId(null);
       toast.success("Address updated");
     } catch (error) {
@@ -81,7 +98,7 @@ function Addresses() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-slate-900">
             Saved Addresses
@@ -105,26 +122,49 @@ function Addresses() {
                 addresses.map((address) => (
                   <div
                     key={address._id}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    className={`rounded-2xl border bg-slate-50 p-4 transition ${
+                      selectedDeliveryAddressId === address._id
+                        ? "border-indigo-500 bg-indigo-50/60 shadow-md"
+                        : "border-slate-200"
+                    }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {address.label}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-900">{address.label}</span>
+                          {address.isDefault && (
+                            <span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                              Default
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-2 text-xs font-semibold text-slate-700">
+                          {address.recipientName?.trim() || "Recipient"}
                         </p>
                         <p className="text-xs text-slate-500">
+                          {address.phoneNumber?.trim() || "Phone not set"}
+                        </p>
+                        <p className="mt-2 text-xs text-slate-500">
                           {address.street}, {address.city}, {address.state}
                         </p>
                         <p className="text-xs text-slate-500">
                           {address.pincode}, {address.country}
                         </p>
+                        <label className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                          <input
+                            type="radio"
+                            name="deliveryAddress"
+                            checked={selectedDeliveryAddressId === address._id}
+                            onChange={() => {
+                              setSelectedDeliveryAddressId(address._id);
+                              toast.success("Delivery address selected for checkout");
+                            }}
+                            className="h-4 w-4 text-indigo-600"
+                          />
+                          Deliver here for checkout
+                        </label>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-                        {address.isDefault && (
-                          <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-700">
-                            Default
-                          </span>
-                        )}
                         {!address.isDefault && (
                           <button
                             type="button"
@@ -168,6 +208,22 @@ function Addresses() {
                           onChange={handleEditChange}
                           placeholder="Label"
                           className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs"
+                        />
+                        <input
+                          name="recipientName"
+                          value={editData.recipientName}
+                          onChange={handleEditChange}
+                          placeholder="Recipient name"
+                          className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs"
+                          required
+                        />
+                        <input
+                          name="phoneNumber"
+                          value={editData.phoneNumber}
+                          onChange={handleEditChange}
+                          placeholder="Phone number"
+                          className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs"
+                          required
                         />
                         <input
                           name="street"
@@ -247,6 +303,22 @@ function Addresses() {
                 onChange={handleChange}
                 placeholder="Label (Home, Office)"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
+              />
+              <input
+                name="recipientName"
+                value={formData.recipientName}
+                onChange={handleChange}
+                placeholder="Recipient name"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
+                required
+              />
+              <input
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                placeholder="Phone number"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
+                required
               />
               <input
                 name="street"

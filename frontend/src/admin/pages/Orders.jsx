@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Search, Package, User } from "lucide-react";
 import api from "../../utils/api";
+import { resolveImageUrl } from "../../utils/imageUrl";
 
 const statusColors = {
   Pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
@@ -203,7 +204,7 @@ function Orders() {
                         <div key={idx} className="flex items-center justify-between py-2 text-sm">
                           <div className="flex items-center gap-3">
                             <img
-                              src={item.product?.imageUrl}
+                              src={resolveImageUrl(item.product?.imageUrl)}
                               alt={item.product?.productName}
                               className="h-10 w-10 rounded bg-white object-cover shadow-sm"
                             />

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
-import { Plus, Search, Edit2, Trash2, X, Image as ImageIcon } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, X, Image as ImageIcon, Upload, Link } from "lucide-react";
 import api from "../../utils/api";
+import { resolveImageUrl } from "../../utils/imageUrl";
 import ConfirmModal from "../components/ConfirmModal";
 
 const initialForm = {
@@ -23,6 +24,13 @@ function Products() {
   const [formData, setFormData] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Image upload state
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [useUrlMode, setUseUrlMode] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
   
   // Delete Modal state
   const [deleteId, setDeleteId] = useState(null);
@@ -63,6 +71,9 @@ function Products() {
   const openAddModal = () => {
     setEditingId(null);
     setFormData(initialForm);
+    setImageFile(null);
+    setImagePreview("");
+    setUseUrlMode(false);
     setIsModalOpen(true);
   };
 
@@ -77,18 +88,93 @@ function Products() {
       imageUrl: product.imageUrl || "",
       featured: product.featured || false,
     });
+    setImageFile(null);
+    // Show existing image as preview
+    if (product.imageUrl) {
+      const isLocalUpload = product.imageUrl.startsWith("/uploads/");
+      setImagePreview(
+        isLocalUpload
+          ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${product.imageUrl}`
+          : product.imageUrl
+      );
+      setUseUrlMode(!isLocalUpload && product.imageUrl.startsWith("http"));
+    } else {
+      setImagePreview("");
+      setUseUrlMode(false);
+    }
     setIsModalOpen(true);
+  };
+
+  const handleFileSelect = (file) => {
+    if (!file) return;
+    // Validate type
+    const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Only image files (jpg, png, gif, webp, svg) are allowed");
+      return;
+    }
+    // Validate size (5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5 MB");
+      return;
+    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    // Clear URL mode value when a file is selected
+    setFormData((prev) => ({ ...prev, imageUrl: "" }));
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileSelect(file);
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      // Use FormData to support file upload
+      const data = new FormData();
+      data.append("productName", formData.productName);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("stock", formData.stock);
+      data.append("featured", formData.featured);
+
+      if (imageFile) {
+        data.append("image", imageFile);
+      } else if (formData.imageUrl) {
+        data.append("imageUrl", formData.imageUrl);
+      }
+
       if (editingId) {
-        await api.put(`/api/admin/products/${editingId}`, formData);
+        await api.put(`/api/admin/products/${editingId}`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Product updated successfully");
       } else {
-        await api.post("/api/admin/products", formData);
+        await api.post("/api/admin/products", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast.success("Product created successfully");
       }
       setIsModalOpen(false);
@@ -191,7 +277,7 @@ function Products() {
                         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                           {product.imageUrl ? (
                             <img
-                              src={product.imageUrl}
+                              src={resolveImageUrl(product.imageUrl)}
                               alt={product.productName}
                               className="h-full w-full object-cover"
                             />
@@ -360,15 +446,111 @@ function Products() {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  />
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Product Image
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUseUrlMode(!useUrlMode);
+                        if (!useUrlMode) {
+                          // Switching to URL mode — clear file
+                          setImageFile(null);
+                          setImagePreview("");
+                          if (fileInputRef.current) fileInputRef.current.value = "";
+                        } else {
+                          // Switching to upload mode — clear URL
+                          setFormData((prev) => ({ ...prev, imageUrl: "" }));
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 transition hover:text-indigo-800"
+                    >
+                      {useUrlMode ? (
+                        <><Upload className="h-3 w-3" /> Upload file</>
+                      ) : (
+                        <><Link className="h-3 w-3" /> Use URL instead</>
+                      )}
+                    </button>
+                  </div>
+
+                  {useUrlMode ? (
+                    /* ── URL Input Mode ── */
+                    <div>
+                      <input
+                        type="url"
+                        placeholder="https://example.com/image.jpg"
+                        value={formData.imageUrl}
+                        onChange={(e) => {
+                          setFormData({ ...formData, imageUrl: e.target.value });
+                          setImagePreview(e.target.value);
+                        }}
+                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                      {imagePreview && (
+                        <div className="relative mt-3 inline-block">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="h-24 w-24 rounded-lg border border-slate-200 object-cover"
+                            onError={(e) => { e.target.style.display = "none"; }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* ── File Upload Mode ── */
+                    <div>
+                      {imagePreview ? (
+                        /* Show preview with remove button */
+                        <div className="relative inline-block">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="h-40 w-40 rounded-xl border border-slate-200 object-cover shadow-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-white shadow-md transition hover:bg-rose-600"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                          <p className="mt-1.5 text-xs text-slate-500">
+                            {imageFile ? imageFile.name : "Current image"}
+                          </p>
+                        </div>
+                      ) : (
+                        /* Drop zone */
+                        <div
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 transition ${
+                            isDragging
+                              ? "border-indigo-500 bg-indigo-50"
+                              : "border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/50"
+                          }`}
+                        >
+                          <Upload className={`mb-2 h-8 w-8 ${isDragging ? "text-indigo-500" : "text-slate-400"}`} />
+                          <p className="text-sm font-medium text-slate-600">
+                            {isDragging ? "Drop image here" : "Click to upload or drag & drop"}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-400">
+                            JPG, PNG, GIF, WebP or SVG (max 5 MB)
+                          </p>
+                        </div>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                        onChange={(e) => handleFileSelect(e.target.files?.[0])}
+                        className="hidden"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="sm:col-span-2 flex items-center gap-2">

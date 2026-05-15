@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useProfile } from "../context/ProfileContext";
 import { useCart } from "../context/CartContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function Wishlist() {
   const { wishlist, toggleWishlist } = useProfile();
@@ -20,7 +21,7 @@ function Wishlist() {
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-slate-900">
@@ -51,7 +52,7 @@ function Wishlist() {
               >
                 <div className="aspect-[4/3] rounded-2xl bg-slate-50 p-4">
                   <img
-                    src={product.imageUrl}
+                    src={resolveImageUrl(product.imageUrl)}
                     alt={product.productName}
                     className="h-full w-full object-contain"
                   />

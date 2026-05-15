@@ -27,6 +27,8 @@ const cartItemSchema = new mongoose.Schema(
 const savedAddressSchema = new mongoose.Schema(
   {
     label: { type: String, default: "Address" },
+    recipientName: { type: String, default: "" },
+    phoneNumber: { type: String, default: "" },
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },

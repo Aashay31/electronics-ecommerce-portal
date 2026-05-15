@@ -37,6 +37,23 @@ const productSchema = new mongoose.Schema({
     default: false,
   },
 
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+  },
+
+  ratingCount: {
+    type: Number,
+    default: 0,
+  },
+
+  soldCount: {
+    type: Number,
+    default: 0,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,

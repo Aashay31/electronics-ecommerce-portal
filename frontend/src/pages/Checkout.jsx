@@ -7,10 +7,11 @@ import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
 import { useProfile } from "../context/ProfileContext";
 import api from "../utils/api";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function Checkout() {
   const { items, cartTotal, refreshCart } = useCart();
-  const { profile } = useProfile();
+  const { addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId } = useProfile();
   const navigate = useNavigate();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -28,15 +29,20 @@ function Checkout() {
   }, [items, navigate]);
 
   useEffect(() => {
-    if (profile?.savedAddresses?.length > 0) {
-      const defaultAddr = profile.savedAddresses.find((a) => a.isDefault);
-      setSelectedAddress(defaultAddr || profile.savedAddresses[0]);
+    if (addresses.length > 0) {
+      const preferred = addresses.find((a) => a._id === selectedDeliveryAddressId);
+      const defaultAddr = addresses.find((a) => a.isDefault);
+      setSelectedAddress(preferred || defaultAddr || addresses[0]);
     }
-  }, [profile]);
+  }, [addresses, selectedDeliveryAddressId]);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       return toast.error("Please select a shipping address");
+    }
+
+    if (!selectedAddress.recipientName || !selectedAddress.phoneNumber) {
+      return toast.error("Please add recipient name and phone for the selected address");
     }
 
     setIsPlacingOrder(true);
@@ -50,6 +56,8 @@ function Checkout() {
       const payload = {
         items: orderItems,
         shippingAddress: {
+          recipientName: selectedAddress.recipientName,
+          phoneNumber: selectedAddress.phoneNumber,
           street: selectedAddress.street,
           city: selectedAddress.city,
           state: selectedAddress.state,
@@ -65,6 +73,7 @@ function Checkout() {
       if (response.data.success) {
         toast.success("Order placed successfully!");
         await refreshCart(); // Refresh cart to empty state
+        setSelectedDeliveryAddressId("");
         navigate(`/order-success/${response.data.order._id}`);
       }
     } catch (error) {
@@ -80,7 +89,7 @@ function Checkout() {
     <div className="flex min-h-screen flex-col bg-slate-50">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-36 pb-8 sm:px-6 lg:px-8 md:pt-28">
         <Link
           to="/cart"
           className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900"
@@ -92,16 +101,16 @@ function Checkout() {
           {/* Left Column: Details */}
           <div className="space-y-6 lg:col-span-8">
             {/* Shipping Address */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+            <section className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-lg shadow-slate-200/60 backdrop-blur">
+              <div className="flex items-center gap-3 border-b border-slate-100/80 pb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100/60 text-indigo-600">
                   <FiMapPin className="h-5 w-5" />
                 </div>
                 <h2 className="text-lg font-bold text-slate-900">Shipping Address</h2>
               </div>
 
               <div className="mt-6 space-y-4">
-                {!profile?.savedAddresses?.length ? (
+                {!addresses.length ? (
                   <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
                     You have no saved addresses. Please{" "}
                     <Link to="/addresses" className="font-semibold underline">
@@ -110,38 +119,51 @@ function Checkout() {
                     first.
                   </div>
                 ) : (
-                  profile.savedAddresses.map((address) => (
-                    <label
-                      key={address._id}
-                      className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${
-                        selectedAddress?._id === address._id
-                          ? "border-indigo-600 bg-indigo-50/50 shadow-sm ring-1 ring-indigo-600"
-                          : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="address"
-                        className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-600"
-                        checked={selectedAddress?._id === address._id}
-                        onChange={() => setSelectedAddress(address)}
-                      />
-                      <div>
+                  <>
+                    {addresses.map((address) => (
+                      <label
+                        key={address._id}
+                        className={`group grid cursor-pointer gap-4 rounded-2xl border p-4 transition sm:grid-cols-[auto_1fr] ${
+                          selectedAddress?._id === address._id
+                            ? "border-indigo-500 bg-indigo-50/60 shadow-md ring-1 ring-indigo-500"
+                            : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900">{address.label}</span>
-                          {address.isDefault && (
-                            <span className="rounded bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700">
-                              Default
-                            </span>
-                          )}
+                          <input
+                            type="radio"
+                            name="address"
+                            className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-600"
+                            checked={selectedAddress?._id === address._id}
+                            onChange={() => setSelectedAddress(address)}
+                          />
+                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-700">
+                            Deliver Here
+                          </span>
                         </div>
-                        <p className="mt-1 text-sm text-slate-600">
-                          {address.street}, {address.city}, {address.state} {address.pincode},{" "}
-                          {address.country}
-                        </p>
-                      </div>
-                    </label>
-                  ))
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-900">{address.label}</span>
+                            {address.isDefault && (
+                              <span className="rounded bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-2 text-sm font-semibold text-slate-900">
+                            {address.recipientName || "Recipient"}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {address.phoneNumber || "Phone not set"}
+                          </p>
+                          <p className="mt-1 text-sm text-slate-600">
+                            {address.street}, {address.city}, {address.state} {address.pincode},{" "}
+                            {address.country}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </>
                 )}
               </div>
             </section>
@@ -196,7 +218,7 @@ function Checkout() {
                     <div key={item.product._id} className="flex gap-4">
                       <div className="h-16 w-16 flex-shrink-0 rounded-lg border border-slate-100 bg-slate-50 p-1">
                         <img
-                          src={item.product.imageUrl}
+                          src={resolveImageUrl(item.product.imageUrl)}
                           alt={item.product.productName}
                           className="h-full w-full object-contain"
                         />

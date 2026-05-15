@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import { useProfile } from "../context/ProfileContext";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -82,7 +83,7 @@ function ProductDetails() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
 
-      <section className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
+      <section className="mx-auto w-full max-w-6xl flex-1 px-6 pb-12 pt-36 md:pt-28">
         {isLoading && (
           <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md">
             Loading product details...
@@ -100,7 +101,7 @@ function ProductDetails() {
             <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg">
               <div className="aspect-[4/3] bg-slate-50 p-6">
                 <img
-                  src={product.imageUrl}
+                  src={resolveImageUrl(product.imageUrl)}
                   alt={product.productName}
                   className="h-full w-full object-contain transition duration-300 hover:scale-[1.02]"
                 />

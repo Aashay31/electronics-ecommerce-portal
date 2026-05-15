@@ -1,6 +1,7 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
+const upload = require("../middleware/upload");
 const {
   getStats,
   getProducts,
@@ -26,8 +27,8 @@ router.get("/stats", getStats);
 
 // Products
 router.get("/products", getProducts);
-router.post("/products", createProduct);
-router.put("/products/:id", updateProduct);
+router.post("/products", upload.single("image"), createProduct);
+router.put("/products/:id", upload.single("image"), updateProduct);
 router.delete("/products/:id", deleteProduct);
 
 // Orders

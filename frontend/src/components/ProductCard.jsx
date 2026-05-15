@@ -4,6 +4,7 @@ import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../context/CartContext";
 import { useProfile } from "../context/ProfileContext";
 import { useAuth } from "../context/AuthContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -58,7 +59,7 @@ function ProductCard({ product }) {
       <Link to={`/products/${product._id}`} className="flex flex-col">
         <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-50">
           <img
-            src={product.imageUrl}
+            src={resolveImageUrl(product.imageUrl)}
             alt={product.productName}
             className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
           />
@@ -73,21 +74,21 @@ function ProductCard({ product }) {
           </span>
         </div>
 
-        <h2 className="mt-3 text-base font-semibold text-slate-900">
+        <h2 className="mt-3 min-h-[3rem] text-base font-semibold text-slate-900 line-clamp-2">
           {product.productName}
         </h2>
 
-        <p className="mt-2 max-h-10 overflow-hidden text-sm text-slate-600">
+        <p className="mt-2 min-h-[2.5rem] text-sm text-slate-600 line-clamp-2">
           {product.description}
         </p>
       </Link>
 
-      <div className="mt-auto flex items-center justify-between pt-4">
-        <span className="text-lg font-bold text-blue-600">₹{product.price}</span>
+      <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+        <span className="text-base font-bold text-blue-600 whitespace-nowrap">₹{product.price}</span>
         <button
           type="button"
           onClick={handleAddToCart}
-          className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
+          className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-slate-900 px-3 py-2 text-[11px] font-semibold text-white shadow-sm shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
         >
           <FiShoppingCart className="h-4 w-4" />
           Add to Cart

@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
@@ -11,7 +13,10 @@ const getStats = async (req, res) => {
 
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ orderStatus: "Pending" });
-    const orders = await Order.find();
+    const orders = await Order.find({
+      orderStatus: { $ne: "Cancelled" },
+      paymentStatus: "Paid",
+    });
     
     let totalRevenue = 0;
     orders.forEach((order) => {
@@ -80,14 +85,22 @@ const createProduct = async (req, res) => {
       });
     }
 
+    // Determine image URL: uploaded file takes priority over a URL string
+    let finalImageUrl;
+    if (req.file) {
+      finalImageUrl = `/uploads/products/${req.file.filename}`;
+    } else if (imageUrl) {
+      finalImageUrl = imageUrl;
+    }
+
     const product = await Product.create({
       productName,
       description,
       price,
       category,
       stock,
-      imageUrl: imageUrl || undefined,
-      featured: Boolean(featured),
+      imageUrl: finalImageUrl || undefined,
+      featured: featured === "true" || featured === true,
     });
 
     return res.status(201).json({ success: true, product });
@@ -98,16 +111,34 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
+    const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    return res.status(200).json({ success: true, product });
+    const updates = { ...req.body };
+
+    // Convert featured string from FormData to boolean
+    if (updates.featured !== undefined) {
+      updates.featured = updates.featured === "true" || updates.featured === true;
+    }
+
+    // Handle image: uploaded file takes priority
+    if (req.file) {
+      // Delete old uploaded image from disk if it was a local upload
+      if (product.imageUrl && product.imageUrl.startsWith("/uploads/")) {
+        const oldPath = path.join(__dirname, "..", product.imageUrl);
+        fs.unlink(oldPath, () => {}); // fire-and-forget
+      }
+      updates.imageUrl = `/uploads/products/${req.file.filename}`;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    return res.status(200).json({ success: true, product: updatedProduct });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

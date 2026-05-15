@@ -19,6 +19,13 @@ export function ProfileProvider({ children }) {
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDeliveryAddressId, setSelectedDeliveryAddressId] = useState(() => {
+    return localStorage.getItem("selectedDeliveryAddressId") || "";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("selectedDeliveryAddressId", selectedDeliveryAddressId);
+  }, [selectedDeliveryAddressId]);
 
   const refreshProfile = useCallback(async () => {
     if (!isAuthenticated) {
@@ -106,24 +113,36 @@ export function ProfileProvider({ children }) {
   const addAddress = useCallback(async (payload) => {
     const response = await api.post("/api/users/me/addresses", payload);
     setAddresses(response.data.addresses || []);
+    setProfile((current) =>
+      current ? { ...current, savedAddresses: response.data.addresses || [] } : current
+    );
     return response.data.addresses || [];
   }, []);
 
   const updateAddress = useCallback(async (addressId, payload) => {
     const response = await api.put(`/api/users/me/addresses/${addressId}`, payload);
     setAddresses(response.data.addresses || []);
+    setProfile((current) =>
+      current ? { ...current, savedAddresses: response.data.addresses || [] } : current
+    );
     return response.data.addresses || [];
   }, []);
 
   const deleteAddress = useCallback(async (addressId) => {
     const response = await api.delete(`/api/users/me/addresses/${addressId}`);
     setAddresses(response.data.addresses || []);
+    setProfile((current) =>
+      current ? { ...current, savedAddresses: response.data.addresses || [] } : current
+    );
     return response.data.addresses || [];
   }, []);
 
   const setDefaultAddress = useCallback(async (addressId) => {
     const response = await api.put(`/api/users/me/addresses/${addressId}/default`);
     setAddresses(response.data.addresses || []);
+    setProfile((current) =>
+      current ? { ...current, savedAddresses: response.data.addresses || [] } : current
+    );
     return response.data.addresses || [];
   }, []);
 
@@ -145,6 +164,8 @@ export function ProfileProvider({ children }) {
       updateAddress,
       deleteAddress,
       setDefaultAddress,
+      selectedDeliveryAddressId,
+      setSelectedDeliveryAddressId,
     }),
     [
       profile,
@@ -163,6 +184,7 @@ export function ProfileProvider({ children }) {
       updateAddress,
       deleteAddress,
       setDefaultAddress,
+      selectedDeliveryAddressId,
     ]
   );
 

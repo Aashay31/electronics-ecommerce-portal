@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import api from "../utils/api";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 const statusSteps = ["Pending", "Confirmed", "Processing", "Shipped", "Delivered"];
 
@@ -70,7 +71,7 @@ function OrderDetails() {
     <div className="flex min-h-screen flex-col bg-slate-50">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-36 pb-8 sm:px-6 lg:px-8 md:pt-28">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <Link
             to="/orders"
@@ -220,7 +221,7 @@ function OrderDetails() {
                 <div key={item.product._id} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
                   <div className="h-24 w-24 shrink-0 rounded-xl bg-slate-50 p-2">
                     <img 
-                      src={item.product.imageUrl} 
+                      src={resolveImageUrl(item.product.imageUrl)} 
                       alt={item.product.productName}
                       className="h-full w-full object-contain"
                     />
