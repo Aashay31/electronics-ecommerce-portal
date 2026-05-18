@@ -16,21 +16,37 @@ function OrderDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  const fetchOrder = async () => {
-    try {
-      const response = await api.get(`/api/orders/${id}`);
-      setOrder(response.data.order);
-    } catch (error) {
-      toast.error("Failed to load order details");
-      navigate("/orders");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (id) fetchOrder();
-  }, [id]);
+    let active = true;
+
+    const fetchOrder = async () => {
+      try {
+        const response = await api.get(`/api/orders/${id}`);
+        if (active) {
+          setOrder(response.data.order);
+        }
+      } catch {
+        if (active) {
+          toast.error("Failed to load order details");
+          setTimeout(() => navigate("/orders"), 0);
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    if (id) {
+      setTimeout(() => {
+        if (active) fetchOrder();
+      }, 0);
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [id, navigate]);
 
   const handleCancel = async () => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;

@@ -1,7 +1,9 @@
 const Order = require("../models/Order");
 const User = require("../models/User");
 const Product = require("../models/Product");
-
+const sendEmail = require("../utils/sendEmail");
+const orderTemplate = require("../templates/orderTemplate");
+const statusTemplate = require("../templates/statusTemplate");
 // Place a new order
 const placeOrder = async (req, res) => {
   try {
@@ -56,6 +58,22 @@ const placeOrder = async (req, res) => {
       paymentMethod,
       paymentStatus: paymentMethod === "Cash on Delivery" ? "Pending" : "Paid", // Simplified for UI-only payments
     });
+
+    // Populate order items product for email
+    const populatedOrder = await Order.findById(order._id).populate("items.product");
+    const user = await User.findById(userId);
+
+    // Send order confirmation email
+    try {
+      const orderUrl = `${process.env.FRONTEND_URL}/profile`;
+      await sendEmail({
+        email: user.email,
+        subject: "Order Confirmation - ElectroMart",
+        html: orderTemplate(populatedOrder, user.fullName, orderUrl),
+      });
+    } catch (err) {
+      console.error("Order confirmation email could not be sent:", err);
+    }
 
     // Reduce stock
     for (let item of orderItems) {
@@ -147,6 +165,19 @@ const cancelOrder = async (req, res) => {
 
     order.orderStatus = "Cancelled";
     await order.save();
+
+    // Send cancellation email
+    try {
+      const user = await User.findById(order.user);
+      const statusUrl = `${process.env.FRONTEND_URL}/profile`;
+      await sendEmail({
+        email: user.email,
+        subject: "Order Cancelled - ElectroMart",
+        html: statusTemplate(order, user.fullName, statusUrl),
+      });
+    } catch (err) {
+      console.error("Order cancellation email could not be sent:", err);
+    }
 
     // Restore stock
     for (let item of order.items) {

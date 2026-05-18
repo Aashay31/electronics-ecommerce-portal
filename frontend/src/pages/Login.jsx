@@ -140,12 +140,12 @@ function Login() {
                   />
                   Show password
                 </label>
-                <a
+                <Link
                   className="text-xs font-semibold text-slate-500 transition hover:text-slate-900"
-                  href="#"
+                  to="/forgot-password"
                 >
                   Forgot Password?
-                </a>
+                </Link>
               </div>
             </div>
 

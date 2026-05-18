@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -65,6 +67,22 @@ function App() {
             element={
               <GuestRoute>
                 <Signup />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <GuestRoute>
+                <ForgotPassword />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <GuestRoute>
+                <ResetPassword />
               </GuestRoute>
             }
           />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FiMapPin, FiCreditCard, FiTruck, FiChevronLeft } from "react-icons/fi";
@@ -14,7 +14,7 @@ function Checkout() {
   const { addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId } = useProfile();
   const navigate = useNavigate();
 
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
@@ -24,17 +24,22 @@ function Checkout() {
 
   useEffect(() => {
     if (items.length === 0) {
-      navigate("/cart");
+      setTimeout(() => navigate("/cart"), 0);
     }
   }, [items, navigate]);
 
-  useEffect(() => {
-    if (addresses.length > 0) {
-      const preferred = addresses.find((a) => a._id === selectedDeliveryAddressId);
-      const defaultAddr = addresses.find((a) => a.isDefault);
-      setSelectedAddress(preferred || defaultAddr || addresses[0]);
+  const selectedAddress = useMemo(() => {
+    if (addresses.length === 0) {
+      return null;
     }
-  }, [addresses, selectedDeliveryAddressId]);
+    if (selectedAddressId) {
+      const found = addresses.find((a) => a._id === selectedAddressId);
+      if (found) return found;
+    }
+    const preferred = addresses.find((a) => a._id === selectedDeliveryAddressId);
+    const defaultAddr = addresses.find((a) => a.isDefault);
+    return preferred || defaultAddr || addresses[0];
+  }, [addresses, selectedAddressId, selectedDeliveryAddressId]);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
@@ -135,7 +140,7 @@ function Checkout() {
                             name="address"
                             className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-600"
                             checked={selectedAddress?._id === address._id}
-                            onChange={() => setSelectedAddress(address)}
+                            onChange={() => setSelectedAddressId(address._id)}
                           />
                           <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-700">
                             Deliver Here

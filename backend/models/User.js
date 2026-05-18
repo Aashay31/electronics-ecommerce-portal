@@ -61,6 +61,8 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
     ],
     savedAddresses: [savedAddressSchema],
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true }
 );

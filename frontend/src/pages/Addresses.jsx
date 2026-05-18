@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -30,15 +30,7 @@ function Addresses() {
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState(emptyForm);
-  useEffect(() => {
-    if (!selectedDeliveryAddressId) {
-      return;
-    }
-    const exists = addresses.some((address) => address._id === selectedDeliveryAddressId);
-    if (!exists) {
-      setSelectedDeliveryAddressId("");
-    }
-  }, [addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId]);
+
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;

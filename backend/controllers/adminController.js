@@ -3,6 +3,8 @@ const fs = require("fs");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const sendEmail = require("../utils/sendEmail");
+const statusTemplate = require("../templates/statusTemplate");
 
 // ─── Dashboard Stats ────────────────────────────────────────────────
 const getStats = async (req, res) => {
@@ -232,6 +234,19 @@ const updateOrderStatus = async (req, res) => {
     }
 
     await order.save();
+
+    // Send status update email
+    try {
+      const user = await User.findById(order.user);
+      const statusUrl = `${process.env.FRONTEND_URL}/profile`;
+      await sendEmail({
+        email: user.email,
+        subject: `Order Status Update: ${deliveryStatus} - ElectroMart`,
+        html: statusTemplate(order, user.fullName, statusUrl),
+      });
+    } catch (err) {
+      console.error("Order status update email could not be sent:", err);
+    }
 
     return res.status(200).json({ success: true, order });
   } catch (error) {
