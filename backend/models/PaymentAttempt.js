@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const orderItemSchema = new mongoose.Schema(
+const paymentItemSchema = new mongoose.Schema(
   {
     product: {
       type: mongoose.Schema.Types.ObjectId,
@@ -33,14 +33,14 @@ const shippingAddressSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const orderSchema = new mongoose.Schema(
+const paymentAttemptSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    items: [orderItemSchema],
+    items: [paymentItemSchema],
     totalAmount: {
       type: Number,
       required: true,
@@ -48,60 +48,34 @@ const orderSchema = new mongoose.Schema(
     shippingAddress: shippingAddressSchema,
     paymentMethod: {
       type: String,
-      enum: ["Cash on Delivery", "UPI", "Card", "Netbanking", "Wallet"],
+      enum: ["UPI", "Card", "Netbanking", "Wallet"],
       required: true,
     },
-    paymentStatus: {
-      type: String,
-      enum: ["Pending", "Paid", "Failed", "Refunded"],
-      default: "Pending",
+    shippingCharge: {
+      type: Number,
+      default: 0,
+    },
+    taxAmount: {
+      type: Number,
+      default: 0,
     },
     razorpayOrderId: {
       type: String,
-      default: null,
+      required: true,
     },
     razorpayPaymentId: {
       type: String,
       default: null,
     },
-    transactionStatus: {
+    status: {
       type: String,
-      enum: ["created", "captured", "failed", "refunded"],
+      enum: ["created", "failed", "completed"],
       default: "created",
-    },
-    orderStatus: {
-      type: String,
-      enum: [
-        "Pending",
-        "Confirmed",
-        "Processing",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-      ],
-      default: "Pending",
-    },
-    cancellationReason: {
-      type: String,
-      default: null,
-    },
-    cancelledBy: {
-      type: String,
-      enum: ["user", "admin"],
-      default: null,
-    },
-    cancelledAt: {
-      type: Date,
-      default: null,
-    },
-    estimatedDelivery: {
-      type: Date,
-      default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     },
   },
   { timestamps: true }
 );
 
-const Order = mongoose.model("Order", orderSchema);
+const PaymentAttempt = mongoose.model("PaymentAttempt", paymentAttemptSchema);
 
-module.exports = Order;
+module.exports = PaymentAttempt;

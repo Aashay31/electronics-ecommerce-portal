@@ -12,7 +12,13 @@ connectDB();
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 // Serve uploaded images as static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -25,6 +31,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
@@ -32,6 +39,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 
 
 const PORT = process.env.PORT || 5000;

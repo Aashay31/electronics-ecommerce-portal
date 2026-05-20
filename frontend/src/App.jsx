@@ -18,6 +18,7 @@ import EditProfile from "./pages/EditProfile";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import OrderSuccess from "./pages/OrderSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Addresses from "./pages/Addresses";
@@ -29,6 +30,7 @@ import AdminDashboard from "./admin/pages/Dashboard";
 import AdminProducts from "./admin/pages/Products";
 import AdminOrders from "./admin/pages/Orders";
 import AdminUsers from "./admin/pages/Users";
+import AdminReviews from "./admin/pages/Reviews";
 import "./App.css";
 
 function App() {
@@ -143,6 +145,14 @@ function App() {
             }
           />
           <Route
+            path="/payment-failed"
+            element={
+              <ProtectedRoute>
+                <PaymentFailure />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/wishlist"
             element={
               <ProtectedRoute>
@@ -179,6 +189,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
         </Routes>

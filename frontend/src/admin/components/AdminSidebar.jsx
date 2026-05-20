@@ -5,6 +5,7 @@ import {
   Package,
   ShoppingCart,
   Users,
+  MessageSquare,
   LogOut,
   ChevronLeft,
   Menu,
@@ -16,6 +17,7 @@ const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/reviews", label: "Reviews", icon: MessageSquare },
   { to: "/admin/users", label: "Users", icon: Users },
 ];
 

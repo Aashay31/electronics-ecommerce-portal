@@ -127,11 +127,15 @@ function Orders() {
             No orders found matching your criteria.
           </div>
         ) : (
-          orders.map((order) => (
-            <div
-              key={order._id}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
-            >
+          orders.map((order) => {
+            const paymentLabel =
+              order.paymentMethod === "Cash on Delivery" ? "COD" : order.paymentStatus || "-";
+
+            return (
+              <div
+                key={order._id}
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+              >
               {/* Order Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50 p-5">
                 <div className="flex flex-wrap items-center gap-6">
@@ -181,6 +185,30 @@ function Orders() {
               {/* Order Details (Expanded) */}
               {expandedOrderId === order._id && (
                 <div className="grid gap-6 p-5 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      <Package className="h-4 w-4 text-slate-400" />
+                      Payment Details
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      <p>
+                        <span className="font-medium text-slate-900">Method:</span> {order.paymentMethod || "-"}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-900">Status:</span> {paymentLabel}
+                      </p>
+                      {order.transactionId && (
+                        <p>
+                          <span className="font-medium text-slate-900">Transaction:</span> {order.transactionId}
+                        </p>
+                      )}
+                      {order.cancellationReason && (
+                        <p>
+                          <span className="font-medium text-slate-900">Cancel Reason:</span> {order.cancellationReason}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                   {/* Customer Info */}
                   <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
@@ -224,8 +252,9 @@ function Orders() {
                   </div>
                 </div>
               )}
-            </div>
-          ))
+              </div>
+            );
+          })
         )}
       </div>
 

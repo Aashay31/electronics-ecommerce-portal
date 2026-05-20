@@ -11,19 +11,41 @@ const getStats = async (req, res) => {
   try {
     const totalProducts = await Product.countDocuments();
     const totalUsers = await User.countDocuments({ role: "user" });
-    const lowStockProducts = await Product.countDocuments({ stock: { $lte: 5 } });
+    const outOfStockProducts = await Product.countDocuments({ stock: { $lte: 0 } });
+    const lowStockProducts = await Product.countDocuments({ stock: { $gt: 0, $lte: 5 } });
 
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ orderStatus: "Pending" });
-    const orders = await Order.find({
+    const revenueOrders = await Order.find({
       orderStatus: { $ne: "Cancelled" },
-      paymentStatus: "Paid",
+      $or: [
+        { paymentMethod: "Cash on Delivery" },
+        { paymentStatus: "Paid", razorpayPaymentId: { $ne: null } },
+      ],
     });
+    const failedPayments = await Order.countDocuments({ paymentStatus: "Failed" });
+    const refundedPayments = await Order.countDocuments({ paymentStatus: "Refunded" });
     
     let totalRevenue = 0;
-    orders.forEach((order) => {
+    revenueOrders.forEach((order) => {
       totalRevenue += order.totalAmount || 0;
     });
+
+    const reviewAggregation = await Product.aggregate([
+      { $unwind: "$reviews" },
+      {
+        $group: {
+          _id: null,
+          totalReviews: { $sum: 1 },
+          averageRating: { $avg: "$reviews.rating" },
+        },
+      },
+    ]);
+
+    const reviewStats = reviewAggregation[0] || {
+      totalReviews: 0,
+      averageRating: 0,
+    };
 
     return res.status(200).json({
       success: true,
@@ -32,13 +54,29 @@ const getStats = async (req, res) => {
         totalUsers,
         totalOrders,
         totalRevenue,
+        failedPayments,
+        refundedPayments,
         pendingOrders,
         lowStockProducts,
+        outOfStockProducts,
+        totalReviews: reviewStats.totalReviews,
+        averageRating: Number((reviewStats.averageRating || 0).toFixed(2)),
       },
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
+};
+
+const buildRatingStats = (reviews = []) => {
+  const totalReviews = reviews.length;
+  if (!totalReviews) {
+    return { averageRating: 0, totalReviews: 0 };
+  }
+  const averageRating =
+    reviews.reduce((sum, review) => sum + (review.rating || 0), 0) /
+    totalReviews;
+  return { averageRating: Number(averageRating.toFixed(2)), totalReviews };
 };
 
 // ─── Product Management ─────────────────────────────────────────────
@@ -136,7 +174,7 @@ const updateProduct = async (req, res) => {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 
@@ -184,6 +222,12 @@ const getOrders = async (req, res) => {
       );
     }
 
+    orders = orders.filter(
+      (o) =>
+        o.paymentMethod === "Cash on Delivery" ||
+        (o.paymentStatus === "Paid" && o.razorpayPaymentId)
+    );
+
     const total = orders.length;
     const skip = (Number(page) - 1) * Number(limit);
     const paginatedOrders = orders.slice(skip, skip + Number(limit));
@@ -198,6 +242,10 @@ const getOrders = async (req, res) => {
       obj.total = o.totalAmount;
       obj.orderedAt = o.createdAt;
       obj.deliveryStatus = o.orderStatus;
+      obj.paymentMethod = o.paymentMethod;
+      obj.paymentStatus = o.paymentStatus;
+      obj.transactionId = o.razorpayPaymentId || o.razorpayOrderId || null;
+      obj.cancellationReason = o.cancellationReason || null;
       return obj;
     });
 
@@ -219,7 +267,7 @@ const updateOrderStatus = async (req, res) => {
   try {
     // Frontend passes /orders/:userId/:orderId but we only need orderId now
     const { orderId } = req.params;
-    const { deliveryStatus } = req.body;
+    const { deliveryStatus, cancellationReason } = req.body;
 
     const order = await Order.findById(orderId);
     if (!order) {
@@ -227,9 +275,22 @@ const updateOrderStatus = async (req, res) => {
     }
 
     if (deliveryStatus) {
+      const wasCancelled = order.orderStatus === "Cancelled";
       order.orderStatus = deliveryStatus;
       if (deliveryStatus === "Delivered" && order.paymentStatus === "Pending") {
         order.paymentStatus = "Paid";
+      }
+      if (deliveryStatus === "Cancelled") {
+        order.cancellationReason = cancellationReason || order.cancellationReason || "Admin override";
+        order.cancelledBy = "admin";
+        order.cancelledAt = new Date();
+        if (!wasCancelled) {
+          for (const item of order.items) {
+            await Product.findByIdAndUpdate(item.product, {
+              $inc: { stock: item.quantity },
+            });
+          }
+        }
       }
     }
 
@@ -322,7 +383,7 @@ const changeUserRole = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { role },
-      { new: true }
+      { returnDocument: "after" }
     ).select("-password");
 
     if (!user) {
@@ -380,6 +441,165 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// ─── Review Management ─────────────────────────────────────────────
+const getReviews = async (req, res) => {
+  try {
+    const { search, rating, sort = "recent", page = 1, limit = 10 } = req.query;
+    const safeLimit = Math.min(Number(limit) || 10, 50);
+    const pageNumber = Math.max(Number(page) || 1, 1);
+    const skip = (pageNumber - 1) * safeLimit;
+
+    const matchStage = {};
+    if (rating) {
+      matchStage["reviews.rating"] = Number(rating);
+    }
+
+    const searchRegex = search ? new RegExp(search, "i") : null;
+
+    const pipeline = [
+      { $unwind: "$reviews" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "reviews.user",
+          foreignField: "_id",
+          as: "reviewUser",
+        },
+      },
+      {
+        $unwind: {
+          path: "$reviewUser",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
+    if (Object.keys(matchStage).length > 0) {
+      pipeline.push({ $match: matchStage });
+    }
+
+    if (searchRegex) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { productName: searchRegex },
+            { "reviews.title": searchRegex },
+            { "reviews.comment": searchRegex },
+            { "reviewUser.fullName": searchRegex },
+            { "reviewUser.email": searchRegex },
+          ],
+        },
+      });
+    }
+
+    let sortStage = { "reviews.createdAt": -1 };
+    if (sort === "highest") {
+      sortStage = { "reviews.rating": -1, "reviews.createdAt": -1 };
+    }
+    if (sort === "lowest") {
+      sortStage = { "reviews.rating": 1, "reviews.createdAt": -1 };
+    }
+    if (sort === "helpful") {
+      sortStage = { "reviews.helpfulCount": -1, "reviews.createdAt": -1 };
+    }
+
+    pipeline.push({ $sort: sortStage });
+    pipeline.push({
+      $facet: {
+        data: [
+          { $skip: skip },
+          { $limit: safeLimit },
+          {
+            $project: {
+              productId: "$_id",
+              productName: 1,
+              imageUrl: 1,
+              reviewId: "$reviews._id",
+              rating: "$reviews.rating",
+              title: "$reviews.title",
+              comment: "$reviews.comment",
+              verifiedPurchase: "$reviews.verifiedPurchase",
+              helpfulCount: "$reviews.helpfulCount",
+              createdAt: "$reviews.createdAt",
+              userId: "$reviewUser._id",
+              userName: "$reviewUser.fullName",
+              userEmail: "$reviewUser.email",
+            },
+          },
+        ],
+        total: [{ $count: "count" }],
+      },
+    });
+
+    const result = await Product.aggregate(pipeline);
+    const data = result[0]?.data || [];
+    const total = result[0]?.total?.[0]?.count || 0;
+
+    return res.status(200).json({
+      success: true,
+      reviews: data,
+      pagination: {
+        total,
+        page: pageNumber,
+        pages: Math.ceil(total / safeLimit) || 1,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const deleteReview = async (req, res) => {
+  try {
+    const { productId, reviewId } = req.params;
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    const review = product.reviews.id(reviewId);
+    if (!review) {
+      return res.status(404).json({ success: false, message: "Review not found" });
+    }
+
+    review.deleteOne();
+    const stats = buildRatingStats(product.reviews || []);
+    product.averageRating = stats.averageRating;
+    product.totalReviews = stats.totalReviews;
+    product.rating = stats.averageRating;
+    product.ratingCount = stats.totalReviews;
+    await product.save();
+
+    return res.status(200).json({ success: true, message: "Review deleted" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getReviewAnalytics = async (req, res) => {
+  try {
+    const topReviewed = await Product.find({ totalReviews: { $gt: 0 } })
+      .select("productName imageUrl totalReviews averageRating")
+      .sort({ totalReviews: -1 })
+      .limit(5);
+
+    const lowestRated = await Product.find({ totalReviews: { $gt: 0 } })
+      .select("productName imageUrl totalReviews averageRating")
+      .sort({ averageRating: 1 })
+      .limit(5);
+
+    return res.status(200).json({
+      success: true,
+      analytics: {
+        topReviewed,
+        lowestRated,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getStats,
   getProducts,
@@ -393,4 +613,7 @@ module.exports = {
   changeUserRole,
   toggleBanUser,
   deleteUser,
+  getReviews,
+  deleteReview,
+  getReviewAnalytics,
 };

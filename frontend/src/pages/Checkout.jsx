@@ -6,17 +6,20 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
 import { useProfile } from "../context/ProfileContext";
+import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
 
 function Checkout() {
   const { items, cartTotal, refreshCart } = useCart();
   const { addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId } = useProfile();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const shippingCharge = cartTotal > 500 ? 0 : 50;
   const taxAmount = cartTotal * 0.18; // 18% GST Example
@@ -41,6 +44,21 @@ function Checkout() {
     return preferred || defaultAddr || addresses[0];
   }, [addresses, selectedAddressId, selectedDeliveryAddressId]);
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       return toast.error("Please select a shipping address");
@@ -49,6 +67,11 @@ function Checkout() {
     if (!selectedAddress.recipientName || !selectedAddress.phoneNumber) {
       return toast.error("Please add recipient name and phone for the selected address");
     }
+
+    const resetProcessing = () => {
+      setIsPlacingOrder(false);
+      setIsProcessingPayment(false);
+    };
 
     setIsPlacingOrder(true);
     try {
@@ -71,20 +94,93 @@ function Checkout() {
         },
         paymentMethod,
         totalAmount: finalTotal,
+        shippingCharge,
+        taxAmount,
       };
 
-      const response = await api.post("/api/orders", payload);
-      
-      if (response.data.success) {
-        toast.success("Order placed successfully!");
-        await refreshCart(); // Refresh cart to empty state
-        setSelectedDeliveryAddressId("");
-        navigate(`/order-success/${response.data.order._id}`);
+      if (paymentMethod === "Cash on Delivery") {
+        const response = await api.post("/api/orders", payload);
+
+        if (response.data.success) {
+          toast.success("Order placed successfully!");
+          await refreshCart();
+          setSelectedDeliveryAddressId("");
+          navigate(`/order-success/${response.data.order._id}`);
+        }
+        resetProcessing();
+        return;
       }
+
+      setIsProcessingPayment(true);
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Unable to load payment gateway. Please try again.");
+        resetProcessing();
+        return;
+      }
+
+      const response = await api.post("/api/payment/create-order", payload);
+
+      if (!response.data.success) {
+        toast.error("Unable to start payment. Please try again.");
+        resetProcessing();
+        return;
+      }
+
+      const options = {
+        key: response.data.key_id,
+        amount: response.data.amount,
+        currency: response.data.currency,
+        name: "ElectroMart",
+        description: "Secure checkout",
+        order_id: response.data.order_id,
+        prefill: {
+          name: user?.fullName || "",
+          email: user?.email || "",
+          contact: user?.phoneNumber || "",
+        },
+        theme: { color: "#4f46e5" },
+        handler: async (responsePayload) => {
+          try {
+            const verifyResponse = await api.post("/api/payment/verify-payment", {
+              ...responsePayload,
+            });
+
+            if (verifyResponse.data.success) {
+              toast.success("Payment verified successfully!");
+              await refreshCart();
+              setSelectedDeliveryAddressId("");
+              navigate(`/order-success/${verifyResponse.data.order._id}`);
+            } else {
+              toast.error("Payment verification failed");
+              navigate("/payment-failed", { state: { reason: "verification" } });
+            }
+          } catch (error) {
+            toast.error(error.response?.data?.message || "Payment verification failed");
+            navigate("/payment-failed", { state: { reason: "verification" } });
+          } finally {
+            resetProcessing();
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            toast.error("Payment was cancelled");
+            navigate("/payment-failed", { state: { reason: "cancelled" } });
+            resetProcessing();
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", (responsePayload) => {
+        toast.error(responsePayload?.error?.description || "Payment failed");
+        navigate("/payment-failed", { state: { reason: "failed" } });
+        resetProcessing();
+      });
+      razorpay.open();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to place order");
-    } finally {
-      setIsPlacingOrder(false);
+      resetProcessing();
     }
   };
 
@@ -183,7 +279,7 @@ function Checkout() {
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                {["Cash on Delivery", "UPI", "Card"].map((method) => (
+                {["Cash on Delivery", "UPI", "Card", "Netbanking", "Wallet"].map((method) => (
                   <label
                     key={method}
                     className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border p-4 text-center transition ${
@@ -201,7 +297,7 @@ function Checkout() {
                     />
                     <span className="text-sm font-semibold text-slate-900">{method}</span>
                     {method !== "Cash on Delivery" && (
-                      <span className="text-xs text-slate-500">(UI Only Simulation)</span>
+                      <span className="text-xs text-slate-500">Razorpay Secure</span>
                     )}
                   </label>
                 ))}
@@ -272,13 +368,19 @@ function Checkout() {
 
                 <button
                   type="button"
-                  disabled={isPlacingOrder || !selectedAddress}
+                  disabled={isPlacingOrder || isProcessingPayment || !selectedAddress}
                   onClick={handlePlaceOrder}
                   className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <FiTruck className="h-4 w-4" />
-                  {isPlacingOrder ? "Processing..." : "Place Order"}
+                  {isPlacingOrder || isProcessingPayment ? "Processing..." : "Place Order"}
                 </button>
+                {isProcessingPayment && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-indigo-600">
+                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+                    Completing payment securely...
+                  </div>
+                )}
               </div>
             </section>
           </div>

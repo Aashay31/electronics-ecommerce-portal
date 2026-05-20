@@ -1,5 +1,54 @@
 const mongoose = require("mongoose");
 
+const reviewSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 2000,
+    },
+    images: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    verifiedPurchase: {
+      type: Boolean,
+      default: false,
+    },
+    helpfulCount: {
+      type: Number,
+      default: 0,
+    },
+    helpfulBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
 const productSchema = new mongoose.Schema({
   productName: {
     type: String,
@@ -48,6 +97,20 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+
+  averageRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+  },
+
+  totalReviews: {
+    type: Number,
+    default: 0,
+  },
+
+  reviews: [reviewSchema],
 
   soldCount: {
     type: Number,

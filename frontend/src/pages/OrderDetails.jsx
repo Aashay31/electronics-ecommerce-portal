@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiMapPin, FiCreditCard, FiPackage, FiTruck, FiXCircle } from "react-icons/fi";
+import { FiArrowLeft, FiMapPin, FiCreditCard, FiPackage, FiTruck, FiXCircle, FiCheckCircle } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import CancelOrderModal from "../components/CancelOrderModal";
 import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
 
@@ -15,6 +16,7 @@ function OrderDetails() {
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -48,15 +50,14 @@ function OrderDetails() {
     };
   }, [id, navigate]);
 
-  const handleCancel = async () => {
-    if (!window.confirm("Are you sure you want to cancel this order?")) return;
-
+  const handleCancel = async (reason) => {
     setIsCancelling(true);
     try {
-      const response = await api.put(`/api/orders/${id}/cancel`);
+      const response = await api.put(`/api/orders/${id}/cancel`, { reason });
       if (response.data.success) {
         toast.success("Order cancelled successfully");
         setOrder(response.data.order); // Update UI
+        setIsCancelModalOpen(false);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to cancel order");
@@ -81,7 +82,15 @@ function OrderDetails() {
 
   const currentStepIndex = statusSteps.indexOf(order.orderStatus);
   const isCancelled = order.orderStatus === "Cancelled";
-  const canCancel = ["Pending", "Confirmed"].includes(order.orderStatus);
+  const isCodOrder = order.paymentMethod === "Cash on Delivery";
+  const paymentLabel = isCodOrder ? "COD" : order.paymentStatus;
+  const canCancel =
+    isCodOrder &&
+    order.paymentStatus !== "Paid" &&
+    ["Pending", "Confirmed"].includes(order.orderStatus);
+  const cancelMessage = !isCodOrder || order.paymentStatus === "Paid"
+    ? "Paid orders cannot be cancelled online"
+    : "This order can no longer be cancelled";
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
@@ -96,17 +105,21 @@ function OrderDetails() {
             <FiArrowLeft className="h-4 w-4" /> Back to Orders
           </Link>
 
-          {canCancel && (
+          {order.orderStatus !== "Cancelled" && (canCancel ? (
             <button
               type="button"
-              onClick={handleCancel}
+              onClick={() => setIsCancelModalOpen(true)}
               disabled={isCancelling}
               className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 disabled:opacity-50"
             >
               <FiXCircle className="h-4 w-4" />
               {isCancelling ? "Cancelling..." : "Cancel Order"}
             </button>
-          )}
+          ) : (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-500" title={cancelMessage}>
+              {cancelMessage}
+            </div>
+          ))}
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -214,6 +227,16 @@ function OrderDetails() {
                   <span className="font-semibold text-slate-900">{order.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>Status</span>
+                  <span className="font-semibold text-slate-900">{paymentLabel}</span>
+                </div>
+                {order.razorpayPaymentId && (
+                  <div className="flex justify-between">
+                    <span>Payment ID</span>
+                    <span className="font-semibold text-slate-900">{order.razorpayPaymentId}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-semibold text-slate-900">₹{order.totalAmount.toLocaleString()}</span>
                 </div>
@@ -260,11 +283,15 @@ function OrderDetails() {
       </main>
 
       <Footer />
+
+      <CancelOrderModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancel}
+        isSubmitting={isCancelling}
+      />
     </div>
   );
 }
-
-// Small workaround for FiCheckCircle import which I forgot above
-import { FiCheckCircle } from "react-icons/fi";
 
 export default OrderDetails;

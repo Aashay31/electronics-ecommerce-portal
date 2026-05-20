@@ -65,6 +65,11 @@ function OrderSuccess() {
                     <p>
                       <span className="font-medium text-slate-900">Payment:</span> {order.paymentMethod}
                     </p>
+                    {order.razorpayPaymentId && (
+                      <p>
+                        <span className="font-medium text-slate-900">Payment ID:</span> {order.razorpayPaymentId}
+                      </p>
+                    )}
                   </div>
                 </div>
 

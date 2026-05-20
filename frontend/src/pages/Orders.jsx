@@ -1,17 +1,46 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiEye } from "react-icons/fi";
+import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useProfile } from "../context/ProfileContext";
 import { resolveImageUrl } from "../utils/imageUrl";
+import CancelOrderModal from "../components/CancelOrderModal";
+import api from "../utils/api";
 
 function Orders() {
   const { orders, loadOrders } = useProfile();
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState(null);
 
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  const handleOpenCancel = (orderId) => {
+    setActiveOrderId(orderId);
+    setIsCancelModalOpen(true);
+  };
+
+  const handleCancel = async (reason) => {
+    if (!activeOrderId) return;
+
+    setIsCancelling(true);
+    try {
+      const response = await api.put(`/api/orders/${activeOrderId}/cancel`, { reason });
+      if (response.data.success) {
+        toast.success("Order cancelled successfully");
+        await loadOrders();
+        setIsCancelModalOpen(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to cancel order");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
@@ -31,12 +60,16 @@ function Orders() {
           </div>
         ) : (
           <div className="space-y-6">
-            {orders.map((order, index) => (
-              <div
-                key={`${order._id || index}`}
-                className="rounded-3xl border border-slate-100 bg-white p-6 shadow-md"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
+            {orders.map((order, index) => {
+              const paymentLabel =
+                order.paymentMethod === "Cash on Delivery" ? "COD" : order.paymentStatus;
+
+              return (
+                <div
+                  key={`${order._id || index}`}
+                  className="rounded-3xl border border-slate-100 bg-white p-6 shadow-md"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                       Order #{order._id.slice(-8).toUpperCase()}
@@ -49,10 +82,16 @@ function Orders() {
                         ? new Date(order.createdAt).toLocaleDateString()
                         : "-"}
                     </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Method: <span className="font-semibold text-slate-700">{order.paymentMethod}</span>
+                      {order.razorpayPaymentId && (
+                        <span className="ml-2 text-slate-400">Txn: {order.razorpayPaymentId.slice(-10)}</span>
+                      )}
+                    </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-xs sm:gap-3 sm:text-sm">
                     <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-700" title="Payment Status">
-                      Payment: {order.paymentStatus}
+                      Payment: {paymentLabel}
                     </span>
                     <span className={`rounded-full px-3 py-1 font-semibold ${
                       order.orderStatus === "Delivered" ? "bg-emerald-100 text-emerald-700" :
@@ -61,6 +100,30 @@ function Orders() {
                     }`} title="Order Status">
                       {order.orderStatus}
                     </span>
+                    {order.orderStatus !== "Cancelled" && (
+                      order.paymentMethod === "Cash on Delivery" &&
+                      ["Pending", "Confirmed"].includes(order.orderStatus) &&
+                      order.paymentStatus !== "Paid" ? (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCancel(order._id)}
+                          className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1 font-semibold text-rose-600 transition hover:bg-rose-100"
+                        >
+                          Cancel Order
+                        </button>
+                      ) : (
+                        <span
+                          className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-semibold text-slate-400"
+                          title={
+                            order.paymentMethod !== "Cash on Delivery" || order.paymentStatus === "Paid"
+                              ? "Paid orders cannot be cancelled online"
+                              : "This order can no longer be cancelled"
+                          }
+                        >
+                          Cancel Disabled
+                        </span>
+                      )
+                    )}
                     <Link
                       to={`/orders/${order._id}`}
                       className="ml-2 flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1 font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -99,13 +162,21 @@ function Orders() {
                     </div>
                   ))}
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </main>
 
       <Footer />
+
+      <CancelOrderModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancel}
+        isSubmitting={isCancelling}
+      />
     </div>
   );
 }

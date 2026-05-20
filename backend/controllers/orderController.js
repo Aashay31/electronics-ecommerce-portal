@@ -4,11 +4,26 @@ const Product = require("../models/Product");
 const sendEmail = require("../utils/sendEmail");
 const orderTemplate = require("../templates/orderTemplate");
 const statusTemplate = require("../templates/statusTemplate");
+
+const normalizeAmount = (value) => {
+  const numberValue = Number(value);
+  if (Number.isNaN(numberValue)) {
+    return 0;
+  }
+  return Math.max(0, Math.round(numberValue * 100) / 100);
+};
 // Place a new order
 const placeOrder = async (req, res) => {
   try {
-    const { items, shippingAddress, paymentMethod, totalAmount } = req.body;
+    const { items, shippingAddress, paymentMethod, totalAmount, shippingCharge, taxAmount } = req.body;
     const userId = req.user.id;
+
+    if (paymentMethod !== "Cash on Delivery") {
+      return res.status(400).json({
+        success: false,
+        message: "Please use Razorpay checkout for online payments",
+      });
+    }
 
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: "No order items" });
@@ -19,7 +34,7 @@ const placeOrder = async (req, res) => {
     }
 
     // Validate stock and calculate total (to prevent frontend tampering)
-    let calculatedTotal = 0;
+    let calculatedSubtotal = 0;
     const orderItems = [];
 
     for (let item of items) {
@@ -29,14 +44,21 @@ const placeOrder = async (req, res) => {
         return res.status(404).json({ success: false, message: `Product not found` });
       }
 
-      if (product.stock < item.quantity) {
+      if (product.stock <= 0) {
         return res.status(400).json({ 
           success: false, 
-          message: `${product.productName} is out of stock. Available: ${product.stock}` 
+          message: "Product is out of stock" 
         });
       }
 
-      calculatedTotal += product.price * item.quantity;
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Requested quantity exceeds available stock" 
+        });
+      }
+
+      calculatedSubtotal += product.price * item.quantity;
       orderItems.push({
         product: product._id,
         quantity: item.quantity,
@@ -50,13 +72,26 @@ const placeOrder = async (req, res) => {
     // Let's assume totalAmount passed from frontend includes tax/shipping, but we'll use our calculated base + flat shipping here if we wanted.
     // To match user prompt, we'll trust the verified products base + any valid shipping. We'll just use the items base for now.
 
+    const safeShipping = normalizeAmount(shippingCharge);
+    const safeTax = normalizeAmount(taxAmount);
+    const calculatedTotal = normalizeAmount(calculatedSubtotal + safeShipping + safeTax);
+    const requestedTotal = normalizeAmount(totalAmount);
+
+    if (!requestedTotal || Math.abs(calculatedTotal - requestedTotal) > 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Total amount mismatch. Please refresh and try again.",
+      });
+    }
+
     const order = await Order.create({
       user: userId,
       items: orderItems,
-      totalAmount: totalAmount || calculatedTotal, // Ideally backend handles full calc, but we accept totalAmount if provided
+      totalAmount: calculatedTotal,
       shippingAddress,
       paymentMethod,
-      paymentStatus: paymentMethod === "Cash on Delivery" ? "Pending" : "Paid", // Simplified for UI-only payments
+      paymentStatus: "Pending",
+      transactionStatus: "created",
     });
 
     // Populate order items product for email
@@ -98,7 +133,13 @@ const placeOrder = async (req, res) => {
 // Get User's Orders
 const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id })
+    const orders = await Order.find({
+      user: req.user.id,
+      $or: [
+        { paymentMethod: "Cash on Delivery" },
+        { paymentStatus: "Paid", razorpayPaymentId: { $ne: null } },
+      ],
+    })
       .populate("items.product", "productName imageUrl price category")
       .sort({ createdAt: -1 });
 
@@ -156,14 +197,26 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    if (!["Pending", "Confirmed"].includes(order.orderStatus)) {
+    if (["Shipped", "Delivered"].includes(order.orderStatus)) {
       return res.status(400).json({ 
         success: false, 
-        message: "Cannot cancel order that is already processing or shipped" 
+        message: "Cannot cancel order that is already shipped or delivered" 
       });
     }
 
+    if (order.paymentMethod !== "Cash on Delivery" || order.paymentStatus === "Paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Paid orders cannot be cancelled",
+      });
+    }
+
+    const { reason } = req.body;
+
     order.orderStatus = "Cancelled";
+    order.cancellationReason = reason || order.cancellationReason || "Ordered by mistake";
+    order.cancelledBy = "user";
+    order.cancelledAt = new Date();
     await order.save();
 
     // Send cancellation email

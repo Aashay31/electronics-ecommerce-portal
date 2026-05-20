@@ -36,17 +36,58 @@ function Products() {
   const [deleteId, setDeleteId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Quick Stock Edit state
+  const [quickEditStockId, setQuickEditStockId] = useState(null);
+  const [quickStockValue, setQuickStockValue] = useState("");
+  const [isQuickUpdating, setIsQuickUpdating] = useState(false);
+
+  // Inventory Overview stats
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    lowStockProducts: 0,
+    outOfStockProducts: 0,
+  });
+
   const fetchProducts = async (page = 1, searchQuery = search) => {
     try {
-      const response = await api.get("/api/admin/products", {
-        params: { page, limit: 10, search: searchQuery },
-      });
-      setProducts(response.data.products);
-      setPagination(response.data.pagination);
+      const [prodRes, statsRes] = await Promise.all([
+        api.get("/api/admin/products", {
+          params: { page, limit: 10, search: searchQuery },
+        }),
+        api.get("/api/admin/stats").catch(() => null)
+      ]);
+      
+      setProducts(prodRes.data.products);
+      setPagination(prodRes.data.pagination);
+
+      if (statsRes && statsRes.data?.success) {
+        setStats(statsRes.data.stats);
+      }
     } catch {
       toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleQuickStockSubmit = async (productId) => {
+    const val = Number(quickStockValue);
+    if (quickStockValue === "" || isNaN(val) || val < 0) {
+      toast.error("Please enter a valid stock quantity");
+      return;
+    }
+    setIsQuickUpdating(true);
+    try {
+      await api.put(`/api/admin/products/${productId}`, {
+        stock: val,
+      });
+      toast.success("Stock updated successfully");
+      setQuickEditStockId(null);
+      fetchProducts(pagination.page, search);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update stock");
+    } finally {
+      setIsQuickUpdating(false);
     }
   };
 
@@ -221,6 +262,39 @@ function Products() {
         </button>
       </div>
 
+      {/* Inventory Alerts & Overview */}
+      <div className="grid gap-5 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Catalog Items</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-slate-900">{stats.totalProducts}</span>
+            <span className="text-xs text-slate-500">Products</span>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-500">Low Stock Alerts</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-amber-600">{stats.lowStockProducts}</span>
+            <span className="text-xs text-amber-500">Items (1-5 stock)</span>
+          </div>
+          {stats.lowStockProducts > 0 && (
+            <p className="mt-2 text-xs text-amber-700 font-medium">⚠️ Action required: Replenish stock soon.</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-rose-100 bg-rose-50/30 p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">Out of Stock Alerts</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-rose-600 animate-pulse">{stats.outOfStockProducts}</span>
+            <span className="text-xs text-rose-500">Items (0 stock)</span>
+          </div>
+          {stats.outOfStockProducts > 0 && (
+            <p className="mt-2 text-xs text-rose-700 font-medium">🚨 Customers cannot purchase these items!</p>
+          )}
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
         <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -302,17 +376,67 @@ function Products() {
                       ₹{product.price.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          product.stock > 10
-                            ? "bg-emerald-50 text-emerald-700"
-                            : product.stock > 0
-                            ? "bg-amber-50 text-amber-700"
-                            : "bg-rose-50 text-rose-700"
-                        }`}
-                      >
-                        {product.stock} in stock
-                      </span>
+                      {quickEditStockId === product._id ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-16 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-indigo-500 focus:outline-none"
+                            value={quickStockValue}
+                            onChange={(e) => setQuickStockValue(e.target.value)}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleQuickStockSubmit(product._id)}
+                            disabled={isQuickUpdating}
+                            className="rounded-lg bg-emerald-600 p-1 text-white hover:bg-emerald-700 transition"
+                            title="Save"
+                          >
+                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setQuickEditStockId(null)}
+                            className="rounded-lg bg-slate-100 p-1 text-slate-500 hover:bg-slate-200 transition"
+                            title="Cancel"
+                          >
+                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 group">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                              product.stock <= 0
+                                ? "bg-rose-50 border-rose-200 text-rose-700 animate-pulse"
+                                : product.stock <= 5
+                                ? "bg-amber-50 border-amber-200 text-amber-700 font-bold"
+                                : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                            }`}
+                          >
+                            {product.stock <= 0
+                              ? "Out of Stock"
+                              : product.stock <= 5
+                              ? `Low Stock (${product.stock})`
+                              : `In Stock (${product.stock})`}
+                          </span>
+                          <button
+                            onClick={() => {
+                              setQuickEditStockId(product._id);
+                              setQuickStockValue(product.stock);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition rounded p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                            title="Quick Edit Stock"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">

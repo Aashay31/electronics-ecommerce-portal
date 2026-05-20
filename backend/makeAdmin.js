@@ -9,9 +9,9 @@ async function makeAdmin() {
 
     // Update the first user found to be an admin
     const user = await User.findOneAndUpdate(
-      {}, 
+      {},
       { role: "admin" },
-      { new: true, sort: { createdAt: 1 } }
+      { returnDocument: "after", sort: { createdAt: 1 } }
     );
 
     if (user) {

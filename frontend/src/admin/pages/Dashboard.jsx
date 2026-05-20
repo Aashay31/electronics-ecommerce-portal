@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Package, Users, ShoppingCart, IndianRupee, Clock, AlertTriangle } from "lucide-react";
+import {
+  Package,
+  Users,
+  ShoppingCart,
+  IndianRupee,
+  Clock,
+  AlertTriangle,
+  Star,
+  MessageSquare,
+} from "lucide-react";
 import api from "../../utils/api";
 import StatsCard from "../components/StatsCard";
 
@@ -63,6 +72,18 @@ function Dashboard() {
           color="amber"
         />
         <StatsCard
+          title="Failed Payments"
+          value={stats?.failedPayments || 0}
+          icon={AlertTriangle}
+          color="rose"
+        />
+        <StatsCard
+          title="Refunded Payments"
+          value={stats?.refundedPayments || 0}
+          icon={AlertTriangle}
+          color="amber"
+        />
+        <StatsCard
           title="Total Products"
           value={stats?.totalProducts || 0}
           icon={Package}
@@ -72,6 +93,12 @@ function Dashboard() {
           title="Low Stock Items"
           value={stats?.lowStockProducts || 0}
           icon={AlertTriangle}
+          color="amber"
+        />
+        <StatsCard
+          title="Out of Stock Items"
+          value={stats?.outOfStockProducts || 0}
+          icon={AlertTriangle}
           color="rose"
         />
         <StatsCard
@@ -79,6 +106,18 @@ function Dashboard() {
           value={stats?.totalUsers || 0}
           icon={Users}
           color="violet"
+        />
+        <StatsCard
+          title="Total Reviews"
+          value={stats?.totalReviews || 0}
+          icon={MessageSquare}
+          color="indigo"
+        />
+        <StatsCard
+          title="Average Rating"
+          value={stats?.averageRating ? stats.averageRating.toFixed(1) : "0.0"}
+          icon={Star}
+          color="amber"
         />
       </div>
     </div>

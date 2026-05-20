@@ -15,6 +15,9 @@ const {
   changeUserRole,
   toggleBanUser,
   deleteUser,
+  getReviews,
+  deleteReview,
+  getReviewAnalytics,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -41,5 +44,10 @@ router.get("/users/:id", getUserDetail);
 router.put("/users/:id/role", changeUserRole);
 router.put("/users/:id/ban", toggleBanUser);
 router.delete("/users/:id", deleteUser);
+
+// Reviews
+router.get("/reviews", getReviews);
+router.get("/reviews/analytics", getReviewAnalytics);
+router.delete("/reviews/:productId/:reviewId", deleteReview);
 
 module.exports = router;

@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useProfile } from "../context/ProfileContext";
 import { useAuth } from "../context/AuthContext";
 import { resolveImageUrl } from "../utils/imageUrl";
+import StarRating from "./StarRating";
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -65,13 +66,23 @@ function ProductCard({ product }) {
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
             {product.category}
           </span>
-          <span className="text-sm text-slate-500">
-            Stock: {product.stock}
-          </span>
+          {product.stock <= 0 ? (
+            <span className="rounded-full bg-rose-50 border border-rose-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-600 animate-pulse">
+              Out of Stock
+            </span>
+          ) : product.stock <= 5 ? (
+            <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">
+              Only {product.stock} Left
+            </span>
+          ) : (
+            <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+              In Stock
+            </span>
+          )}
         </div>
 
         <h2 className="mt-3 min-h-[3rem] text-base font-semibold text-slate-900 line-clamp-2">
@@ -81,6 +92,16 @@ function ProductCard({ product }) {
         <p className="mt-2 min-h-[2.5rem] text-sm text-slate-600 line-clamp-2">
           {product.description}
         </p>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <StarRating value={product.averageRating ?? product.rating ?? 0} readOnly size={14} />
+          <span className="text-xs font-semibold text-slate-500">
+            {(product.averageRating ?? product.rating ?? 0).toFixed(1)}
+          </span>
+          <span className="text-[10px] text-slate-400">
+            ({product.totalReviews ?? product.ratingCount ?? 0})
+          </span>
+        </div>
       </Link>
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-4">
@@ -88,10 +109,15 @@ function ProductCard({ product }) {
         <button
           type="button"
           onClick={handleAddToCart}
-          className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-slate-900 px-3 py-2 text-[11px] font-semibold text-white shadow-sm shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
+          disabled={product.stock <= 0}
+          className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-[11px] font-semibold transition ${
+            product.stock <= 0
+              ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+              : "bg-slate-900 text-white shadow-sm shadow-slate-900/30 hover:-translate-y-0.5 hover:bg-slate-800"
+          }`}
         >
           <FiShoppingCart className="h-4 w-4" />
-          Add to Cart
+          {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </div>
