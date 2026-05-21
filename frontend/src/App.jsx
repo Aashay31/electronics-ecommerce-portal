@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { SearchProvider } from "./context/SearchContext";
+import { AssistantProvider } from "./assistant/AssistantContext";
+import ChatWidget from "./assistant/ChatWidget";
 
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
@@ -36,9 +38,20 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      <SearchProvider>
-        <Toaster position="top-right" />
-        <Routes>
+      <AssistantProvider>
+        <SearchProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                borderRadius: "18px",
+                background: "#0f172a",
+                color: "#e2e8f0",
+                border: "1px solid rgba(148, 163, 184, 0.15)",
+              },
+            }}
+          />
+          <Routes>
           <Route path="/" element={<Landing />} />
           <Route
             path="/home"
@@ -192,8 +205,10 @@ function App() {
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
-        </Routes>
-      </SearchProvider>
+          </Routes>
+          <ChatWidget />
+        </SearchProvider>
+      </AssistantProvider>
     </BrowserRouter>
   );
 }

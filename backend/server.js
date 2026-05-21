@@ -32,6 +32,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const assistantRoutes = require("./routes/assistantRoutes");
 
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
@@ -40,6 +41,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/assistant", assistantRoutes);
 
 
 const PORT = process.env.PORT || 5000;

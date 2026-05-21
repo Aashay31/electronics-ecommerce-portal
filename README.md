@@ -2,6 +2,33 @@
 
 A full-featured e-commerce platform for browsing, purchasing, and managing electronic products with comprehensive admin controls and secure authentication.
 
+### 📧 Email System
+Automated email notifications for critical user actions:
+
+#### Email Templates
+- **Order Confirmation Email**: Sent immediately after successful order placement (COD or Razorpay)
+  - Order number and items list
+  - Order total with formatted pricing
+  - Shipping address confirmation
+  - Direct link to order tracking
+  - Professional HTML-formatted template
+
+- **Welcome Email**: Sent on user registration
+- **Password Reset Email**: Sent when user requests password recovery
+- **Order Status Update Email**: Sent when order status changes (Confirmed, Processing, Shipped, Delivered)
+
+#### Email Configuration
+- **Provider**: Nodemailer with SMTP support (Gmail, custom servers, etc.)
+- **Async Delivery**: Non-blocking email sending - failures don't block order processing
+- **Error Handling**: Graceful fallback if email fails; order still completes successfully
+- **Environment Variables**: 
+  - `EMAIL_HOST`: SMTP server hostname
+  - `EMAIL_PORT`: SMTP port (usually 465 for secure, 587 for TLS)
+  - `EMAIL_USER`: Sender email account
+  - `EMAIL_PASS`: Sender email password
+  - `FROM_NAME`: Display name for sender
+  - `FROM_EMAIL`: From email address
+
 ---
 
 ## 📋 Table of Contents
@@ -73,6 +100,27 @@ A full-featured e-commerce platform for browsing, purchasing, and managing elect
 - **Protected Browsing Experience**: Core shopping pages (Home, Shop, Product Details) are restricted to registered members, with elegant redirects and toast notifications for guests
 - **Local Network Testing Support**: API requests dynamically resolve to the host IP instead of localhost when testing on mobile devices via Wi-Fi
 
+### 🤖 AI Chatbot Assistant
+Intelligent support powered by Groq AI with real-time order management and product expertise:
+
+#### Assistant Features
+- **Order Tracking**: Instant order status lookup with delivery timelines and tracking details
+- **Order Cancellation**: Smart eligibility assessment with real-time cancellation support for eligible orders
+- **Product Recommendations**: AI-powered product suggestions based on budget and preferences
+- **Product Comparison**: Compare two electronics side-by-side with detailed specifications
+- **Electronics Guidance**: Expert knowledge on sensors, Arduino, ESP32, IoT components, and robotics
+- **Payment & Delivery Help**: Assistance with payment methods and shipping inquiries
+- **Conversation History**: Persistent chat sessions per user with context awareness
+- **Quick Actions**: Pre-built action buttons for common tasks (Track Orders, Recommend Products, Compare, Payment Help, Delivery Help)
+- **Rich Response Format**: Orders and products rendered with actionable buttons and detailed information
+
+#### Assistant Technical Details
+- **AI Engine**: Groq SDK for fast, real-time responses
+- **Context Awareness**: Tracks active orders and products within conversation
+- **Order Snapshots**: Real-time hydration of order data with payment and status information
+- **Intent Detection**: Automatic detection of user intent (track, cancel, recommend, compare, general support)
+- **Smart Search**: Multi-field product search with budget filtering and relevance sorting
+
 ### 📊 Admin Dashboard
 Comprehensive analytics and management tools:
 
@@ -127,6 +175,9 @@ Comprehensive analytics and management tools:
 | **Database** | MongoDB with Mongoose 9.6.2 |
 | **Authentication** | JWT (JSON Web Tokens) |
 | **Password Hashing** | bcrypt 5.1.1 |
+| **AI Assistant** | Groq SDK for real-time LLM responses |
+| **Email Service** | Nodemailer with SMTP |
+| **Payment Gateway** | Razorpay integration |
 
 ---
 
@@ -157,14 +208,48 @@ electronics-ecommerce-portal/
 │   │   └── PaymentAttempt.js        # Razorpay payment attempt schema
 │   ├── routes/
 │   │   ├── adminRoutes.js           # Admin endpoints
+│   │   ├── assistantRoutes.js       # AI chatbot endpoints
 │   │   ├── authRoutes.js            # Auth endpoints
 │   │   ├── cartRoutes.js            # Cart endpoints
 │   │   ├── orderRoutes.js           # Order endpoints
 │   │   ├── paymentRoutes.js         # Razorpay endpoints
 │   │   ├── productRoutes.js         # Product endpoints
 │   │   └── userRoutes.js            # User endpoints
+│   ├── models/
+│   │   ├── ChatSession.js           # AI chat session schema
+│   │   ├── User.js                  # User schema
+│   │   ├── Product.js               # Product schema
+│   │   ├── Order.js                 # Order schema
+│   │   └── PaymentAttempt.js        # Razorpay payment attempt schema
+│   ├── middleware/
+│   │   ├── adminMiddleware.js       # Admin role verification
+│   │   ├── authMiddleware.js        # Token validation
+│   │   ├── optionalAuth.js          # Optional token validation
+│   │   └── upload.js                # Multer image upload configuration
+│   ├── services/
+│   │   ├── assistantService.js      # AI chatbot logic and utilities
+│   │   ├── orderCancellationService.js  # Order cancellation logic
+│   │   └── orderSupportService.js   # Order support utilities and snapshots
+│   ├── controllers/
+│   │   ├── adminController.js       # Admin operations
+│   │   ├── assistantController.js   # AI chatbot controller
+│   │   ├── authController.js        # Authentication logic
+│   │   ├── cartController.js        # Cart management
+│   │   ├── orderController.js       # Order operations
+│   │   ├── paymentController.js     # Razorpay payment operations
+│   │   ├── productController.js     # Product operations
+│   │   └── userController.js        # User profile operations
+│   ├── templates/
+│   │   ├── orderTemplate.js         # Order confirmation email template
+│   │   ├── resetPasswordTemplate.js # Password reset email template
+│   │   ├── statusTemplate.js        # Order status update email template
+│   │   └── welcomeTemplate.js       # Welcome email template
 │   ├── utils/
-│   │   └── jwt.js                   # JWT token utilities
+│   │   ├── jwt.js                   # JWT token utilities
+│   │   ├── sendEmail.js             # Email sending utility (Nodemailer)
+│   │   └── imageUrl.js              # Image URL resolution utility
+│   ├── uploads/
+│   │   └── products/                # Uploaded product images directory
 │   ├── server.js                    # Express server setup
 │   ├── makeAdmin.js                 # Admin creation utility
 │   └── package.json
@@ -361,6 +446,15 @@ npm run build
 | PUT | `/admin/users/:id/ban` | Toggle user ban status |
 | DELETE | `/admin/users/:id` | Delete user |
 
+### AI Assistant Routes (`/api/assistant`) - Protected
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/assistant/chat` | Send message to AI assistant |
+| GET | `/assistant/session` | Get or create chat session |
+| GET | `/assistant/session/messages` | Get session conversation history |
+| DELETE | `/assistant/session` | Clear session |
+| POST | `/assistant/quick-action` | Handle quick action buttons |
+
 ---
 
 ## 🗄️ Database Models
@@ -450,10 +544,46 @@ npm run build
     pincode: String
     country: String
   }
-  paymentMethod: String (values: "Cash on Delivery" | "UPI" | "Card")
-  paymentStatus: String (values: "Pending" | "Paid" | "Failed")
+  paymentMethod: String (values: "Cash on Delivery" | "UPI" | "Card" | "Netbanking" | "Wallet")
+  paymentStatus: String (values: "Pending" | "Paid" | "Failed" | "Refunded")
+  razorpayOrderId: String (default: null)
+  razorpayPaymentId: String (default: null)
+  transactionStatus: String (values: "created" | "captured" | "failed" | "refunded")
   orderStatus: String (values: "Pending" | "Confirmed" | "Processing" | "Shipped" | "Delivered" | "Cancelled")
+  cancellationReason: String
+  cancelledBy: String (values: "user" | "admin")
+  cancelledAt: Date
   estimatedDelivery: Date (default: current date + 7 days)
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+```
+
+### ChatSession Model (AI Assistant)
+```
+{
+  user: ObjectId (reference to User, required)
+  messages: Array of {
+    role: String (values: "user" | "assistant")
+    content: String (message text)
+    richContent: Object {
+      intent: String (detected user intent)
+      summary: String
+      quickActions: Array of action buttons
+      products: Array of product snapshots
+      orders: Array of order snapshots
+      comparison: Object (product comparison data)
+    }
+    createdAt: Timestamp
+  }
+  title: String (conversation title derived from first message)
+  summary: String (brief conversation summary)
+  lastIntent: String (last detected user intent)
+  context: Object {
+    activeOrderId: ObjectId
+    activeProductIds: Array of ObjectId
+    lastResolvedReference: String
+  }
   createdAt: Timestamp
   updatedAt: Timestamp
 }
@@ -493,6 +623,9 @@ npm run build
 - ✅ **Revenue Tracking**: Calculated from delivered orders only
 - ✅ **Order Cancellation**: Restricted to early stages (Pending/Confirmed) only
 - ✅ **Real-time Statistics**: Live dashboard metrics
+- ✅ **AI-Powered Support**: Smart chatbot for order tracking, cancellation, product recommendations
+- ✅ **Automated Email Notifications**: Order confirmation, status updates, password reset emails
+- ✅ **Razorpay Webhook Integration**: Real-time payment status updates from payment gateway
 
 ---
 
@@ -503,11 +636,30 @@ npm run build
 MONGODB_URI=mongodb://username:password@host:port/database
 JWT_SECRET=your_super_secret_key
 PORT=5000
+
+# Email Configuration (Nodemailer)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=465
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+FROM_NAME=ElectroMart
+FROM_EMAIL=noreply@electromart.com
+
+# Razorpay Configuration
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+
+# AI Assistant (Groq)
+GROQ_API_KEY=your_groq_api_key
+
+# Frontend URL (for email links)
+FRONTEND_URL=http://localhost:5173
 ```
 
-### Frontend (src/utils/api.js)
+### Frontend (.env)
 ```
-API_BASE_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ---

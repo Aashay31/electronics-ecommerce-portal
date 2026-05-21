@@ -3,7 +3,7 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 const sendEmail = require("../utils/sendEmail");
 const orderTemplate = require("../templates/orderTemplate");
-const statusTemplate = require("../templates/statusTemplate");
+const { cancelOrderForUser } = require("../services/orderCancellationService");
 
 const normalizeAmount = (value) => {
   const numberValue = Number(value);
@@ -180,64 +180,12 @@ const getOrderById = async (req, res) => {
 // Cancel Order
 const cancelOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
-    }
-
-    if (order.user.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: "Not authorized" });
-    }
-
-    if (order.orderStatus === "Cancelled") {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Order is already cancelled" 
-      });
-    }
-
-    if (["Shipped", "Delivered"].includes(order.orderStatus)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Cannot cancel order that is already shipped or delivered" 
-      });
-    }
-
-    if (order.paymentMethod !== "Cash on Delivery" || order.paymentStatus === "Paid") {
-      return res.status(400).json({
-        success: false,
-        message: "Paid orders cannot be cancelled",
-      });
-    }
-
     const { reason } = req.body;
-
-    order.orderStatus = "Cancelled";
-    order.cancellationReason = reason || order.cancellationReason || "Ordered by mistake";
-    order.cancelledBy = "user";
-    order.cancelledAt = new Date();
-    await order.save();
-
-    // Send cancellation email
-    try {
-      const user = await User.findById(order.user);
-      const statusUrl = `${process.env.FRONTEND_URL}/profile`;
-      await sendEmail({
-        email: user.email,
-        subject: "Order Cancelled - ElectroMart",
-        html: statusTemplate(order, user.fullName, statusUrl),
-      });
-    } catch (err) {
-      console.error("Order cancellation email could not be sent:", err);
-    }
-
-    // Restore stock
-    for (let item of order.items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: item.quantity }
-      });
-    }
+    const order = await cancelOrderForUser({
+      orderId: req.params.id,
+      userId: req.user.id,
+      reason,
+    });
 
     return res.status(200).json({
       success: true,
@@ -245,7 +193,15 @@ const cancelOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    if (error.assessment) {
+      return res.status(error.statusCode || 400).json({
+        success: false,
+        message: error.assessment.shortMessage,
+        assessment: error.assessment,
+      });
+    }
+
+    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
   }
 };
 
