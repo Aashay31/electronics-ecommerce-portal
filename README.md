@@ -43,6 +43,9 @@ A full-featured e-commerce platform for browsing, purchasing, and managing elect
   - Cash on Delivery (COD)
   - UPI Payments
   - Card Payments
+- **Secure Online Payments**: Razorpay order creation + signature verification before order confirmation
+- **COD Instant Orders**: COD orders are created immediately after placement
+- **Payment Failure Handling**: Cancelled/failed online payments do not create orders
 - **Address Selection**: Choose from saved addresses or use default shipping address
 - **Order Tracking**: Monitor orders through complete lifecycle:
   - Pending → Confirmed → Processing → Shipped → Delivered
@@ -77,7 +80,7 @@ Comprehensive analytics and management tools:
 - **Total Products**: Quantity of all products in catalog
 - **Total Users**: Count of all registered users
 - **Total Orders**: Number of all placed orders
-- **Total Revenue**: Sum of all order amounts (from delivered orders)
+- **Total Revenue**: Sum of COD orders and paid Razorpay orders
 - **Pending Orders**: Orders awaiting processing
 - **Low Stock Alert**: Products with 5 or fewer units
 
@@ -140,6 +143,7 @@ electronics-ecommerce-portal/
 │   │   ├── authController.js        # Authentication logic
 │   │   ├── cartController.js        # Cart management
 │   │   ├── orderController.js       # Order operations
+│   │   ├── paymentController.js     # Razorpay payment operations
 │   │   ├── productController.js     # Product operations
 │   │   └── userController.js        # User profile operations
 │   ├── middleware/
@@ -149,12 +153,14 @@ electronics-ecommerce-portal/
 │   ├── models/
 │   │   ├── User.js                  # User schema
 │   │   ├── Product.js               # Product schema
-│   │   └── Order.js                 # Order schema
+│   │   ├── Order.js                 # Order schema
+│   │   └── PaymentAttempt.js        # Razorpay payment attempt schema
 │   ├── routes/
 │   │   ├── adminRoutes.js           # Admin endpoints
 │   │   ├── authRoutes.js            # Auth endpoints
 │   │   ├── cartRoutes.js            # Cart endpoints
 │   │   ├── orderRoutes.js           # Order endpoints
+│   │   ├── paymentRoutes.js         # Razorpay endpoints
 │   │   ├── productRoutes.js         # Product endpoints
 │   │   └── userRoutes.js            # User endpoints
 │   ├── utils/
@@ -317,6 +323,13 @@ npm run build
 | GET | `/orders/:id` | Get specific order details |
 | PUT | `/orders/:id/cancel` | Cancel order |
 
+### Payment Routes (`/api/payment`) - Protected
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/payment/create-order` | Create Razorpay order (no ecommerce order yet) |
+| POST | `/payment/verify-payment` | Verify payment and create ecommerce order |
+| POST | `/payment/webhook` | Razorpay webhook handler |
+
 ### User Profile Routes (`/api/users`) - Protected
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -397,6 +410,24 @@ npm run build
   stock: Number (required)
   imageUrl: String (default: provided)
   featured: Boolean (default: false)
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+```
+
+### PaymentAttempt Model
+```
+{
+  user: ObjectId (reference to User)
+  items: Array of { product: ObjectId, quantity: Number, price: Number }
+  totalAmount: Number
+  shippingAddress: Object
+  paymentMethod: String (UPI | Card | Netbanking | Wallet)
+  shippingCharge: Number
+  taxAmount: Number
+  razorpayOrderId: String
+  razorpayPaymentId: String
+  status: String (created | failed | completed)
   createdAt: Timestamp
   updatedAt: Timestamp
 }
