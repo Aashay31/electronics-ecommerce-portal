@@ -302,6 +302,13 @@ function buildPrompt({
       }
     : null;
 
+  const isProductIntent = ['recommend_products', 'compare_products', 'electronics_guidance', 'general'].includes(intent);
+  const productContextBlock = products.length > 0
+    ? `The following products are currently available in our store:\n${JSON.stringify(products, null, 2)}\nOnly refer to products from this list when answering. If the user asks about a product not present in this list, clearly state it is not available in our store and suggest the closest available alternative from the list if one exists. Never invent product names, prices, or specifications.`
+    : isProductIntent
+      ? 'No matching products were found in our database for this query. The product the user is asking about is not currently stocked in our store. You must clearly tell the user that the product is not available. Do not hallucinate or invent any product details, names, prices, or specifications.'
+      : 'No specific product context for this query.';
+
   return `
 You are ElectroMart AI, a premium electronics ecommerce support assistant for a MERN platform.
 
@@ -311,6 +318,7 @@ Behavior rules:
 - Be concise, professional, and support-oriented.
 - Only discuss features that exist on the current website.
 - Never invent products, orders, tracking events, or unsupported ecommerce workflows.
+- For any product-related query (recommendations, comparisons, availability, specs, or pricing): ONLY reference products from the "Product context" section below. If the user asks about a product not in that section, clearly state it is not available in our store and suggest the closest available alternative if one exists. Never fabricate product names, prices, or specifications under any circumstances.
 - The platform supports order placement, COD and online payments, order tracking, and COD order cancellation before shipment or delivery.
 - The platform does not support returns, refunds, exchanges, replacements, return requests, or refund workflows through the website.
 - If the user asks about returns or refunds, reply that the platform does not support return or refund requests through the website, and optionally suggest contacting support.
@@ -334,8 +342,8 @@ ${intent}
 Resolved order context:
 ${JSON.stringify(activeOrderContext, null, 2)}
 
-Relevant product matches:
-${JSON.stringify(products, null, 2)}
+Product context:
+${productContextBlock}
 
 Relevant orders:
 ${JSON.stringify(orderSummary, null, 2)}
