@@ -34,12 +34,43 @@ function extractBudget(text) {
 }
 
 function extractComparisonTerms(text) {
-  const match = text.match(/(.+?)\s+(?:vs|versus|compare)\s+(.+)/i);
-  if (!match) {
-    return [];
+  const cleaned = text
+    .replace(/[^\w\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Pattern 1: "compare X and Y", "compare X with Y", "compare X & Y"
+  let match = cleaned.match(
+    /\bcompare\s+(.+?)\s+(?:and|with|&|,)\s+(.+)/i
+  );
+  if (match) return [match[1].trim(), match[2].trim()].filter(Boolean);
+
+  // Pattern 2: "X vs Y", "X versus Y"
+  match = cleaned.match(/(.+?)\s+(?:vs\.?|versus)\s+(.+)/i);
+  if (match) return [match[1].trim(), match[2].trim()].filter(Boolean);
+
+  // Pattern 3: "difference between X and Y", "differences between X and Y"
+  match = cleaned.match(
+    /\bdifferences?\s+between\s+(.+?)\s+(?:and|&|,)\s+(.+)/i
+  );
+  if (match) return [match[1].trim(), match[2].trim()].filter(Boolean);
+
+  // Pattern 4: "compare X" (single product, no second term)
+  match = cleaned.match(/\bcompare\s+(.+)/i);
+  if (match) {
+    // Attempt to split on "and" / "," in case of "compare X, Y"
+    const parts = match[1].split(/\s+(?:and|&)\s+|,\s*/i).filter(Boolean);
+    if (parts.length >= 2) return [parts[0].trim(), parts[1].trim()];
+    return [parts[0].trim()];
   }
 
-  return [match[1].trim(), match[2].trim()].filter(Boolean);
+  return [];
+}
+
+// Strip common filler words from a comparison term to get cleaner search keywords
+function cleanSearchTerm(term) {
+  const fillers = /\b(the|a|an|this|that|with|for|and|or|of|is|it|its|my|your|our|their|between|compare|comparison|difference|differences|vs|versus|product|products)\b/gi;
+  return term.replace(fillers, " ").replace(/\s+/g, " ").trim();
 }
 
 function detectIntent(message, quickAction) {
@@ -105,6 +136,30 @@ async function searchProductsByTerms(text, limit = 6) {
 
   return Product.find(filter)
     .sort({ featured: -1, rating: -1, soldCount: -1, price: 1 })
+    .limit(limit);
+}
+
+// Fuzzy search for a single comparison term – splits the term into keywords
+// and matches any keyword against productName, category, or description.
+async function searchProductByFuzzyTerm(term, limit = 3) {
+  const cleaned = cleanSearchTerm(term);
+  const keywords = normalizeText(cleaned)
+    .split(" ")
+    .filter((k) => k.length > 1)
+    .slice(0, 6);
+
+  if (keywords.length === 0) return [];
+
+  const pattern = keywords.join("|");
+  return Product.find({
+    stock: { $gt: 0 },
+    $or: [
+      { productName: { $regex: pattern, $options: "i" } },
+      { category: { $regex: pattern, $options: "i" } },
+      { description: { $regex: pattern, $options: "i" } },
+    ],
+  })
+    .sort({ stock: -1, rating: -1, soldCount: -1 })
     .limit(limit);
 }
 
@@ -303,11 +358,17 @@ function buildPrompt({
     : null;
 
   const isProductIntent = ['recommend_products', 'compare_products', 'electronics_guidance', 'general'].includes(intent);
-  const productContextBlock = products.length > 0
-    ? `The following products are currently available in our store:\n${JSON.stringify(products, null, 2)}\nOnly refer to products from this list when answering. If the user asks about a product not present in this list, clearly state it is not available in our store and suggest the closest available alternative from the list if one exists. Never invent product names, prices, or specifications.`
-    : isProductIntent
-      ? 'No matching products were found in our database for this query. The product the user is asking about is not currently stocked in our store. You must clearly tell the user that the product is not available. Do not hallucinate or invent any product details, names, prices, or specifications.'
-      : 'No specific product context for this query.';
+  let productContextBlock;
+  if (products.length > 0 && intent === 'compare_products') {
+    const labeled = products.map((p, i) => `Product ${i + 1}: ${JSON.stringify(p, null, 2)}`).join('\n');
+    productContextBlock = `Here are the products found in our store relevant to this query:\n${labeled}\nUse ONLY these products for the comparison. Do not refer to any product not in this list. If the user asked about a product that is not listed here, state that it is not available in our store and compare only the products that were found.`;
+  } else if (products.length > 0) {
+    productContextBlock = `The following products are currently available in our store:\n${JSON.stringify(products, null, 2)}\nOnly refer to products from this list when answering. If the user asks about a product not present in this list, clearly state it is not available in our store and suggest the closest available alternative from the list if one exists. Never invent product names, prices, or specifications.`;
+  } else if (isProductIntent) {
+    productContextBlock = 'No matching products were found in our database for this query. The product the user is asking about is not currently stocked in our store. You must clearly tell the user that the product is not available. Do not hallucinate or invent any product details, names, prices, or specifications.';
+  } else {
+    productContextBlock = 'No specific product context for this query.';
+  }
 
   return `
 You are ElectroMart AI, a premium electronics ecommerce support assistant for a MERN platform.
@@ -460,17 +521,31 @@ async function buildAssistantResponse({ userId, message, quickAction, selectedOr
   if (intent === "compare_products") {
     const terms = extractComparisonTerms(message);
     const compared = [];
+    const seenIds = new Set();
+
+    // Search for each comparison term separately using fuzzy matching
     for (const term of terms) {
-      const found = await Product.findOne({
-        $or: [
-          { productName: { $regex: term, $options: "i" } },
-          { category: { $regex: term, $options: "i" } },
-        ],
-      }).sort({ stock: -1, rating: -1, soldCount: -1 });
-      if (found) {
-        compared.push(found);
+      const results = await searchProductByFuzzyTerm(term, 3);
+      // Pick the first result not already in the compared list
+      const pick = results.find((r) => !seenIds.has(String(r._id)));
+      if (pick) {
+        compared.push(pick);
+        seenIds.add(String(pick._id));
       }
     }
+
+    // Fallback: if we didn't find enough products per-term, try a broad search
+    if (compared.length < terms.length && terms.length > 0) {
+      const broadResults = await searchProductsByTerms(message, 6);
+      for (const product of broadResults) {
+        if (!seenIds.has(String(product._id))) {
+          compared.push(product);
+          seenIds.add(String(product._id));
+          if (compared.length >= 2) break;
+        }
+      }
+    }
+
     products = compared;
     if (compared.length >= 2) {
       comparison = {
