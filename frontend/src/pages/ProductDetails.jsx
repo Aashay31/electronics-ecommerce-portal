@@ -11,6 +11,7 @@ import { useProfile } from "../context/ProfileContext";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
+import { useSocket } from "../context/SocketContext";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ function ProductDetails() {
   const { isAuthenticated } = useAuth();
   const { wishlist, toggleWishlist } = useProfile();
   const navigate = useNavigate();
+  const socket = useSocket();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,6 +40,31 @@ function ProductDetails() {
 
     fetchProduct();
   }, [id]);
+
+  // Socket: listen for real-time product updates
+  useEffect(() => {
+    if (!socket || !id) return;
+
+    const handleStockUpdated = (data) => {
+      if (String(data.productId) === String(id)) {
+        setProduct((prev) => prev ? { ...prev, stock: data.stock } : prev);
+      }
+    };
+
+    const handlePriceUpdated = (data) => {
+      if (String(data.productId) === String(id)) {
+        setProduct((prev) => prev ? { ...prev, price: data.price } : prev);
+      }
+    };
+
+    socket.on("product:stockUpdated", handleStockUpdated);
+    socket.on("product:priceUpdated", handlePriceUpdated);
+
+    return () => {
+      socket.off("product:stockUpdated", handleStockUpdated);
+      socket.off("product:priceUpdated", handlePriceUpdated);
+    };
+  }, [socket, id]);
 
   const handleAddToCart = async () => {
     if (!product) {

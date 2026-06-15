@@ -19,6 +19,7 @@ import SortDropdown from "../components/SortDropdown";
 import ProductGrid from "../components/ProductGrid";
 import api from "../utils/api";
 import { useSearch } from "../context/SearchContext";
+import { useSocket } from "../context/SocketContext";
 
 const CATEGORY_META = [
   {
@@ -79,6 +80,7 @@ function Shop() {
   const categoriesRef = useRef(null);
   const productsRef = useRef(null);
   const { searchValue, setSearchValue } = useSearch();
+  const socket = useSocket();
 
   const [products, setProducts] = useState([]);
   const [categoryCounts, setCategoryCounts] = useState([]);
@@ -166,6 +168,53 @@ function Shop() {
       categoriesRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [location.hash]);
+
+  // Socket: listen for real-time product events
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStockUpdated = (data) => {
+      setProducts((prev) =>
+        prev.map((p) =>
+          String(p._id) === String(data.productId)
+            ? { ...p, stock: data.stock }
+            : p
+        )
+      );
+    };
+
+    const handlePriceUpdated = (data) => {
+      setProducts((prev) =>
+        prev.map((p) =>
+          String(p._id) === String(data.productId)
+            ? { ...p, price: data.price }
+            : p
+        )
+      );
+    };
+
+    const handleProductAdded = (product) => {
+      setProducts((prev) => [...prev, product]);
+    };
+
+    const handleProductDeleted = (data) => {
+      setProducts((prev) =>
+        prev.filter((p) => String(p._id) !== String(data.productId))
+      );
+    };
+
+    socket.on("product:stockUpdated", handleStockUpdated);
+    socket.on("product:priceUpdated", handlePriceUpdated);
+    socket.on("product:added", handleProductAdded);
+    socket.on("product:deleted", handleProductDeleted);
+
+    return () => {
+      socket.off("product:stockUpdated", handleStockUpdated);
+      socket.off("product:priceUpdated", handlePriceUpdated);
+      socket.off("product:added", handleProductAdded);
+      socket.off("product:deleted", handleProductDeleted);
+    };
+  }, [socket]);
 
   const availableCategories = useMemo(() => {
     if (categoryCounts.length) return categoryCounts;

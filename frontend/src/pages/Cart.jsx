@@ -1,13 +1,70 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
 import { resolveImageUrl } from "../utils/imageUrl";
+import { useSocket } from "../context/SocketContext";
 
 function Cart() {
-  const { items, cartTotal, removeFromCart, updateQuantity, isLoading } =
+  const { items, setItems, cartTotal, removeFromCart, updateQuantity, isLoading } =
     useCart();
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStockUpdated = (data) => {
+      setItems((prevItems) =>
+        prevItems.map((entry) => {
+          if (entry.product && entry.product._id === data.productId) {
+            return {
+              ...entry,
+              product: {
+                ...entry.product,
+                stock: data.stock,
+              },
+            };
+          }
+          return entry;
+        })
+      );
+    };
+
+    const handlePriceUpdated = (data) => {
+      setItems((prevItems) =>
+        prevItems.map((entry) => {
+          if (entry.product && entry.product._id === data.productId) {
+            return {
+              ...entry,
+              product: {
+                ...entry.product,
+                price: data.price,
+              },
+            };
+          }
+          return entry;
+        })
+      );
+    };
+
+    const handleProductDeleted = (data) => {
+      setItems((prevItems) =>
+        prevItems.filter((entry) => !entry.product || entry.product._id !== data.productId)
+      );
+    };
+
+    socket.on("product:stockUpdated", handleStockUpdated);
+    socket.on("product:priceUpdated", handlePriceUpdated);
+    socket.on("product:deleted", handleProductDeleted);
+
+    return () => {
+      socket.off("product:stockUpdated", handleStockUpdated);
+      socket.off("product:priceUpdated", handlePriceUpdated);
+      socket.off("product:deleted", handleProductDeleted);
+    };
+  }, [socket, setItems]);
 
   const hasOutOfStockItems = items.some(
     (entry) => !entry.product || entry.product.stock <= 0

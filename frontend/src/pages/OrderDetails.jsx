@@ -7,12 +7,14 @@ import Footer from "../components/Footer";
 import CancelOrderModal from "../components/CancelOrderModal";
 import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
+import { useSocket } from "../context/SocketContext";
 
 const statusSteps = ["Pending", "Confirmed", "Processing", "Shipped", "Delivered"];
 
 function OrderDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const socket = useSocket();
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -49,6 +51,35 @@ function OrderDetails() {
       active = false;
     };
   }, [id, navigate]);
+
+  // Socket: listen for real-time order status updates
+  useEffect(() => {
+    if (!socket || !id) return;
+
+    const handleStatusUpdated = (data) => {
+      if (String(data.orderId) === String(id)) {
+        setOrder((prev) =>
+          prev ? { ...prev, orderStatus: data.orderStatus, paymentStatus: data.paymentStatus || prev.paymentStatus } : prev
+        );
+      }
+    };
+
+    const handleCancelled = (data) => {
+      if (String(data.orderId) === String(id)) {
+        setOrder((prev) =>
+          prev ? { ...prev, orderStatus: "Cancelled" } : prev
+        );
+      }
+    };
+
+    socket.on("order:statusUpdated", handleStatusUpdated);
+    socket.on("order:cancelled", handleCancelled);
+
+    return () => {
+      socket.off("order:statusUpdated", handleStatusUpdated);
+      socket.off("order:cancelled", handleCancelled);
+    };
+  }, [socket, id]);
 
   const handleCancel = async (reason) => {
     setIsCancelling(true);

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { Search, Package, User } from "lucide-react";
 import api from "../../utils/api";
 import { resolveImageUrl } from "../../utils/imageUrl";
+import { useSocket } from "../../context/SocketContext";
 
 const statusColors = {
   Pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
@@ -19,6 +20,60 @@ function Orders() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleOrderCreated = (newOrder) => {
+      setOrders((prevOrders) => {
+        // Avoid duplicates just in case
+        if (prevOrders.some((o) => o._id === newOrder._id)) {
+          return prevOrders;
+        }
+        return [newOrder, ...prevOrders];
+      });
+    };
+
+    const handleOrderStatusUpdated = (data) => {
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => {
+          if (order._id === data.orderId) {
+            return {
+              ...order,
+              deliveryStatus: data.orderStatus,
+              paymentStatus: data.paymentStatus,
+            };
+          }
+          return order;
+        })
+      );
+    };
+
+    const handleOrderCancelled = (data) => {
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => {
+          if (order._id === data.orderId) {
+            return {
+              ...order,
+              deliveryStatus: "Cancelled",
+            };
+          }
+          return order;
+        })
+      );
+    };
+
+    socket.on("order:created", handleOrderCreated);
+    socket.on("order:statusUpdated", handleOrderStatusUpdated);
+    socket.on("order:cancelled", handleOrderCancelled);
+
+    return () => {
+      socket.off("order:created", handleOrderCreated);
+      socket.off("order:statusUpdated", handleOrderStatusUpdated);
+      socket.off("order:cancelled", handleOrderCancelled);
+    };
+  }, [socket]);
 
   const fetchOrders = async (page = 1, searchQuery = search, status = statusFilter) => {
     try {
@@ -75,11 +130,20 @@ function Orders() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Manage customer orders and fulfillments.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Manage customer orders and fulfillments.
+          </p>
+        </div>
+        <div className="flex w-max items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 shadow-sm">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+          </span>
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Live Updates</span>
+        </div>
       </div>
 
       {/* Filters */}

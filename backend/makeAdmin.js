@@ -7,11 +7,12 @@ async function makeAdmin() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB.");
 
-    // Update the first user found to be an admin
+    // Promote ashayv0@gmail.com to admin and set all other users to standard user role
+    await User.updateMany({ email: { $ne: "ashayv0@gmail.com" } }, { role: "user" });
     const user = await User.findOneAndUpdate(
-      {},
+      { email: "ashayv0@gmail.com" },
       { role: "admin" },
-      { returnDocument: "after", sort: { createdAt: 1 } }
+      { returnDocument: "after" }
     );
 
     if (user) {
@@ -20,8 +21,14 @@ async function makeAdmin() {
       console.log(`Email: ${user.email}`);
       console.log(`\nYou can now log in with this email to access the Admin Dashboard.\n`);
     } else {
-      console.log("No users found in the database. Please create an account first.");
+      console.log("ashayv0@gmail.com not found in the database. Creating or choosing another user wasn't performed.");
     }
+
+    const users = await User.find({}, "fullName email role");
+    console.log("Current user list:");
+    users.forEach(u => {
+      console.log(`- ${u.fullName} (${u.email}): role=${u.role}`);
+    });
   } catch (error) {
     console.error("Error:", error);
   } finally {

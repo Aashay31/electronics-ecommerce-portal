@@ -1,9 +1,11 @@
 const express = require("express");
+const http = require("http");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 
 const connectDB = require("./config/database");
+const { initSocket } = require("./socket");
 
 dotenv.config();
 
@@ -50,6 +52,9 @@ app.get("/", (req, res) => {
   res.send("Backend server is running");
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -5,6 +5,8 @@ const Product = require("../models/Product");
 const Order = require("../models/Order");
 const sendEmail = require("../utils/sendEmail");
 const statusTemplate = require("../templates/statusTemplate");
+const { getIO } = require("../socket");
+const { emitDashboardStats } = require("../utils/emitDashboardStats");
 
 // ─── Dashboard Stats ────────────────────────────────────────────────
 const getStats = async (req, res) => {
@@ -143,6 +145,15 @@ const createProduct = async (req, res) => {
       featured: featured === "true" || featured === true,
     });
 
+    // Socket: broadcast product:added globally
+    try {
+      const io = getIO();
+      io.emit("product:added", product);
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting product:added:", socketError.message);
+    }
+
     return res.status(201).json({ success: true, product });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -178,6 +189,25 @@ const updateProduct = async (req, res) => {
       runValidators: true,
     });
 
+    // Socket: broadcast price/stock changes globally
+    try {
+      const io = getIO();
+      if (updates.price !== undefined && Number(updates.price) !== product.price) {
+        io.emit("product:priceUpdated", {
+          productId: updatedProduct._id,
+          price: updatedProduct.price,
+        });
+      }
+      if (updates.stock !== undefined && Number(updates.stock) !== product.stock) {
+        io.emit("product:stockUpdated", {
+          productId: updatedProduct._id,
+          stock: updatedProduct.stock,
+        });
+      }
+    } catch (socketError) {
+      console.error("[Socket] Error emitting product update:", socketError.message);
+    }
+
     return res.status(200).json({ success: true, product: updatedProduct });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -190,6 +220,15 @@ const deleteProduct = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    // Socket: broadcast product:deleted globally
+    try {
+      const io = getIO();
+      io.emit("product:deleted", { productId: req.params.id });
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting product:deleted:", socketError.message);
     }
 
     return res.status(200).json({ success: true, message: "Product deleted" });
@@ -307,6 +346,37 @@ const updateOrderStatus = async (req, res) => {
       });
     } catch (err) {
       console.error("Order status update email could not be sent:", err);
+    }
+
+    // Socket: emit order status change to user room and admin room
+    try {
+      const io = getIO();
+      const eventData = {
+        orderId: order._id,
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+      };
+
+      io.to(`user:${String(order.user)}`).to("admin").emit("order:statusUpdated", eventData);
+
+      if (deliveryStatus === "Cancelled") {
+        io.to(`user:${String(order.user)}`).to("admin").emit("order:cancelled", eventData);
+
+        // Emit stock updates for restored products
+        for (const item of order.items) {
+          const updatedProduct = await Product.findById(item.product).select("_id stock price");
+          if (updatedProduct) {
+            io.emit("product:stockUpdated", {
+              productId: updatedProduct._id,
+              stock: updatedProduct.stock,
+            });
+          }
+        }
+      }
+
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting order:statusUpdated:", socketError.message);
     }
 
     return res.status(200).json({ success: true, order });

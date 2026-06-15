@@ -12,10 +12,26 @@ import {
 } from "lucide-react";
 import api from "../../utils/api";
 import StatsCard from "../components/StatsCard";
+import { useSocket } from "../../context/SocketContext";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStatsUpdated = (newStats) => {
+      setStats(newStats);
+    };
+
+    socket.on("dashboard:statsUpdated", handleStatsUpdated);
+
+    return () => {
+      socket.off("dashboard:statsUpdated", handleStatsUpdated);
+    };
+  }, [socket]);
 
   useEffect(() => {
     const fetchStats = async () => {

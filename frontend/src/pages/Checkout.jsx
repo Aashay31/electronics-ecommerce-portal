@@ -11,7 +11,7 @@ import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
 
 function Checkout() {
-  const { items, cartTotal, refreshCart } = useCart();
+  const { items, setItems, cartTotal, refreshCart } = useCart();
   const { addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId } = useProfile();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -102,10 +102,10 @@ function Checkout() {
         const response = await api.post("/api/orders", payload);
 
         if (response.data.success) {
+          navigate("/orders");
           toast.success("Order placed successfully!");
-          await refreshCart();
+          refreshCart();
           setSelectedDeliveryAddressId("");
-          navigate(`/order-success/${response.data.order._id}`);
         }
         resetProcessing();
         return;
@@ -147,10 +147,10 @@ function Checkout() {
             });
 
             if (verifyResponse.data.success) {
+              navigate("/orders");
               toast.success("Payment verified successfully!");
-              await refreshCart();
+              refreshCart();
               setSelectedDeliveryAddressId("");
-              navigate(`/order-success/${verifyResponse.data.order._id}`);
             } else {
               toast.error("Payment verification failed");
               navigate("/payment-failed", { state: { reason: "verification" } });

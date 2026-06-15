@@ -4,6 +4,8 @@ const Product = require("../models/Product");
 const sendEmail = require("../utils/sendEmail");
 const orderTemplate = require("../templates/orderTemplate");
 const { cancelOrderForUser } = require("../services/orderCancellationService");
+const { getIO } = require("../socket");
+const { emitDashboardStats } = require("../utils/emitDashboardStats");
 
 const normalizeAmount = (value) => {
   const numberValue = Number(value);
@@ -120,6 +122,48 @@ const placeOrder = async (req, res) => {
     // Clear user cart
     await User.findByIdAndUpdate(userId, { cartItems: [] });
 
+    // Socket: emit order:created to user room
+    try {
+      const io = getIO();
+      io.to(`user:${userId}`).emit("order:created", populatedOrder);
+
+      // Populate user details for admin room
+      const adminOrderRaw = await Order.findById(order._id)
+        .populate("user", "fullName email")
+        .populate("items.product", "productName imageUrl price category");
+
+      if (adminOrderRaw) {
+        const adminOrder = adminOrderRaw.toObject();
+        adminOrder.customerName = adminOrderRaw.user?.fullName;
+        adminOrder.customerEmail = adminOrderRaw.user?.email;
+        adminOrder.userId = adminOrderRaw.user?._id;
+        adminOrder.total = adminOrderRaw.totalAmount;
+        adminOrder.orderedAt = adminOrderRaw.createdAt;
+        adminOrder.deliveryStatus = adminOrderRaw.orderStatus;
+        adminOrder.paymentMethod = adminOrderRaw.paymentMethod;
+        adminOrder.paymentStatus = adminOrderRaw.paymentStatus;
+        adminOrder.transactionId = adminOrderRaw.razorpayPaymentId || adminOrderRaw.razorpayOrderId || null;
+        adminOrder.cancellationReason = adminOrderRaw.cancellationReason || null;
+
+        io.to("admin").emit("order:created", adminOrder);
+      }
+
+      // Emit stock updates for each product
+      for (const item of orderItems) {
+        const updatedProduct = await Product.findById(item.product).select("_id stock price");
+        if (updatedProduct) {
+          io.emit("product:stockUpdated", {
+            productId: updatedProduct._id,
+            stock: updatedProduct.stock,
+          });
+        }
+      }
+
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting order:created:", socketError.message);
+    }
+
     return res.status(201).json({
       success: true,
       message: "Order placed successfully",
@@ -186,6 +230,30 @@ const cancelOrder = async (req, res) => {
       userId: req.user.id,
       reason,
     });
+
+    // Socket: emit order:cancelled to user and admin room
+    try {
+      const io = getIO();
+      io.to(`user:${req.user.id}`).to("admin").emit("order:cancelled", {
+        orderId: order._id,
+        orderStatus: "Cancelled",
+      });
+
+      // Emit stock updates for restored products
+      for (const item of order.items) {
+        const updatedProduct = await Product.findById(item.product).select("_id stock price");
+        if (updatedProduct) {
+          io.emit("product:stockUpdated", {
+            productId: updatedProduct._id,
+            stock: updatedProduct.stock,
+          });
+        }
+      }
+
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting order:cancelled:", socketError.message);
+    }
 
     return res.status(200).json({
       success: true,

@@ -8,9 +8,11 @@ import { useProfile } from "../context/ProfileContext";
 import { resolveImageUrl } from "../utils/imageUrl";
 import CancelOrderModal from "../components/CancelOrderModal";
 import api from "../utils/api";
+import { useSocket } from "../context/SocketContext";
 
 function Orders() {
-  const { orders, loadOrders } = useProfile();
+  const { orders, setOrders, loadOrders } = useProfile();
+  const socket = useSocket();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState(null);
@@ -18,6 +20,45 @@ function Orders() {
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  // Socket: listen for real-time order events
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleOrderCreated = (newOrder) => {
+      setOrders((prev) => [newOrder, ...prev]);
+    };
+
+    const handleOrderStatusUpdated = (data) => {
+      setOrders((prev) =>
+        prev.map((o) =>
+          String(o._id) === String(data.orderId)
+            ? { ...o, orderStatus: data.orderStatus, paymentStatus: data.paymentStatus || o.paymentStatus }
+            : o
+        )
+      );
+    };
+
+    const handleOrderCancelled = (data) => {
+      setOrders((prev) =>
+        prev.map((o) =>
+          String(o._id) === String(data.orderId)
+            ? { ...o, orderStatus: "Cancelled" }
+            : o
+        )
+      );
+    };
+
+    socket.on("order:created", handleOrderCreated);
+    socket.on("order:statusUpdated", handleOrderStatusUpdated);
+    socket.on("order:cancelled", handleOrderCancelled);
+
+    return () => {
+      socket.off("order:created", handleOrderCreated);
+      socket.off("order:statusUpdated", handleOrderStatusUpdated);
+      socket.off("order:cancelled", handleOrderCancelled);
+    };
+  }, [socket, setOrders]);
 
   const handleOpenCancel = (orderId) => {
     setActiveOrderId(orderId);

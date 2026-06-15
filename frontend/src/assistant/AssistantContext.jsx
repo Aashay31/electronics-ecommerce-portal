@@ -9,6 +9,7 @@ import {
 import toast from "react-hot-toast";
 import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 
 const AssistantContext = createContext(null);
 const STORAGE_KEY = "electromart_ai_widget_open";
@@ -23,6 +24,71 @@ export function AssistantProvider({ children }) {
   const [isSending, setIsSending] = useState(false);
   const [activeOrderActionId, setActiveOrderActionId] = useState("");
   const initializedRef = useRef(false);
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleOrderStatusUpdated = (data) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) => {
+          if (msg.richContent && msg.richContent.orders) {
+            const updatedOrders = msg.richContent.orders.map((o) => {
+              if (String(o.orderId) === String(data.orderId)) {
+                return {
+                  ...o,
+                  orderStatus: data.orderStatus,
+                };
+              }
+              return o;
+            });
+            return {
+              ...msg,
+              richContent: {
+                ...msg.richContent,
+                orders: updatedOrders,
+              },
+            };
+          }
+          return msg;
+        })
+      );
+    };
+
+    const handleOrderCancelled = (data) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) => {
+          if (msg.richContent && msg.richContent.orders) {
+            const updatedOrders = msg.richContent.orders.map((o) => {
+              if (String(o.orderId) === String(data.orderId)) {
+                return {
+                  ...o,
+                  orderStatus: "Cancelled",
+                };
+              }
+              return o;
+            });
+            return {
+              ...msg,
+              richContent: {
+                ...msg.richContent,
+                orders: updatedOrders,
+              },
+            };
+          }
+          return msg;
+        })
+      );
+    };
+
+    socket.on("order:statusUpdated", handleOrderStatusUpdated);
+    socket.on("order:cancelled", handleOrderCancelled);
+
+    return () => {
+      socket.off("order:statusUpdated", handleOrderStatusUpdated);
+      socket.off("order:cancelled", handleOrderCancelled);
+    };
+  }, [socket]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(isOpen));

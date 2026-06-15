@@ -6,6 +6,8 @@ const Product = require("../models/Product");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 const orderTemplate = require("../templates/orderTemplate");
+const { getIO } = require("../socket");
+const { emitDashboardStats } = require("../utils/emitDashboardStats");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -204,6 +206,49 @@ const verifyPayment = async (req, res) => {
       });
     } catch (err) {
       console.error("Order confirmation email could not be sent:", err);
+    }
+
+    // Socket: emit order:created to user room and admin room
+    try {
+      const io = getIO();
+      const populatedForSocket = await Order.findById(order._id).populate("items.product", "productName imageUrl price category");
+      io.to(`user:${String(order.user)}`).emit("order:created", populatedForSocket);
+
+      // Populate user details for admin room
+      const adminOrderRaw = await Order.findById(order._id)
+        .populate("user", "fullName email")
+        .populate("items.product", "productName imageUrl price category");
+
+      if (adminOrderRaw) {
+        const adminOrder = adminOrderRaw.toObject();
+        adminOrder.customerName = adminOrderRaw.user?.fullName;
+        adminOrder.customerEmail = adminOrderRaw.user?.email;
+        adminOrder.userId = adminOrderRaw.user?._id;
+        adminOrder.total = adminOrderRaw.totalAmount;
+        adminOrder.orderedAt = adminOrderRaw.createdAt;
+        adminOrder.deliveryStatus = adminOrderRaw.orderStatus;
+        adminOrder.paymentMethod = adminOrderRaw.paymentMethod;
+        adminOrder.paymentStatus = adminOrderRaw.paymentStatus;
+        adminOrder.transactionId = adminOrderRaw.razorpayPaymentId || adminOrderRaw.razorpayOrderId || null;
+        adminOrder.cancellationReason = adminOrderRaw.cancellationReason || null;
+
+        io.to("admin").emit("order:created", adminOrder);
+      }
+
+      // Emit stock updates for each product
+      for (const item of order.items) {
+        const updatedProduct = await Product.findById(item.product).select("_id stock price");
+        if (updatedProduct) {
+          io.emit("product:stockUpdated", {
+            productId: updatedProduct._id,
+            stock: updatedProduct.stock,
+          });
+        }
+      }
+
+      emitDashboardStats();
+    } catch (socketError) {
+      console.error("[Socket] Error emitting order:created:", socketError.message);
     }
 
     return res.status(200).json({ success: true, order });
