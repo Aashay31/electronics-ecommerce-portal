@@ -22,7 +22,7 @@ function ProductCard({ product }) {
     }
 
     toast.custom((toastInstance) => (
-      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70">
+      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 dark:shadow-none">
         <span>{product.productName} added to cart.</span>
         <button
           type="button"
@@ -30,7 +30,7 @@ function ProductCard({ product }) {
             navigate("/cart");
             toast.dismiss(toastInstance.id);
           }}
-          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
         >
           Open Cart
         </button>
@@ -39,7 +39,7 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group relative flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-md shadow-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="group relative flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-md shadow-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-slate-900 dark:shadow-none dark:hover:shadow-lg dark:hover:shadow-black/20">
       <button
         type="button"
         onClick={async () => {
@@ -51,14 +51,14 @@ function ProductCard({ product }) {
         }}
         className={`absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border text-sm transition ${
           isWishlisted
-            ? "border-rose-200 bg-rose-50 text-rose-500"
-            : "border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500"
+            ? "border-rose-200 bg-rose-50 text-rose-500 dark:border-rose-500/30 dark:bg-rose-500/10"
+            : "border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:border-white/10 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-rose-500/30 dark:hover:text-rose-400"
         }`}
       >
         <FiHeart className={isWishlisted ? "fill-current" : ""} />
       </button>
       <Link to={`/products/${product._id}`} className="flex flex-col">
-        <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-50">
+        <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-900 dark:bg-white/5">
           <img
             src={resolveImageUrl(product.imageUrl)}
             alt={product.productName}
@@ -67,38 +67,38 @@ function ProductCard({ product }) {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-700 dark:bg-white/10 dark:text-slate-300">
             {product.category}
           </span>
           {product.stock <= 0 ? (
-            <span className="rounded-full bg-rose-50 border border-rose-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-600 animate-pulse">
+            <span className="rounded-full bg-rose-50 border border-rose-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-600 animate-pulse dark:bg-rose-500/10 dark:border-rose-500/30">
               Out of Stock
             </span>
           ) : product.stock <= 5 ? (
-            <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">
+            <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/30">
               Only {product.stock} Left
             </span>
           ) : (
-            <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+            <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/30">
               In Stock
             </span>
           )}
         </div>
 
-        <h2 className="mt-3 min-h-[3rem] text-base font-semibold text-slate-900 line-clamp-2">
+        <h2 className="mt-3 min-h-[3rem] text-base font-semibold text-slate-900 line-clamp-2 dark:text-white">
           {product.productName}
         </h2>
 
-        <p className="mt-2 min-h-[2.5rem] text-sm text-slate-600 line-clamp-2">
+        <p className="mt-2 min-h-[2.5rem] text-sm text-slate-600 line-clamp-2 dark:text-slate-400">
           {product.description}
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <StarRating value={product.averageRating ?? product.rating ?? 0} readOnly size={14} />
-          <span className="text-xs font-semibold text-slate-500">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             {(product.averageRating ?? product.rating ?? 0).toFixed(1)}
           </span>
-          <span className="text-[10px] text-slate-400">
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">
             ({product.totalReviews ?? product.ratingCount ?? 0})
           </span>
         </div>
@@ -112,8 +112,8 @@ function ProductCard({ product }) {
           disabled={product.stock <= 0}
           className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-[11px] font-semibold transition ${
             product.stock <= 0
-              ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-              : "bg-slate-900 text-white shadow-sm shadow-slate-900/30 hover:-translate-y-0.5 hover:bg-slate-800"
+              ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none dark:bg-white/5 dark:text-slate-500"
+              : "bg-slate-900 text-white shadow-sm shadow-slate-900/30 hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white/10 dark:shadow-none dark:hover:bg-white/20"
           }`}
         >
           <FiShoppingCart className="h-4 w-4" />

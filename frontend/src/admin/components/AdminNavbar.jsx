@@ -15,17 +15,17 @@ function AdminNavbar() {
 
   return (
     <header
-      className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-6 backdrop-blur transition-all"
+      className="sticky top-0 z-20 flex h-[56px] items-center justify-between border-b border-[var(--admin-border)] bg-white px-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all"
     >
       <div className="pl-12 lg:pl-0">
-        <h2 className="text-sm font-semibold text-slate-900">Admin Panel</h2>
-        <p className="text-xs text-slate-500">Manage your store</p>
+        <h2 className="text-sm font-semibold text-[var(--admin-text-primary)]">Admin Panel</h2>
+        <p className="text-xs text-[var(--admin-text-secondary)]">Manage your store</p>
       </div>
 
       <div className="flex items-center gap-4">
         <button
           type="button"
-          className="relative rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          className="relative rounded-md p-[7px] text-[var(--admin-text-secondary)] bg-transparent border border-[var(--admin-border)] transition hover:bg-[var(--admin-surface-2)] hover:border-[var(--admin-border-strong)]"
         >
           <Bell className="h-5 w-5" />
         </button>
@@ -35,8 +35,8 @@ function AdminNavbar() {
               {initials}
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-slate-900">{user?.fullName}</p>
-            <p className="text-xs text-slate-500">{user?.role}</p>
+            <p className="text-sm font-semibold text-[var(--admin-text-primary)]">{user?.fullName}</p>
+            <p className="text-xs text-[var(--admin-text-secondary)]">{user?.role}</p>
           </div>
         </div>
       </div>

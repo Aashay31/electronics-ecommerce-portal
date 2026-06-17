@@ -248,14 +248,14 @@ function Products() {
       {/* Header & Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Products</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-[20px] font-semibold text-[var(--admin-text-primary)] tracking-[-0.01em]">Products</h1>
+          <p className="mt-1 text-[13px] text-[var(--admin-text-secondary)]">
             Manage your inventory and product details.
           </p>
         </div>
         <button
           onClick={openAddModal}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800"
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-[var(--admin-accent)] px-[18px] py-[8px] text-[14px] font-medium text-white transition hover:bg-[var(--admin-accent-hover)] border-none"
         >
           <Plus className="h-4 w-4" />
           Add Product
@@ -264,53 +264,53 @@ function Products() {
 
       {/* Inventory Alerts & Overview */}
       <div className="grid gap-5 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Catalog Items</p>
+        <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] border-t-[3px] border-t-[var(--admin-accent)]">
+          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Total Catalog Items</p>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-slate-900">{stats.totalProducts}</span>
-            <span className="text-xs text-slate-500">Products</span>
+            <span className="text-[28px] font-bold text-[var(--admin-text-primary)]">{stats.totalProducts}</span>
+            <span className="text-[13px] text-[var(--admin-text-secondary)]">Products</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-amber-500">Low Stock Alerts</p>
+        <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] border-t-[3px] border-t-[var(--admin-warning)]">
+          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Low Stock Alerts</p>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-amber-600">{stats.lowStockProducts}</span>
-            <span className="text-xs text-amber-500">Items (1-5 stock)</span>
+            <span className="text-[28px] font-bold text-[var(--admin-text-primary)]">{stats.lowStockProducts}</span>
+            <span className="text-[13px] text-[var(--admin-text-secondary)]">Items (1-5 stock)</span>
           </div>
           {stats.lowStockProducts > 0 && (
-            <p className="mt-2 text-xs text-amber-700 font-medium">⚠️ Action required: Replenish stock soon.</p>
+            <p className="mt-2 text-[13px] font-medium text-[var(--admin-warning)]">⚠️ Action required: Replenish stock soon.</p>
           )}
         </div>
 
-        <div className="rounded-2xl border border-rose-100 bg-rose-50/30 p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-rose-500">Out of Stock Alerts</p>
+        <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] border-t-[3px] border-t-[var(--admin-danger)]">
+          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Out of Stock Alerts</p>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-rose-600 animate-pulse">{stats.outOfStockProducts}</span>
-            <span className="text-xs text-rose-500">Items (0 stock)</span>
+            <span className="text-[28px] font-bold text-[var(--admin-text-primary)]">{stats.outOfStockProducts}</span>
+            <span className="text-[13px] text-[var(--admin-text-secondary)]">Items (0 stock)</span>
           </div>
           {stats.outOfStockProducts > 0 && (
-            <p className="mt-2 text-xs text-rose-700 font-medium">🚨 Customers cannot purchase these items!</p>
+            <p className="mt-2 text-[13px] font-medium text-[var(--admin-danger)]">🚨 Customers cannot purchase these items!</p>
           )}
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
+      <div className="flex items-center gap-[12px] rounded-t-lg border border-b-0 border-[var(--admin-border)] bg-[var(--admin-surface)] px-[16px] py-[14px]">
+        <form onSubmit={handleSearch} className="flex w-full items-center gap-[12px]">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-muted)]" />
             <input
               type="text"
               placeholder="Search products by name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border-none bg-slate-50 py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface-2)] py-[8px] pl-10 pr-3 text-[14px] text-[var(--admin-text-primary)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-100"
+            className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[18px] py-[8px] text-[14px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)]"
           >
             Search
           </button>
@@ -318,37 +318,37 @@ function Products() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-b-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]">
         <div className="overflow-x-auto">
-          <table className="w-full whitespace-nowrap text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
+          <table className="w-full whitespace-nowrap text-left">
+            <thead className="border-b-2 border-[var(--admin-border-strong)] bg-[var(--admin-surface-2)]">
               <tr>
-                <th className="px-6 py-4 font-medium">Product</th>
-                <th className="px-6 py-4 font-medium">Category</th>
-                <th className="px-6 py-4 font-medium">Price</th>
-                <th className="px-6 py-4 font-medium">Stock</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Product</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Category</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Price</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Stock</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="5" className="px-[16px] py-[14px] text-center text-[14px] text-[var(--admin-text-secondary)]">
                     Loading products...
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="5" className="px-[16px] py-[14px] text-center text-[14px] text-[var(--admin-text-secondary)]">
                     No products found.
                   </td>
                 </tr>
               ) : (
-                products.map((product) => (
-                  <tr key={product._id} className="transition hover:bg-slate-50">
-                    <td className="px-6 py-4">
+                products.map((product, idx) => (
+                  <tr key={product._id} className={`cursor-pointer transition hover:bg-[var(--admin-accent-light)] ${idx % 2 === 0 ? "bg-[var(--admin-surface)]" : "bg-[#FAFBFC]"}`}>
+                    <td className="px-[16px] py-[14px]">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-2)]">
                           {product.imageUrl ? (
                             <img
                               src={resolveImageUrl(product.imageUrl)}
@@ -356,32 +356,32 @@ function Products() {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <ImageIcon className="h-5 w-5 text-slate-400" />
+                            <ImageIcon className="h-5 w-5 text-[var(--admin-text-muted)]" />
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="text-[14px] text-[var(--admin-text-primary)]">
                             {product.productName}
                           </p>
                           {product.featured && (
-                            <span className="mt-0.5 inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                            <span className="mt-0.5 inline-flex items-center rounded-full bg-[var(--admin-info-bg)] px-[10px] py-[3px] text-[12px] font-medium text-[var(--admin-info)] border border-[#A5F3FC]">
                               Featured
                             </span>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-600">{product.category}</td>
-                    <td className="px-6 py-4 font-medium text-slate-900">
+                    <td className="px-[16px] py-[14px] text-[14px] text-[var(--admin-text-primary)]">{product.category}</td>
+                    <td className="px-[16px] py-[14px] text-[14px] text-[var(--admin-text-primary)]">
                       ₹{product.price.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-[16px] py-[14px]">
                       {quickEditStockId === product._id ? (
                         <div className="flex items-center gap-1.5">
                           <input
                             type="number"
                             min="0"
-                            className="w-16 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-indigo-500 focus:outline-none"
+                            className="w-16 rounded-md border border-[var(--admin-border)] px-2 py-1 text-[13px] focus:border-[var(--admin-accent)] focus:outline-none"
                             value={quickStockValue}
                             onChange={(e) => setQuickStockValue(e.target.value)}
                             autoFocus
@@ -390,7 +390,7 @@ function Products() {
                             type="button"
                             onClick={() => handleQuickStockSubmit(product._id)}
                             disabled={isQuickUpdating}
-                            className="rounded-lg bg-emerald-600 p-1 text-white hover:bg-emerald-700 transition"
+                            className="rounded-md bg-[var(--admin-success)] p-1 text-white hover:opacity-90 transition"
                             title="Save"
                           >
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -400,7 +400,7 @@ function Products() {
                           <button
                             type="button"
                             onClick={() => setQuickEditStockId(null)}
-                            className="rounded-lg bg-slate-100 p-1 text-slate-500 hover:bg-slate-200 transition"
+                            className="rounded-md bg-[var(--admin-surface)] border border-[var(--admin-border)] p-1 text-[var(--admin-text-secondary)] hover:bg-[var(--admin-surface-2)] transition"
                             title="Cancel"
                           >
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -411,12 +411,12 @@ function Products() {
                       ) : (
                         <div className="flex items-center gap-2 group">
                           <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                            className={`inline-flex items-center rounded-full px-[10px] py-[3px] text-[12px] font-medium border ${
                               product.stock <= 0
-                                ? "bg-rose-50 border-rose-200 text-rose-700 animate-pulse"
+                                ? "bg-[var(--admin-danger-bg)] border-[#FECACA] text-[var(--admin-danger)]"
                                 : product.stock <= 5
-                                ? "bg-amber-50 border-amber-200 text-amber-700 font-bold"
-                                : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                ? "bg-[var(--admin-warning-bg)] border-[#FDE68A] text-[var(--admin-warning)] font-bold"
+                                : "bg-[var(--admin-success-bg)] border-[#BBF7D0] text-[var(--admin-success)]"
                             }`}
                           >
                             {product.stock <= 0
@@ -430,7 +430,7 @@ function Products() {
                               setQuickEditStockId(product._id);
                               setQuickStockValue(product.stock);
                             }}
-                            className="opacity-0 group-hover:opacity-100 transition rounded p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                            className="opacity-0 group-hover:opacity-100 transition rounded p-1 hover:bg-[var(--admin-surface-2)] text-[var(--admin-text-secondary)]"
                             title="Quick Edit Stock"
                           >
                             <Edit2 className="h-3 w-3" />
@@ -438,18 +438,18 @@ function Products() {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-[16px] py-[14px] text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openEditModal(product)}
-                          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-indigo-600"
+                          className="rounded-md p-[7px] text-[var(--admin-text-secondary)] transition hover:bg-[var(--admin-surface-2)] hover:text-[var(--admin-accent)] border border-transparent hover:border-[var(--admin-border)]"
                           title="Edit"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(product._id)}
-                          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                          className="rounded-md p-[7px] text-[var(--admin-text-secondary)] transition hover:bg-[var(--admin-danger-bg)] hover:text-[var(--admin-danger)] border border-transparent hover:border-[#FECACA]"
                           title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -465,23 +465,23 @@ function Products() {
 
         {/* Pagination */}
         {!isLoading && pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-3">
-            <p className="text-sm text-slate-500">
-              Showing page <span className="font-medium text-slate-900">{pagination.page}</span> of{" "}
-              <span className="font-medium text-slate-900">{pagination.pages}</span>
+          <div className="flex items-center justify-between border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[12px]">
+            <p className="text-[13px] text-[var(--admin-text-secondary)]">
+              Showing page <span className="font-medium text-[var(--admin-text-primary)]">{pagination.page}</span> of{" "}
+              <span className="font-medium text-[var(--admin-text-primary)]">{pagination.pages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.pages}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>
@@ -492,24 +492,24 @@ function Products() {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm sm:p-0">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <h3 className="text-lg font-semibold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 sm:p-0">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-[var(--admin-surface)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] border border-[var(--admin-border)]">
+            <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-[24px] py-[16px]">
+              <h3 className="text-[20px] font-semibold text-[var(--admin-text-primary)] tracking-[-0.01em]">
                 {editingId ? "Edit Product" : "Add New Product"}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-md p-[7px] text-[var(--admin-text-secondary)] bg-transparent border border-[var(--admin-border)] transition hover:bg-[var(--admin-surface-2)] hover:border-[var(--admin-border-strong)]"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="p-6">
+            <form onSubmit={handleFormSubmit} className="p-[24px]">
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                  <label className="mb-[6px] block text-[13px] font-medium text-[var(--admin-text-secondary)]">
                     Product Name
                   </label>
                   <input
@@ -517,12 +517,12 @@ function Products() {
                     required
                     value={formData.productName}
                     onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                  <label className="mb-[6px] block text-[13px] font-medium text-[var(--admin-text-secondary)]">
                     Description
                   </label>
                   <textarea
@@ -530,48 +530,48 @@ function Products() {
                     rows="3"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Price (₹)</label>
+                  <label className="mb-[6px] block text-[13px] font-medium text-[var(--admin-text-secondary)]">Price (₹)</label>
                   <input
                     type="number"
                     required
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Stock</label>
+                  <label className="mb-[6px] block text-[13px] font-medium text-[var(--admin-text-secondary)]">Stock</label>
                   <input
                     type="number"
                     required
                     min="0"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
+                  <label className="mb-[6px] block text-[13px] font-medium text-[var(--admin-text-secondary)]">Category</label>
                   <input
                     type="text"
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <div className="mb-2 flex items-center justify-between">
-                    <label className="block text-sm font-medium text-slate-700">
+                  <div className="mb-[6px] flex items-center justify-between">
+                    <label className="block text-[13px] font-medium text-[var(--admin-text-secondary)]">
                       Product Image
                     </label>
                     <button
@@ -588,7 +588,7 @@ function Products() {
                           setFormData((prev) => ({ ...prev, imageUrl: "" }));
                         }
                       }}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 transition hover:text-indigo-800"
+                      className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--admin-accent)] transition hover:text-[var(--admin-accent-hover)]"
                     >
                       {useUrlMode ? (
                         <><Upload className="h-3 w-3" /> Upload file</>
@@ -609,14 +609,14 @@ function Products() {
                           setFormData({ ...formData, imageUrl: e.target.value });
                           setImagePreview(e.target.value);
                         }}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-full rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[8px] text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] placeholder-[var(--admin-text-muted)]"
                       />
                       {imagePreview && (
                         <div className="relative mt-3 inline-block">
                           <img
                             src={imagePreview}
                             alt="Preview"
-                            className="h-24 w-24 rounded-lg border border-slate-200 object-cover"
+                            className="h-24 w-24 rounded-lg border border-[var(--admin-border)] object-cover"
                             onError={(e) => { e.target.style.display = "none"; }}
                           />
                         </div>
@@ -631,16 +631,16 @@ function Products() {
                           <img
                             src={imagePreview}
                             alt="Preview"
-                            className="h-40 w-40 rounded-xl border border-slate-200 object-cover shadow-sm"
+                            className="h-40 w-40 rounded-lg border border-[var(--admin-border)] object-cover shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                           />
                           <button
                             type="button"
                             onClick={handleRemoveImage}
-                            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-white shadow-md transition hover:bg-rose-600"
+                            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--admin-danger)] text-white shadow-md transition hover:bg-[#B91C1C]"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
-                          <p className="mt-1.5 text-xs text-slate-500">
+                          <p className="mt-1.5 text-[13px] text-[var(--admin-text-secondary)]">
                             {imageFile ? imageFile.name : "Current image"}
                           </p>
                         </div>
@@ -651,17 +651,17 @@ function Products() {
                           onDragLeave={handleDragLeave}
                           onDrop={handleDrop}
                           onClick={() => fileInputRef.current?.click()}
-                          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 transition ${
+                          className={`flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed px-6 py-8 transition ${
                             isDragging
-                              ? "border-indigo-500 bg-indigo-50"
-                              : "border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/50"
+                              ? "border-[var(--admin-accent)] bg-[var(--admin-accent-light)]"
+                              : "border-[var(--admin-border-strong)] bg-[var(--admin-surface)] hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface-2)]"
                           }`}
                         >
-                          <Upload className={`mb-2 h-8 w-8 ${isDragging ? "text-indigo-500" : "text-slate-400"}`} />
-                          <p className="text-sm font-medium text-slate-600">
+                          <Upload className={`mb-2 h-8 w-8 ${isDragging ? "text-[var(--admin-accent)]" : "text-[var(--admin-text-muted)]"}`} />
+                          <p className="text-[14px] font-medium text-[var(--admin-text-secondary)]">
                             {isDragging ? "Drop image here" : "Click to upload or drag & drop"}
                           </p>
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="mt-1 text-[13px] text-[var(--admin-text-muted)]">
                             JPG, PNG, GIF, WebP or SVG (max 5 MB)
                           </p>
                         </div>
@@ -683,26 +683,26 @@ function Products() {
                     id="featured"
                     checked={formData.featured}
                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
+                    className="h-4 w-4 rounded border-[var(--admin-border-strong)] text-[var(--admin-accent)] focus:ring-[var(--admin-accent)]"
                   />
-                  <label htmlFor="featured" className="text-sm font-medium text-slate-700">
+                  <label htmlFor="featured" className="text-[13px] font-medium text-[var(--admin-text-secondary)]">
                     Featured Product (Show on homepage)
                   </label>
                 </div>
               </div>
 
-              <div className="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-6">
+              <div className="mt-8 flex justify-end gap-3 border-t border-[var(--admin-border)] pt-6">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  className="rounded-md bg-[var(--admin-surface)] text-[var(--admin-text-primary)] border border-[var(--admin-border-strong)] text-[14px] font-medium px-[18px] py-[8px] transition hover:bg-[var(--admin-surface-2)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800 disabled:opacity-70"
+                  className="rounded-md bg-[var(--admin-accent)] px-[18px] py-[8px] text-[14px] font-medium text-white transition hover:bg-[var(--admin-accent-hover)] disabled:opacity-70 border-none"
                 >
                   {isSubmitting ? "Saving..." : "Save Product"}
                 </button>

@@ -81,29 +81,29 @@ function Cart() {
       <section className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold text-slate-900">Your Cart</h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <h1 className="text-3xl font-semibold text-slate-900 dark:text-white">Your Cart</h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Review your items before checkout.
             </p>
           </div>
           <Link
             to="/home"
-            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
           >
             Continue Shopping
           </Link>
         </div>
 
         {isLoading ? (
-          <div className="mt-10 rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md">
+          <div className="mt-10 rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md dark:border-white/10 dark:bg-slate-900 dark:text-slate-400">
             Loading your cart...
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-            <h2 className="text-lg font-semibold text-slate-800">
+          <div className="mt-10 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900 p-10 text-center">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
               Your cart is empty
             </h2>
-            <p className="mt-3 text-sm text-slate-500">
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
               Add products to your cart to see them here.
             </p>
           </div>
@@ -117,11 +117,11 @@ function Cart() {
                 return (
                   <div
                     key={entry.product?._id || entry.product}
-                    className={`flex flex-col gap-6 rounded-2xl border bg-white p-4 shadow-md sm:flex-row sm:items-center transition ${
-                      isOutOfStock ? "border-rose-100 bg-rose-50/10" : "border-slate-100"
+                    className={`flex flex-col gap-6 rounded-2xl border bg-white dark:bg-slate-900 p-4 shadow-md sm:flex-row sm:items-center transition ${
+                      isOutOfStock ? "border-rose-100 bg-rose-50/10" : "border-slate-100 dark:border-white/10"
                     }`}
                   >
-                    <div className="h-28 w-full overflow-hidden rounded-xl bg-slate-50 sm:h-24 sm:w-32">
+                    <div className="h-28 w-full overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-900 sm:h-24 sm:w-32">
                       <img
                         src={resolveImageUrl(entry.product?.imageUrl)}
                         alt={entry.product?.productName}
@@ -130,10 +130,10 @@ function Cart() {
                     </div>
 
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-slate-900">
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-white">
                         {entry.product?.productName}
                       </h3>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                         {entry.product?.category}
                       </p>
                       <div className="flex flex-wrap items-center gap-3">
@@ -177,7 +177,7 @@ function Cart() {
                         >
                           <FiMinus className="h-4 w-4" />
                         </button>
-                        <span className="min-w-10 text-center text-sm font-semibold text-slate-800">
+                        <span className="min-w-10 text-center text-sm font-semibold text-slate-800 dark:text-white">
                           {entry.quantity}
                         </span>
                         <button
@@ -212,11 +212,11 @@ function Cart() {
               })}
             </div>
 
-            <div className="h-fit rounded-2xl border border-slate-100 bg-white p-6 shadow-md">
-              <h2 className="text-lg font-semibold text-slate-900">
+            <div className="h-fit rounded-2xl border border-slate-100 bg-white p-6 shadow-md dark:border-white/10 dark:bg-slate-900">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Order Summary
               </h2>
-              <div className="mt-6 space-y-3 text-sm text-slate-600">
+              <div className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-400">
                 <div className="flex items-center justify-between">
                   <span>Subtotal</span>
                   <span>₹{cartTotal.toFixed(2)}</span>
@@ -225,7 +225,7 @@ function Cart() {
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                <div className="flex items-center justify-between border-t border-slate-200 pt-4 text-base font-semibold text-slate-900">
+                <div className="flex items-center justify-between border-t border-slate-200 pt-4 dark:border-white/10 text-base font-semibold text-slate-900 dark:text-white">
                   <span>Total</span>
                   <span>₹{cartTotal.toFixed(2)}</span>
                 </div>
@@ -235,7 +235,7 @@ function Cart() {
                 <div className="mt-6 flex flex-col gap-2">
                   <button
                     disabled
-                    className="flex w-full justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-400 cursor-not-allowed"
+                    className="flex w-full justify-center rounded-full bg-slate-200 dark:bg-slate-700 px-5 py-3 text-sm font-semibold text-slate-400 cursor-not-allowed"
                   >
                     Proceed to Checkout
                   </button>

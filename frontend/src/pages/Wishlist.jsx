@@ -18,29 +18,29 @@ function Wishlist() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-white">
       <Navbar />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-6 pt-36 pb-12 md:pt-28">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold text-slate-900">
+            <h1 className="text-3xl font-semibold text-slate-900 dark:text-white">
               Wishlist
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Your saved items in one place.
             </p>
           </div>
           <Link
             to="/home"
-            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
           >
             Continue Shopping
           </Link>
         </div>
 
         {wishlist.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 dark:bg-slate-900 p-10 text-center text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
             Your wishlist is empty. Save products to see them here.
           </div>
         ) : (
@@ -48,19 +48,19 @@ function Wishlist() {
             {wishlist.map((product) => (
               <div
                 key={product._id}
-                className="rounded-3xl border border-slate-100 bg-white p-5 shadow-md"
+                className="rounded-3xl border border-slate-100 bg-white p-5 shadow-md dark:border-white/10 dark:bg-slate-900"
               >
-                <div className="aspect-[4/3] rounded-2xl bg-slate-50 p-4">
+                <div className="aspect-[4/3] rounded-2xl bg-slate-50 dark:bg-slate-900 p-4 dark:bg-white/5">
                   <img
                     src={resolveImageUrl(product.imageUrl)}
                     alt={product.productName}
                     className="h-full w-full object-contain"
                   />
                 </div>
-                <h2 className="mt-4 text-base font-semibold text-slate-900">
+                <h2 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
                   {product.productName}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {product.category}
                 </p>
                 <p className="mt-3 text-lg font-semibold text-blue-600">

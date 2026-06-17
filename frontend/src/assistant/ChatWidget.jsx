@@ -131,21 +131,21 @@ function ChatWidget() {
           h-[580px] gives comfortable room; cap with max-h so it never overflows
           the viewport on small screens.
         */}
-        <div className="flex h-[700px] max-h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.96),rgba(15,23,42,0.95))] shadow-[0_30px_90px_rgba(2,12,27,0.65)] backdrop-blur-2xl">
+        <div className="flex h-[700px] max-h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-[2rem] border border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[linear-gradient(180deg,rgba(2,6,23,0.96),rgba(15,23,42,0.95))] shadow-[0_30px_90px_rgba(2,12,27,0.65)] backdrop-blur-2xl">
 
           {/* ── Header ── */}
-          <div className="relative shrink-0 overflow-hidden border-b border-white/10 px-5 py-4">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.18),_transparent_45%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.18),_transparent_40%)]" />
+          <div className="relative shrink-0 overflow-hidden border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-transparent px-5 py-4">
+            <div className="hidden dark:block absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.18),_transparent_45%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.18),_transparent_40%)]" />
             <div className="relative flex items-start justify-between gap-3">
               {/* left: brand + quick actions */}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="shrink-0 rounded-full border border-cyan-300/20 bg-cyan-300/10 p-2 text-cyan-100">
+                  <span className="shrink-0 rounded-full border border-cyan-500/30 dark:border-cyan-300/20 bg-cyan-500/10 dark:bg-cyan-300/10 p-2 text-cyan-600 dark:text-cyan-100">
                     <Sparkles className="h-4 w-4" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-white">ElectroMart AI</p>
-                    <p className="truncate text-xs text-slate-400">{sessionTitle || "Shopping intelligence for electronics and orders"}</p>
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">ElectroMart AI</p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{sessionTitle || "Shopping intelligence for electronics and orders"}</p>
                   </div>
                 </div>
                 <QuickActionButtons actions={HEADER_ACTIONS} onAction={handleQuickAction} compact />
@@ -156,7 +156,7 @@ function ChatWidget() {
                 <button
                   type="button"
                   onClick={clearChat}
-                  className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
+                  className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2 text-slate-600 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-white/10"
                   aria-label="Clear chat"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -164,7 +164,7 @@ function ChatWidget() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
+                  className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2 text-slate-600 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-white/10"
                   aria-label="Close assistant"
                 >
                   <X className="h-4 w-4" />
@@ -182,10 +182,10 @@ function ChatWidget() {
             {isLoadingHistory ? (
               <div className="space-y-3">
                 {[0, 1, 2].map((index) => (
-                  <div key={index} className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="h-3 w-2/3 rounded bg-white/10" />
-                    <div className="mt-3 h-3 w-full rounded bg-white/10" />
-                    <div className="mt-2 h-3 w-4/5 rounded bg-white/10" />
+                  <div key={index} className="animate-pulse rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-4">
+                    <div className="h-3 w-2/3 rounded bg-slate-200 dark:bg-white/10" />
+                    <div className="mt-3 h-3 w-full rounded bg-slate-200 dark:bg-white/10" />
+                    <div className="mt-2 h-3 w-4/5 rounded bg-slate-200 dark:bg-white/10" />
                   </div>
                 ))}
               </div>

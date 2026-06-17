@@ -7,7 +7,7 @@ function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="admin-theme min-h-screen bg-[var(--admin-bg)] font-sans text-[var(--admin-text-primary)]">
       <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div
         className={`flex min-h-screen flex-col transition-all duration-300 ${
@@ -15,7 +15,7 @@ function AdminLayout() {
         }`}
       >
         <AdminNavbar />
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 px-8 py-6">
           <Outlet />
         </main>
       </div>

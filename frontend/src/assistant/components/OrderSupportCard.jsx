@@ -13,13 +13,13 @@ function formatDate(value) {
 function statusTone(status) {
   switch (status) {
     case "Delivered":
-      return "bg-emerald-400/15 text-emerald-100";
+      return "bg-emerald-50 dark:bg-emerald-400/15 text-emerald-700 dark:text-emerald-100";
     case "Cancelled":
-      return "bg-rose-400/15 text-rose-100";
+      return "bg-rose-50 dark:bg-rose-400/15 text-rose-700 dark:text-rose-100";
     case "Shipped":
-      return "bg-sky-400/15 text-sky-100";
+      return "bg-sky-50 dark:bg-sky-400/15 text-sky-700 dark:text-sky-100";
     default:
-      return "bg-amber-400/15 text-amber-100";
+      return "bg-amber-50 dark:bg-amber-400/15 text-amber-700 dark:text-amber-100";
   }
 }
 
@@ -55,11 +55,11 @@ function getOrderPrimaryLabel(order) {
 function getActionClasses(variant) {
   switch (variant) {
     case "primary":
-      return "border-cyan-400/40 bg-cyan-400/15 text-cyan-100 hover:bg-cyan-400/25";
+      return "border-cyan-200 dark:border-cyan-400/40 bg-cyan-50 dark:bg-cyan-400/15 text-cyan-700 dark:text-cyan-100 hover:bg-cyan-100 dark:hover:bg-cyan-400/25";
     case "danger":
-      return "border-rose-400/40 bg-rose-400/10 text-rose-100 hover:bg-rose-400/20";
+      return "border-rose-200 dark:border-rose-400/40 bg-rose-50 dark:bg-rose-400/10 text-rose-700 dark:text-rose-100 hover:bg-rose-100 dark:hover:bg-rose-400/20";
     default:
-      return "border-white/10 bg-white/5 text-slate-100 hover:bg-white/10";
+      return "border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 shadow-sm dark:shadow-none hover:bg-slate-50 dark:hover:bg-white/10";
   }
 }
 
@@ -68,12 +68,12 @@ function OrderSupportCard({ order, onAction, activeOrderActionId = "" }) {
   const cancellation = order.cancellation || null;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm transition duration-300 hover:bg-white/[0.08]">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.06] p-4 shadow-sm dark:shadow-none backdrop-blur-sm transition duration-300 hover:bg-slate-50 dark:hover:bg-white/[0.08]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white">{primaryLabel}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">{primaryLabel}</p>
           <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-slate-500">{order.orderNumber}</p>
-          <p className="mt-1 text-xs text-slate-300">
+          <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
             {order.itemCount} item{order.itemCount === 1 ? "" : "s"} | Rs. {order.totalAmount}
           </p>
         </div>
@@ -82,22 +82,22 @@ function OrderSupportCard({ order, onAction, activeOrderActionId = "" }) {
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-300">
-        <div className="rounded-xl bg-black/20 p-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Payment</p>
-          <p className="mt-1 font-medium text-white">{order.paymentMethod}</p>
-          <p className="mt-1 text-[11px] text-slate-400">{order.paymentStatus}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300">
+        <div className="rounded-xl bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-transparent p-2">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Payment</p>
+          <p className="mt-1 font-medium text-slate-900 dark:text-white">{order.paymentMethod}</p>
+          <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">{order.paymentStatus}</p>
         </div>
-        <div className="rounded-xl bg-black/20 p-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">ETA</p>
-          <p className="mt-1 font-medium text-white">{formatDate(order.estimatedDelivery)}</p>
+        <div className="rounded-xl bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-transparent p-2">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">ETA</p>
+          <p className="mt-1 font-medium text-slate-900 dark:text-white">{formatDate(order.estimatedDelivery)}</p>
         </div>
       </div>
 
       {cancellation?.detailMessage ? (
-        <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Cancellation</p>
-          <p className="mt-1 text-xs leading-5 text-slate-200">{cancellation.detailMessage}</p>
+        <div className="mt-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 p-3">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Cancellation</p>
+          <p className="mt-1 text-xs leading-5 text-slate-700 dark:text-slate-200">{cancellation.detailMessage}</p>
         </div>
       ) : null}
 

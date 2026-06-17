@@ -13,7 +13,7 @@ function formatInline(text) {
 
     if (match[2]) {
       segments.push(
-        <strong key={`${match.index}-bold`} className="font-semibold text-white">
+        <strong key={`${match.index}-bold`} className="font-semibold text-slate-900 dark:text-white">
           {match[2]}
         </strong>
       );
@@ -21,7 +21,7 @@ function formatInline(text) {
       segments.push(
         <code
           key={`${match.index}-code`}
-          className="rounded-md bg-white/10 px-1.5 py-0.5 text-[0.92em] text-cyan-100"
+          className="rounded-md bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 text-[0.92em] text-cyan-700 dark:text-cyan-100"
         >
           {match[3]}
         </code>
@@ -46,7 +46,7 @@ export function renderMarkdown(content = "") {
   const flushList = () => {
     if (listItems.length > 0) {
       elements.push(
-        <ul key={`list-${elements.length}`} className="space-y-1 pl-4 text-sm text-slate-200">
+        <ul key={`list-${elements.length}`} className="space-y-1 pl-4 text-sm text-slate-800 dark:text-slate-200">
           {listItems.map((item, index) => (
             <li key={`${item}-${index}`} className="list-disc">
               {formatInline(item)}
@@ -72,7 +72,7 @@ export function renderMarkdown(content = "") {
 
     flushList();
     elements.push(
-      <p key={`p-${index}`} className="text-sm leading-6 text-slate-200">
+      <p key={`p-${index}`} className="text-sm leading-6 text-slate-800 dark:text-slate-200">
         {formatInline(trimmed)}
       </p>
     );

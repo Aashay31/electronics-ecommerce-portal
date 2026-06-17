@@ -77,7 +77,7 @@ function ProductDetails() {
     }
 
     toast.custom((toastInstance) => (
-      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70">
+      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-800 shadow-lg shadow-slate-200/70 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 dark:shadow-none">
         <span>{product.productName} added to cart.</span>
         <button
           type="button"
@@ -85,7 +85,7 @@ function ProductDetails() {
             navigate("/cart");
             toast.dismiss(toastInstance.id);
           }}
-          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+          className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
         >
           Open Cart
         </button>
@@ -116,18 +116,18 @@ function ProductDetails() {
   const isWishlisted = wishlist.some((item) => item._id === product?._id);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 dark:bg-slate-950">
       <Navbar />
 
       <section className="mx-auto w-full max-w-6xl flex-1 px-6 pb-12 pt-36 md:pt-28">
         {isLoading && (
-          <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md">
+          <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center text-slate-500 shadow-md dark:border-white/10 dark:bg-slate-900 dark:text-slate-400">
             Loading product details...
           </div>
         )}
 
         {!isLoading && errorMessage && (
-          <div className="rounded-2xl border border-rose-100 bg-rose-50 p-10 text-center text-rose-600 shadow-md">
+          <div className="rounded-2xl border border-rose-100 bg-rose-50 p-10 text-center text-rose-600 shadow-md dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
             {errorMessage}
           </div>
         )}
@@ -135,8 +135,8 @@ function ProductDetails() {
         {!isLoading && product && (
           <>
             <div className="grid gap-10 md:grid-cols-[1.05fr_1fr]">
-              <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg">
-                <div className="aspect-[4/3] bg-slate-50 p-6">
+              <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg dark:border-white/10 dark:bg-slate-900 dark:shadow-none">
+                <div className="aspect-[4/3] bg-slate-50 dark:bg-slate-900 p-6 dark:bg-white/5">
                   <img
                     src={resolveImageUrl(product.imageUrl)}
                     alt={product.productName}
@@ -147,10 +147,10 @@ function ProductDetails() {
 
               <div className="flex flex-col gap-6">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+                  <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     {product.category}
                   </p>
-                  <h1 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">
+                  <h1 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl dark:text-white">
                     {product.productName}
                   </h1>
                   <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -159,14 +159,14 @@ function ProductDetails() {
                       readOnly
                       size={18}
                     />
-                    <span className="text-sm font-semibold text-slate-600">
+                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                       {(product.averageRating ?? product.rating ?? 0).toFixed(1)} rating
                     </span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {product.totalReviews ?? product.ratingCount ?? 0} reviews
                     </span>
                   </div>
-                  <p className="mt-4 text-lg text-slate-600">
+                  <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
                     {product.description}
                   </p>
                 </div>
@@ -177,15 +177,15 @@ function ProductDetails() {
                       ₹{product.price}
                     </span>
                     {product.stock <= 0 ? (
-                      <span className="rounded-full bg-rose-50 border border-rose-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-rose-600 animate-pulse">
+                      <span className="rounded-full bg-rose-50 border border-rose-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-rose-600 animate-pulse dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400">
                         Out of Stock
                       </span>
                     ) : product.stock <= 5 ? (
-                      <span className="rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-amber-600">
+                      <span className="rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
                         Low Stock
                       </span>
                     ) : (
-                      <span className="rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-emerald-600">
+                      <span className="rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400">
                         In Stock
                       </span>
                     )}
@@ -198,7 +198,7 @@ function ProductDetails() {
                     </div>
                   )}
                   {product.stock > 5 && (
-                    <div className="mt-1 text-sm font-medium text-slate-500">
+                    <div className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                       {product.stock} items available
                     </div>
                   )}
@@ -211,8 +211,8 @@ function ProductDetails() {
                     disabled={product.stock <= 0}
                     className={`inline-flex w-full items-center justify-center gap-3 rounded-full px-6 py-3 text-sm font-semibold transition sm:w-auto ${
                       product.stock <= 0
-                        ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                        : "bg-slate-900 text-white shadow-lg shadow-slate-900/30 hover:-translate-y-0.5 hover:bg-slate-800"
+                        ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none dark:bg-white/5 dark:text-slate-500"
+                        : "bg-slate-900 text-white shadow-lg shadow-slate-900/30 hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:shadow-white/10 dark:hover:bg-slate-200"
                     }`}
                   >
                     <FiShoppingCart className="h-5 w-5" />
@@ -229,8 +229,8 @@ function ProductDetails() {
                     }}
                     className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold transition sm:w-auto ${
                       isWishlisted
-                        ? "border-rose-200 bg-rose-50 text-rose-500"
-                        : "border-slate-200 text-slate-700 hover:border-rose-200 hover:text-rose-500"
+                        ? "border-rose-200 bg-rose-50 text-rose-500 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400"
+                        : "border-slate-200 text-slate-700 hover:border-rose-200 hover:text-rose-500 dark:border-white/10 dark:text-slate-200 dark:hover:border-rose-500/30 dark:hover:text-rose-400"
                     }`}
                   >
                     <FiHeart className={isWishlisted ? "fill-current" : ""} />
@@ -238,18 +238,18 @@ function ProductDetails() {
                   </button>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-md">
-                  <h2 className="text-lg font-semibold text-slate-900">
+                <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-md dark:border-white/10 dark:bg-slate-900 dark:shadow-none">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                     Product specifications
                   </h2>
-                  <div className="mt-4 space-y-3 text-sm text-slate-600">
+                  <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-400">
                     {specs.map((spec) => (
                       <div
                         key={spec.label}
                         className="flex items-center justify-between"
                       >
-                        <span className="text-slate-500">{spec.label}</span>
-                        <span className="font-medium text-slate-800">
+                        <span className="text-slate-500 dark:text-slate-400">{spec.label}</span>
+                        <span className="font-medium text-slate-800 dark:text-slate-200">
                           {spec.value}
                         </span>
                       </div>

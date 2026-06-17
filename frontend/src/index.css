@@ -2,9 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme transition — only bg & color to avoid lag on interactive elements */
+html {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
 @layer base {
   body {
-    @apply bg-white text-neutral-900;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white;
   }
 }
 
+.admin-theme {
+  --admin-bg:           #F4F6F9;
+  --admin-surface:      #FFFFFF;
+  --admin-surface-2:    #F8F9FB;
+  --admin-border:       #DDE1E7;
+  --admin-border-strong:#B0B8C4;
+  --admin-text-primary: #1A1D23;
+  --admin-text-secondary:#52596B;
+  --admin-text-muted:   #8C95A6;
+  --admin-accent:       #2563EB;
+  --admin-accent-hover: #1D4ED8;
+  --admin-accent-light: #EFF4FF;
+  --admin-accent-border:#BFCFFF;
+  --admin-success:      #16A34A;
+  --admin-success-bg:   #F0FDF4;
+  --admin-warning:      #D97706;
+  --admin-warning-bg:   #FFFBEB;
+  --admin-danger:       #DC2626;
+  --admin-danger-bg:    #FEF2F2;
+  --admin-info:         #0891B2;
+  --admin-info-bg:      #ECFEFF;
+}

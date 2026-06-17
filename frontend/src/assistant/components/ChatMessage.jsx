@@ -16,14 +16,14 @@ function ComparisonCard({ comparison }) {
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-      <p className="text-sm font-semibold text-white">{comparison.title}</p>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.06] shadow-sm dark:shadow-none p-3">
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">{comparison.title}</p>
       {comparison.points?.length ? (
         <div className="mt-3 space-y-2">
           {comparison.points.map((point) => (
-            <div key={point.label} className="rounded-xl bg-black/20 p-2">
+            <div key={point.label} className="rounded-xl bg-slate-50 dark:bg-black/20 p-2 border border-slate-200 dark:border-transparent">
               <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">{point.label}</p>
-              <p className="mt-1 text-sm text-slate-200">{point.value}</p>
+              <p className="mt-1 text-sm text-slate-900 dark:text-slate-200">{point.value}</p>
             </div>
           ))}
         </div>
@@ -35,13 +35,13 @@ function ComparisonCard({ comparison }) {
               <span
                 className={`h-2.5 w-2.5 rounded-full ${
                   step.state === "completed"
-                    ? "bg-emerald-300"
+                    ? "bg-emerald-400 dark:bg-emerald-300"
                     : step.state === "current"
-                      ? "bg-cyan-300"
-                      : "bg-slate-600"
+                      ? "bg-cyan-500 dark:bg-cyan-300"
+                      : "bg-slate-300 dark:bg-slate-600"
                 }`}
               />
-              <p className="text-sm text-slate-200">{step.status}</p>
+              <p className="text-sm text-slate-700 dark:text-slate-200">{step.status}</p>
             </div>
           ))}
         </div>
@@ -100,8 +100,8 @@ function ChatMessage({ message, onQuickAction, onExploreProduct, activeOrderActi
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[88%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-2`}>
         {!isUser ? (
-          <div className="rounded-[1.75rem] rounded-bl-md border border-white/10 bg-white/[0.07] px-4 py-3 shadow-xl shadow-black/20">
-            <div className="space-y-3">{renderMarkdown(message.content)}</div>
+          <div className="rounded-[1.75rem] rounded-bl-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.07] px-4 py-3 shadow-sm dark:shadow-xl dark:shadow-black/20">
+            <div className="space-y-3 text-slate-800 dark:text-slate-100">{renderMarkdown(message.content)}</div>
             {rich.products?.length ? (
               <div className="mt-4 space-y-3">
                 {rich.products.map((product) => (
@@ -137,7 +137,7 @@ function ChatMessage({ message, onQuickAction, onExploreProduct, activeOrderActi
             {message.content}
           </div>
         )}
-        <span className="px-1 text-[11px] text-slate-500">{formatTime(message.timestamp)}</span>
+        <span className="px-1 text-[11px] text-slate-400 dark:text-slate-500">{formatTime(message.timestamp)}</span>
       </div>
     </div>
   );

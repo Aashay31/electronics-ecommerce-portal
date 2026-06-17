@@ -295,29 +295,29 @@ function Shop() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 dark:bg-slate-950">
       <Navbar />
 
       <main className="mx-auto w-full max-w-7xl flex-1 space-y-10 px-4 pt-36 pb-10 sm:px-6 lg:px-8 md:pt-28">
 
         {/* ── Hero ── */}
-        <section className="rounded-[32px] border border-slate-200/60 bg-white/90 p-8 shadow-xl shadow-slate-200/60">
+        <section className="rounded-[32px] border border-slate-200/60 bg-white/90 p-8 shadow-xl shadow-slate-200/60 dark:border-white/10 dark:bg-slate-900/90 dark:shadow-none">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
                 Product Discovery
               </p>
-              <h1 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">
+              <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl">
                 Find components that power your next build.
               </h1>
-              <p className="mt-3 max-w-2xl text-sm text-slate-600">
+              <p className="mt-3 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
                 Search across microcontrollers, sensors, and boards, then refine with smart filters.
               </p>
             </div>
             <button
               type="button"
               onClick={() => navigate("/shop#categories")}
-              className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
+              className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:shadow-white/10 dark:hover:bg-slate-200"
             >
               Shop by Category
             </button>
@@ -328,14 +328,14 @@ function Shop() {
         <section ref={categoriesRef} id="categories" className="space-y-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Browse by Category</h2>
-              <p className="mt-1 text-sm text-slate-500">Tap a category to instantly filter products below.</p>
+              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Browse by Category</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Tap a category to instantly filter products below.</p>
             </div>
             {selectedCategories.length > 0 && (
               <button
                 type="button"
                 onClick={() => setSelectedCategories([])}
-                className="text-xs font-semibold text-slate-500 transition hover:text-slate-700"
+                className="text-xs font-semibold text-slate-500 transition hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
               >
                 Clear category
               </button>
@@ -363,7 +363,7 @@ function Shop() {
           <button
             type="button"
             onClick={() => setIsFilterOpen(true)}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white dark:bg-slate-950 px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm dark:border-white/10 dark:bg-slate-800 dark:text-slate-200"
           >
             <FiFilter className="h-4 w-4" /> Filters
           </button>
@@ -374,14 +374,14 @@ function Shop() {
         <section className="grid gap-8 lg:grid-cols-[1fr_3fr] lg:items-start">
 
           {/* Desktop filter sidebar — sticky below the search bar */}
-          <aside className="hidden rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg shadow-slate-200/60 lg:block lg:sticky lg:top-56">
+          <aside className="hidden rounded-3xl border border-slate-200/70 bg-white p-6 shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-slate-900 dark:shadow-none lg:block lg:sticky lg:top-56">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-slate-900">Filters</h3>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Filters</h3>
               {activeFilters.length > 0 && (
                 <button
                   type="button"
                   onClick={handleClearFilters}
-                  className="text-xs font-semibold text-slate-500 transition hover:text-slate-700"
+                  className="text-xs font-semibold text-slate-500 transition hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
                 >
                   Clear all
                 </button>
@@ -394,9 +394,9 @@ function Shop() {
 
           {/* Right: result count + products + pagination */}
           <div className="space-y-6">
-            <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-lg shadow-slate-200/60">
+            <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-lg shadow-slate-200/60 dark:border-white/10 dark:bg-slate-900 dark:shadow-none">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-700">Sort products</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 dark:text-slate-200">Sort products</p>
                 <SortDropdown value={sort} onChange={setSort} />
               </div>
               {activeFilters.length > 0 && (
@@ -404,13 +404,13 @@ function Shop() {
                   {activeFilters.map((chip) => (
                     <span
                       key={chip.key}
-                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600"
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 dark:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
                     >
                       {chip.label}
                       <button
                         type="button"
                         onClick={() => handleRemoveChip(chip.key)}
-                        className="rounded-full p-0.5 text-slate-400 transition hover:text-slate-600"
+                        className="rounded-full p-0.5 text-slate-400 transition hover:text-slate-600 dark:hover:text-white"
                       >
                         <FiX className="h-3 w-3" />
                       </button>
@@ -419,14 +419,14 @@ function Shop() {
                   <button
                     type="button"
                     onClick={handleClearFilters}
-                    className="text-xs font-semibold text-slate-500 transition hover:text-slate-700"
+                    className="text-xs font-semibold text-slate-500 transition hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
                   >
                     Clear all
                   </button>
                 </div>
               )}
             </div>
-            <div ref={productsRef} className="flex items-center justify-between text-sm text-slate-500">
+            <div ref={productsRef} className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
               <span>
                 Showing {pagination.filteredCount || 0} of {pagination.total || 0} products
               </span>
@@ -441,18 +441,18 @@ function Shop() {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                  className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
                 >
                   Previous
                 </button>
-                <span className="text-xs font-semibold text-slate-600">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
                   Page {pagination.page} of {pagination.pages}
                 </span>
                 <button
                   type="button"
                   disabled={page >= pagination.pages}
                   onClick={() => setPage((p) => Math.min(p + 1, pagination.pages))}
-                  className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/5"
                 >
                   Next
                 </button>
@@ -470,13 +470,13 @@ function Shop() {
             onClick={() => setIsFilterOpen(false)}
             className="absolute inset-0 bg-slate-900/40"
           />
-          <div className="relative ml-auto h-full w-[85%] max-w-sm overflow-y-auto bg-white p-6 shadow-2xl">
+          <div className="relative ml-auto h-full w-[85%] max-w-sm overflow-y-auto bg-white p-6 shadow-2xl dark:bg-slate-900">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-slate-900">Filters</h3>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Filters</h3>
               <button
                 type="button"
                 onClick={() => setIsFilterOpen(false)}
-                className="rounded-full border border-slate-200 p-2 text-slate-600"
+                className="rounded-full border border-slate-200 p-2 text-slate-600 dark:border-white/10 dark:text-slate-300"
               >
                 <FiX className="h-4 w-4" />
               </button>

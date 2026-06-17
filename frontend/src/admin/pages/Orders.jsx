@@ -6,11 +6,11 @@ import { resolveImageUrl } from "../../utils/imageUrl";
 import { useSocket } from "../../context/SocketContext";
 
 const statusColors = {
-  Pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  Processing: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  Shipped: "bg-indigo-50 text-indigo-700 ring-indigo-600/20",
-  Delivered: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  Cancelled: "bg-rose-50 text-rose-700 ring-rose-600/20",
+  Pending: "bg-[var(--admin-warning-bg)] text-[var(--admin-warning)] border border-[#FDE68A]",
+  Processing: "bg-[var(--admin-warning-bg)] text-[var(--admin-warning)] border border-[#FDE68A]",
+  Shipped: "bg-[var(--admin-info-bg)] text-[var(--admin-info)] border border-[#A5F3FC]",
+  Delivered: "bg-[var(--admin-success-bg)] text-[var(--admin-success)] border border-[#BBF7D0]",
+  Cancelled: "bg-[var(--admin-danger-bg)] text-[var(--admin-danger)] border border-[#FECACA]",
 };
 
 function Orders() {
@@ -132,36 +132,36 @@ function Orders() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-[20px] font-semibold text-[var(--admin-text-primary)] tracking-[-0.01em]">Orders</h1>
+          <p className="mt-1 text-[13px] text-[var(--admin-text-secondary)]">
             Manage customer orders and fulfillments.
           </p>
         </div>
-        <div className="flex w-max items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 shadow-sm">
+        <div className="flex w-max items-center gap-2 rounded-full border border-[#BBF7D0] bg-[var(--admin-success-bg)] px-[12px] py-[6px] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--admin-success)] opacity-75"></span>
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--admin-success)]"></span>
           </span>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">Live Updates</span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-success)]">Live Updates</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row">
-        <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
+      <div className="flex flex-col gap-[12px] rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[16px] py-[14px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:flex-row sm:items-center">
+        <form onSubmit={handleSearch} className="flex flex-1 items-center gap-[12px]">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-muted)]" />
             <input
               type="text"
               placeholder="Search by customer name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border-none bg-slate-50 py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface-2)] py-[8px] pl-10 pr-3 text-[14px] text-[var(--admin-text-primary)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-100"
+            className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[18px] py-[8px] text-[14px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)]"
           >
             Search
           </button>
@@ -169,7 +169,7 @@ function Orders() {
         <select
           value={statusFilter}
           onChange={handleFilterChange}
-          className="rounded-xl border-none bg-slate-50 py-2.5 pl-4 pr-10 text-sm focus:ring-2 focus:ring-indigo-500 sm:w-48"
+          className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] py-[8px] pl-3 pr-8 text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] sm:w-48"
         >
           <option value="">All Statuses</option>
           <option value="Pending">Pending</option>
@@ -183,11 +183,11 @@ function Orders() {
       {/* Orders List */}
       <div className="space-y-4">
         {isLoading ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+          <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-[32px] text-center text-[14px] text-[var(--admin-text-secondary)]">
             Loading orders...
           </div>
         ) : orders.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+          <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-[32px] text-center text-[14px] text-[var(--admin-text-secondary)]">
             No orders found matching your criteria.
           </div>
         ) : (
@@ -198,26 +198,26 @@ function Orders() {
             return (
               <div
                 key={order._id}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+                className="overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]"
               >
               {/* Order Header */}
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50 p-5">
-                <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--admin-border)] bg-[var(--admin-surface-2)] p-[20px]">
+                <div className="flex flex-wrap items-center gap-[24px]">
                   <div>
-                    <p className="text-xs font-medium text-slate-500">Order ID</p>
-                    <p className="font-mono text-sm font-semibold text-slate-900">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Order ID</p>
+                    <p className="font-mono text-[14px] font-semibold text-[var(--admin-text-primary)]">
                       #{order._id.slice(-8)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-500">Date</p>
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Date</p>
+                    <p className="text-[14px] font-semibold text-[var(--admin-text-primary)]">
                       {new Date(order.orderedAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-500">Total Amount</p>
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Total Amount</p>
+                    <p className="text-[14px] font-semibold text-[var(--admin-text-primary)]">
                       ₹{order.total.toLocaleString()}
                     </p>
                   </div>
@@ -227,9 +227,9 @@ function Orders() {
                   <select
                     value={order.deliveryStatus}
                     onChange={(e) => handleStatusUpdate(order.userId, order._id, e.target.value)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${
+                    className={`rounded-full px-[10px] py-[3px] text-[12px] font-medium outline-none cursor-pointer ${
                       statusColors[order.deliveryStatus] || statusColors.Pending
-                    } border-none focus:ring-2`}
+                    } focus:ring-2`}
                   >
                     <option value="Pending">Pending</option>
                     <option value="Processing">Processing</option>
@@ -239,7 +239,7 @@ function Orders() {
                   </select>
                   <button
                     onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                    className="text-[14px] font-medium text-[var(--admin-accent)] hover:text-[var(--admin-accent-hover)] transition"
                   >
                     {expandedOrderId === order._id ? "Hide Details" : "View Details"}
                   </button>
@@ -248,66 +248,66 @@ function Orders() {
 
               {/* Order Details (Expanded) */}
               {expandedOrderId === order._id && (
-                <div className="grid gap-6 p-5 md:grid-cols-2 lg:grid-cols-3">
-                  <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <Package className="h-4 w-4 text-slate-400" />
+                <div className="grid gap-[24px] p-[20px] md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-[12px] rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-[16px]">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-[var(--admin-text-primary)]">
+                      <Package className="h-4 w-4 text-[var(--admin-text-secondary)]" />
                       Payment Details
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-[13px] text-[var(--admin-text-secondary)] space-y-[4px]">
                       <p>
-                        <span className="font-medium text-slate-900">Method:</span> {order.paymentMethod || "-"}
+                        <span className="font-medium text-[var(--admin-text-primary)]">Method:</span> {order.paymentMethod || "-"}
                       </p>
                       <p>
-                        <span className="font-medium text-slate-900">Status:</span> {paymentLabel}
+                        <span className="font-medium text-[var(--admin-text-primary)]">Status:</span> {paymentLabel}
                       </p>
                       {order.transactionId && (
                         <p>
-                          <span className="font-medium text-slate-900">Transaction:</span> {order.transactionId}
+                          <span className="font-medium text-[var(--admin-text-primary)]">Transaction:</span> {order.transactionId}
                         </p>
                       )}
                       {order.cancellationReason && (
                         <p>
-                          <span className="font-medium text-slate-900">Cancel Reason:</span> {order.cancellationReason}
+                          <span className="font-medium text-[var(--admin-text-primary)]">Cancel Reason:</span> {order.cancellationReason}
                         </p>
                       )}
                     </div>
                   </div>
                   {/* Customer Info */}
-                  <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <User className="h-4 w-4 text-slate-400" />
+                  <div className="space-y-[12px] rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-[16px]">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-[var(--admin-text-primary)]">
+                      <User className="h-4 w-4 text-[var(--admin-text-secondary)]" />
                       Customer Details
                     </div>
-                    <div className="text-sm text-slate-600">
-                      <p className="font-medium text-slate-900">{order.customerName}</p>
+                    <div className="text-[13px] text-[var(--admin-text-secondary)] space-y-[4px]">
+                      <p className="font-medium text-[var(--admin-text-primary)]">{order.customerName}</p>
                       <p>{order.customerEmail}</p>
                     </div>
                   </div>
 
                   {/* Items */}
-                  <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4 lg:col-span-2">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <Package className="h-4 w-4 text-slate-400" />
+                  <div className="space-y-[12px] rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-[16px] lg:col-span-2">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-[var(--admin-text-primary)]">
+                      <Package className="h-4 w-4 text-[var(--admin-text-secondary)]" />
                       Ordered Items
                     </div>
-                    <div className="divide-y divide-slate-200">
+                    <div className="divide-y divide-[var(--admin-border)]">
                       {order.items.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between py-2 text-sm">
+                        <div key={idx} className="flex items-center justify-between py-[8px] text-[14px]">
                           <div className="flex items-center gap-3">
                             <img
                               src={resolveImageUrl(item.product?.imageUrl)}
                               alt={item.product?.productName}
-                              className="h-10 w-10 rounded bg-white object-cover shadow-sm"
+                              className="h-10 w-10 rounded border border-[var(--admin-border)] object-cover shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
                             />
                             <div>
-                              <p className="font-medium text-slate-900">
+                              <p className="font-medium text-[var(--admin-text-primary)]">
                                 {item.product?.productName || "Unknown Product"}
                               </p>
-                              <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
+                              <p className="text-[12px] text-[var(--admin-text-secondary)]">Qty: {item.quantity}</p>
                             </div>
                           </div>
-                          <p className="font-semibold text-slate-900">
+                          <p className="font-semibold text-[var(--admin-text-primary)]">
                             ₹{(item.price * item.quantity).toLocaleString()}
                           </p>
                         </div>
@@ -324,23 +324,23 @@ function Orders() {
 
       {/* Pagination */}
       {!isLoading && pagination.pages > 1 && (
-        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-6 py-3 shadow-sm">
-          <p className="text-sm text-slate-500">
-            Showing page <span className="font-medium text-slate-900">{pagination.page}</span> of{" "}
-            <span className="font-medium text-slate-900">{pagination.pages}</span>
+        <div className="flex items-center justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <p className="text-[13px] text-[var(--admin-text-secondary)]">
+            Showing page <span className="font-medium text-[var(--admin-text-primary)]">{pagination.page}</span> of{" "}
+            <span className="font-medium text-[var(--admin-text-primary)]">{pagination.pages}</span>
           </p>
           <div className="flex gap-2">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page === 1}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page === pagination.pages}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>

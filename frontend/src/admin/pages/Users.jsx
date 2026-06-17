@@ -100,28 +100,28 @@ function Users() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Users</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-[20px] font-semibold text-[var(--admin-text-primary)] tracking-[-0.01em]">Users</h1>
+        <p className="mt-1 text-[13px] text-[var(--admin-text-secondary)]">
           Manage platform users, roles, and access.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row">
-        <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
+      <div className="flex flex-col gap-[12px] rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-[16px] py-[14px] shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:flex-row sm:items-center">
+        <form onSubmit={handleSearch} className="flex flex-1 items-center gap-[12px]">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-muted)]" />
             <input
               type="text"
               placeholder="Search by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border-none bg-slate-50 py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface-2)] py-[8px] pl-10 pr-3 text-[14px] text-[var(--admin-text-primary)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-100"
+            className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[18px] py-[8px] text-[14px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)]"
           >
             Search
           </button>
@@ -129,7 +129,7 @@ function Users() {
         <select
           value={roleFilter}
           onChange={handleFilterChange}
-          className="rounded-xl border-none bg-slate-50 py-2.5 pl-4 pr-10 text-sm focus:ring-2 focus:ring-indigo-500 sm:w-48"
+          className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] py-[8px] pl-3 pr-8 text-[14px] text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] sm:w-48"
         >
           <option value="">All Roles</option>
           <option value="user">User</option>
@@ -138,86 +138,86 @@ function Users() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]">
         <div className="overflow-x-auto">
-          <table className="w-full whitespace-nowrap text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
+          <table className="w-full whitespace-nowrap text-left">
+            <thead className="border-b-2 border-[var(--admin-border-strong)] bg-[var(--admin-surface-2)]">
               <tr>
-                <th className="px-6 py-4 font-medium">User</th>
-                <th className="px-6 py-4 font-medium">Contact</th>
-                <th className="px-6 py-4 font-medium">Role</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">User</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Contact</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Role</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)]">Status</th>
+                <th className="px-[16px] py-[12px] text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--admin-text-secondary)] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="5" className="px-[16px] py-[14px] text-center text-[14px] text-[var(--admin-text-secondary)]">
                     Loading users...
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="5" className="px-[16px] py-[14px] text-center text-[14px] text-[var(--admin-text-secondary)]">
                     No users found.
                   </td>
                 </tr>
               ) : (
-                users.map((u) => {
+                users.map((u, idx) => {
                   const isSelf = u._id === currentUser?._id;
                   
                   return (
-                    <tr key={u._id} className="transition hover:bg-slate-50">
-                      <td className="px-6 py-4">
+                    <tr key={u._id} className={`transition hover:bg-[var(--admin-accent-light)] ${idx % 2 === 0 ? "bg-[var(--admin-surface)]" : "bg-[#FAFBFC]"}`}>
+                      <td className="px-[16px] py-[14px]">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-500">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--admin-surface-2)] text-[var(--admin-text-secondary)] border border-[var(--admin-border)]">
                             <UserIcon className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="font-medium text-slate-900">
-                              {u.fullName} {isSelf && <span className="text-xs font-normal text-indigo-600">(You)</span>}
+                            <p className="text-[14px] font-medium text-[var(--admin-text-primary)]">
+                              {u.fullName} {isSelf && <span className="text-[12px] font-normal text-[var(--admin-accent)]">(You)</span>}
                             </p>
-                            <p className="text-xs text-slate-500">Joined {new Date(u.createdAt).toLocaleDateString()}</p>
+                            <p className="text-[13px] text-[var(--admin-text-secondary)]">Joined {new Date(u.createdAt).toLocaleDateString()}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-slate-900">{u.email}</p>
-                        <p className="text-xs text-slate-500">{u.phoneNumber}</p>
+                      <td className="px-[16px] py-[14px]">
+                        <p className="text-[14px] text-[var(--admin-text-primary)]">{u.email}</p>
+                        <p className="text-[13px] text-[var(--admin-text-secondary)]">{u.phoneNumber}</p>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-[16px] py-[14px]">
                         <select
                           value={u.role}
                           onChange={(e) => handleRoleChange(u._id, e.target.value)}
                           disabled={isSelf}
-                          className="rounded-full border-none bg-slate-50 py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                          className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface-2)] py-[4px] pl-2 pr-8 text-[13px] font-medium text-[var(--admin-text-primary)] outline-none focus:border-[var(--admin-accent)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] disabled:opacity-50"
                         >
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-[16px] py-[14px]">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          className={`inline-flex items-center gap-1.5 rounded-full px-[10px] py-[3px] text-[12px] font-medium border ${
                             u.isBanned
-                              ? "bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20"
-                              : "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
+                              ? "bg-[var(--admin-danger-bg)] text-[var(--admin-danger)] border-[#FECACA]"
+                              : "bg-[var(--admin-success-bg)] text-[var(--admin-success)] border-[#BBF7D0]"
                           }`}
                         >
                           {u.isBanned ? <Ban className="h-3 w-3" /> : <UserCheck className="h-3 w-3" />}
                           {u.isBanned ? "Suspended" : "Active"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-[16px] py-[14px] text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleToggleBan(u._id)}
                             disabled={isSelf}
-                            className={`rounded-lg p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${
+                            className={`rounded-md p-[7px] transition border border-transparent disabled:cursor-not-allowed disabled:opacity-30 ${
                               u.isBanned
-                                ? "text-emerald-600 hover:bg-emerald-50"
-                                : "text-amber-600 hover:bg-amber-50"
+                                ? "text-[var(--admin-success)] hover:bg-[var(--admin-success-bg)] hover:border-[#BBF7D0]"
+                                : "text-[var(--admin-warning)] hover:bg-[var(--admin-warning-bg)] hover:border-[#FDE68A]"
                             }`}
                             title={u.isBanned ? "Unban User" : "Suspend User"}
                           >
@@ -226,7 +226,7 @@ function Users() {
                           <button
                             onClick={() => handleDeleteClick(u._id)}
                             disabled={isSelf}
-                            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-30"
+                            className="rounded-md p-[7px] text-[var(--admin-text-secondary)] transition hover:bg-[var(--admin-danger-bg)] hover:text-[var(--admin-danger)] border border-transparent hover:border-[#FECACA] disabled:cursor-not-allowed disabled:opacity-30"
                             title="Delete User"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -243,23 +243,23 @@ function Users() {
 
         {/* Pagination */}
         {!isLoading && pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-3">
-            <p className="text-sm text-slate-500">
-              Showing page <span className="font-medium text-slate-900">{pagination.page}</span> of{" "}
-              <span className="font-medium text-slate-900">{pagination.pages}</span>
+          <div className="flex items-center justify-between border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-[24px] py-[12px]">
+            <p className="text-[13px] text-[var(--admin-text-secondary)]">
+              Showing page <span className="font-medium text-[var(--admin-text-primary)]">{pagination.page}</span> of{" "}
+              <span className="font-medium text-[var(--admin-text-primary)]">{pagination.pages}</span>
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.pages}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] px-[12px] py-[6px] text-[13px] font-medium text-[var(--admin-text-primary)] transition hover:bg-[var(--admin-surface-2)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>

@@ -65,22 +65,22 @@ function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-100 via-white to-slate-200 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-white">
       <Navbar />
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-4 pt-36 pb-12 sm:px-6 lg:px-8 md:pt-28">
-        <section className="w-full max-w-2xl rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_30px_90px_-50px_rgba(15,23,42,0.4)] backdrop-blur sm:p-8">
+        <section className="w-full max-w-2xl rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_30px_90px_-50px_rgba(15,23,42,0.4)] backdrop-blur dark:border-white/10 dark:bg-slate-900/90 dark:shadow-[0_30px_90px_-50px_rgba(0,0,0,0.6)] sm:p-8">
           <div className="mb-7 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-slate-900/30">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-slate-900/30 dark:bg-white/10 dark:shadow-none">
               EM
             </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
               Electronics & Robotics Marketplace
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Create account
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Join ElectroMart to save carts and manage orders.
             </p>
           </div>
@@ -88,7 +88,7 @@ function Signup() {
           <form className="grid gap-5" onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Full Name
                 </label>
                 <input
@@ -97,11 +97,11 @@ function Signup() {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Email
                 </label>
                 <input
@@ -110,14 +110,14 @@ function Signup() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Phone Number
                 </label>
                 <input
@@ -126,11 +126,11 @@ function Signup() {
                   required
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Password
                 </label>
                 <input
@@ -139,13 +139,13 @@ function Signup() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Confirm Password
               </label>
               <input
@@ -154,13 +154,13 @@ function Signup() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
               />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Street Address
                 </label>
                 <input
@@ -169,11 +169,11 @@ function Signup() {
                   required
                   value={formData.street}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   City
                 </label>
                 <input
@@ -182,14 +182,14 @@ function Signup() {
                   required
                   value={formData.city}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   State
                 </label>
                 <input
@@ -198,11 +198,11 @@ function Signup() {
                   required
                   value={formData.state}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Pincode
                 </label>
                 <input
@@ -211,13 +211,13 @@ function Signup() {
                   required
                   value={formData.pincode}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Country
               </label>
               <input
@@ -226,7 +226,7 @@ function Signup() {
                 required
                 value={formData.country}
                 onChange={handleChange}
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white transition duration-200 ease-out placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-white/20 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
               />
             </div>
 
@@ -239,11 +239,11 @@ function Signup() {
             </button>
           </form>
 
-          <p className="mt-7 text-center text-sm text-slate-500">
+          <p className="mt-7 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-semibold text-slate-900 transition hover:text-indigo-500"
+              className="font-semibold text-slate-900 transition hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400"
             >
               Sign in
             </Link>

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { SearchProvider } from "./context/SearchContext";
 import { AssistantProvider } from "./assistant/AssistantContext";
+import { useTheme } from "./context/ThemeContext";
 import ChatWidget from "./assistant/ChatWidget";
 
 import Landing from "./pages/Landing";
@@ -36,6 +37,8 @@ import AdminReviews from "./admin/pages/Reviews";
 import "./App.css";
 
 function App() {
+  const { isDark } = useTheme();
+
   return (
     <BrowserRouter>
       <AssistantProvider>
@@ -45,9 +48,11 @@ function App() {
             toastOptions={{
               style: {
                 borderRadius: "18px",
-                background: "#0f172a",
-                color: "#e2e8f0",
-                border: "1px solid rgba(148, 163, 184, 0.15)",
+                background: isDark ? "#0f172a" : "#ffffff",
+                color: isDark ? "#e2e8f0" : "#1e293b",
+                border: isDark
+                  ? "1px solid rgba(148, 163, 184, 0.15)"
+                  : "1px solid rgba(226, 232, 240, 0.8)",
               },
             }}
           />

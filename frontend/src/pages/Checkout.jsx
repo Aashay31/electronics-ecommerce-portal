@@ -187,13 +187,13 @@ function Checkout() {
   if (!items.length) return null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-900 dark:bg-slate-950">
       <Navbar />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-36 pb-8 sm:px-6 lg:px-8 md:pt-28">
         <Link
           to="/cart"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-900"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 transition hover:text-slate-900"
         >
           <FiChevronLeft className="h-4 w-4" /> Back to Cart
         </Link>
@@ -202,17 +202,17 @@ function Checkout() {
           {/* Left Column: Details */}
           <div className="space-y-6 lg:col-span-8">
             {/* Shipping Address */}
-            <section className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-lg shadow-slate-200/60 backdrop-blur">
-              <div className="flex items-center gap-3 border-b border-slate-100/80 pb-4">
+            <section className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-lg dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none shadow-slate-200/60 backdrop-blur dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none">
+              <div className="flex items-center gap-3 border-b border-slate-100/80 dark:border-white/10 pb-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100/60 text-indigo-600">
                   <FiMapPin className="h-5 w-5" />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Shipping Address</h2>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Shipping Address</h2>
               </div>
 
               <div className="mt-6 space-y-4">
                 {!addresses.length ? (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
                     You have no saved addresses. Please{" "}
                     <Link to="/addresses" className="font-semibold underline">
                       add an address
@@ -244,20 +244,20 @@ function Checkout() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-900">{address.label}</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">{address.label}</span>
                             {address.isDefault && (
                               <span className="rounded bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700">
                                 Default
                               </span>
                             )}
                           </div>
-                          <p className="mt-2 text-sm font-semibold text-slate-900">
+                          <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                             {address.recipientName || "Recipient"}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             {address.phoneNumber || "Phone not set"}
                           </p>
-                          <p className="mt-1 text-sm text-slate-600">
+                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                             {address.street}, {address.city}, {address.state} {address.pincode},{" "}
                             {address.country}
                           </p>
@@ -270,12 +270,12 @@ function Checkout() {
             </section>
 
             {/* Payment Method */}
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-white/10">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                   <FiCreditCard className="h-5 w-5" />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Payment Method</h2>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Payment Method</h2>
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -295,9 +295,9 @@ function Checkout() {
                       checked={paymentMethod === method}
                       onChange={() => setPaymentMethod(method)}
                     />
-                    <span className="text-sm font-semibold text-slate-900">{method}</span>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{method}</span>
                     {method !== "Cash on Delivery" && (
-                      <span className="text-xs text-slate-500">Razorpay Secure</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">Razorpay Secure</span>
                     )}
                   </label>
                 ))}
@@ -307,17 +307,17 @@ function Checkout() {
 
           {/* Right Column: Order Summary */}
           <div className="lg:col-span-4">
-            <section className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="bg-slate-900 p-5 text-white">
+            <section className="sticky top-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900">
+              <div className="bg-slate-900 p-5 text-white dark:bg-slate-800">
                 <h2 className="text-lg font-bold">Order Summary</h2>
-                <p className="mt-1 text-sm text-slate-300">{items.length} items</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 dark:text-slate-400">{items.length} items</p>
               </div>
 
               <div className="max-h-64 overflow-y-auto p-5">
                 <div className="space-y-4">
                   {items.map((item) => (
                     <div key={item.product._id} className="flex gap-4">
-                      <div className="h-16 w-16 flex-shrink-0 rounded-lg border border-slate-100 bg-slate-50 p-1">
+                      <div className="h-16 w-16 flex-shrink-0 rounded-lg border border-slate-100 bg-slate-50 dark:bg-slate-900 p-1 dark:border-white/10 dark:bg-white/5">
                         <img
                           src={resolveImageUrl(item.product.imageUrl)}
                           alt={item.product.productName}
@@ -325,12 +325,12 @@ function Checkout() {
                         />
                       </div>
                       <div className="flex flex-1 flex-col justify-center">
-                        <p className="line-clamp-1 text-sm font-semibold text-slate-900">
+                        <p className="line-clamp-1 text-sm font-semibold text-slate-900 dark:text-white">
                           {item.product.productName}
                         </p>
                         <div className="mt-1 flex items-center justify-between text-sm">
-                          <span className="text-slate-500">Qty: {item.quantity}</span>
-                          <span className="font-semibold text-slate-900">
+                          <span className="text-slate-500 dark:text-slate-400">Qty: {item.quantity}</span>
+                          <span className="font-semibold text-slate-900 dark:text-white">
                             ₹{(item.product.price * item.quantity).toLocaleString()}
                           </span>
                         </div>
@@ -340,27 +340,27 @@ function Checkout() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 bg-slate-50 p-5">
+              <div className="border-t border-slate-100 bg-slate-50 dark:bg-slate-900 dark:border-white/10 dark:bg-slate-800 p-5">
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-slate-600">
                     <span>Subtotal</span>
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-slate-900 dark:text-white">
                       ₹{cartTotal.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>Shipping fee</span>
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-slate-900 dark:text-white">
                       {shippingCharge === 0 ? "Free" : `₹${shippingCharge.toLocaleString()}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>Estimated Tax (18%)</span>
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-slate-900 dark:text-white">
                       ₹{taxAmount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="mt-4 flex justify-between border-t border-slate-200 pt-4 text-base font-bold text-slate-900">
+                  <div className="mt-4 flex justify-between border-t border-slate-200 pt-4 dark:border-white/10 text-base font-bold text-slate-900 dark:text-white">
                     <span>Total Amount</span>
                     <span className="text-indigo-600">₹{finalTotal.toLocaleString()}</span>
                   </div>
@@ -370,7 +370,7 @@ function Checkout() {
                   type="button"
                   disabled={isPlacingOrder || isProcessingPayment || !selectedAddress}
                   onClick={handlePlaceOrder}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <FiTruck className="h-4 w-4" />
                   {isPlacingOrder || isProcessingPayment ? "Processing..." : "Place Order"}

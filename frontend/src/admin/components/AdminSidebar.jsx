@@ -74,11 +74,11 @@ function AdminSidebar({ collapsed, setCollapsed }) {
               key={link.to}
               to={link.to}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 rounded-md px-5 py-2.5 text-[14px] transition-all ${
                 active
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-white"
-              } ${collapsed ? "justify-center" : ""}`}
+                  ? "bg-[rgba(37,99,235,0.15)] text-[#60A5FA] font-medium border-l-[3px] border-[#2563EB]"
+                  : "text-[#9BA4B5] font-normal hover:bg-[rgba(255,255,255,0.05)] hover:text-white border-l-[3px] border-transparent"
+              } ${collapsed ? "justify-center !px-2" : ""}`}
               title={collapsed ? link.label : undefined}
             >
               <Icon className="h-5 w-5 flex-shrink-0" />
@@ -93,8 +93,8 @@ function AdminSidebar({ collapsed, setCollapsed }) {
         <button
           type="button"
           onClick={handleLogout}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition hover:bg-rose-500/10 hover:text-rose-400 ${
-            collapsed ? "justify-center" : ""
+          className={`flex w-full items-center gap-3 rounded-md px-5 py-2.5 text-[14px] font-normal text-[#9BA4B5] transition hover:bg-rose-500/10 hover:text-rose-400 border-l-[3px] border-transparent ${
+            collapsed ? "justify-center !px-2" : ""
           }`}
           title={collapsed ? "Logout" : undefined}
         >
@@ -126,7 +126,7 @@ function AdminSidebar({ collapsed, setCollapsed }) {
 
       {/* Mobile sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E2330] transition-transform duration-300 lg:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -135,7 +135,7 @@ function AdminSidebar({ collapsed, setCollapsed }) {
 
       {/* Desktop sidebar */}
       <aside
-        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:flex lg:flex-col lg:bg-slate-900 lg:transition-all lg:duration-300 ${
+        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:flex lg:flex-col bg-[#1E2330] lg:transition-all lg:duration-300 ${
           collapsed ? "lg:w-20" : "lg:w-64"
         }`}
       >

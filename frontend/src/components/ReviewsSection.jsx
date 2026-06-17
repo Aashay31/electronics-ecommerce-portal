@@ -126,17 +126,17 @@ function ReviewsSection({ productId }) {
     <section className="mt-12 space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+          <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
             Reviews & Ratings
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+          <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
             Customer feedback
           </h2>
         </div>
         <button
           type="button"
           onClick={() => fetchReviews(1)}
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300"
         >
           <FiRefreshCw className="h-4 w-4" />
           Refresh
@@ -144,14 +144,14 @@ function ReviewsSection({ productId }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1.4fr]">
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-100 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="text-4xl font-semibold text-slate-900">
+            <div className="text-4xl font-semibold text-slate-900 dark:text-white">
               {stats.averageRating?.toFixed(1) || "0.0"}
             </div>
             <div>
               <StarRating value={stats.averageRating || 0} readOnly size={18} />
-              <p className="mt-2 text-xs font-semibold text-slate-500">
+              <p className="mt-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {totalReviews} ratings
               </p>
             </div>
@@ -161,13 +161,13 @@ function ReviewsSection({ productId }) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-100 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-slate-900">Filter reviews</p>
-              <p className="text-xs text-slate-500">Sort by relevance and sentiment.</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">Filter reviews</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">Sort by relevance and sentiment.</p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
               <FiFilter className="h-4 w-4" />
               {pagination.total} results
             </div>
@@ -176,7 +176,7 @@ function ReviewsSection({ productId }) {
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-600 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
             >
               <option value="recent">Most recent</option>
               <option value="highest">Highest rated</option>
@@ -186,7 +186,7 @@ function ReviewsSection({ productId }) {
             <select
               value={ratingFilter}
               onChange={(event) => setRatingFilter(event.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-600 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
             >
               <option value="">All ratings</option>
               <option value="5">5 star only</option>
@@ -196,7 +196,7 @@ function ReviewsSection({ productId }) {
               <option value="1">1 star only</option>
             </select>
           </div>
-          <label className="mt-4 flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <label className="mt-4 flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
             <input
               type="checkbox"
               checked={withImages}
@@ -238,12 +238,12 @@ function ReviewsSection({ productId }) {
             {[...Array(4)].map((_, index) => (
               <div
                 key={index}
-                className="h-40 animate-pulse rounded-2xl border border-slate-100 bg-slate-50"
+                className="h-40 animate-pulse rounded-2xl border border-slate-100 bg-slate-50 dark:bg-slate-900 dark:bg-slate-800"
               />
             ))}
           </div>
         ) : reviews.length === 0 ? (
-          <div className="rounded-2xl border border-slate-100 bg-white p-8 text-center text-slate-500">
+          <div className="rounded-2xl border border-slate-100 bg-white dark:bg-slate-900 p-8 text-center text-slate-500 dark:text-slate-400">
             No reviews yet. Be the first to share your experience.
           </div>
         ) : (
@@ -269,18 +269,18 @@ function ReviewsSection({ productId }) {
             type="button"
             onClick={() => fetchReviews(Math.max(1, pagination.page - 1))}
             disabled={pagination.page === 1}
-            className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-xs font-semibold text-slate-500">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Page {pagination.page} of {pagination.pages}
           </span>
           <button
             type="button"
             onClick={() => fetchReviews(Math.min(pagination.pages, pagination.page + 1))}
             disabled={pagination.page === pagination.pages}
-            className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-slate-200 dark:border-white/10 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
           </button>

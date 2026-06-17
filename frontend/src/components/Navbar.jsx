@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiShoppingCart, FiUser } from "react-icons/fi";
+import { Sun, Moon } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 import { useSearch } from "../context/SearchContext";
+import { useTheme } from "../context/ThemeContext";
 import SearchBar from "./SearchBar";
 
 function Navbar() {
@@ -23,6 +25,7 @@ function Navbar() {
     handleSelectRecent,
     clearSearch,
   } = useSearch();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -58,25 +61,43 @@ function Navbar() {
     : "";
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 bg-[#111] px-4 py-3 text-white shadow-md md:px-10 md:py-4">
+    <nav className="fixed left-0 right-0 top-0 z-50 bg-white px-4 py-3 text-slate-900 shadow-md dark:bg-slate-900 dark:text-white md:px-10 md:py-4">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-4">
-        <Link to="/home" className="text-lg font-semibold text-white no-underline">
+        <Link to="/home" className="text-lg font-semibold text-slate-900 no-underline dark:text-white">
           ElectroMart
         </Link>
 
         {/* Links & Icons (Order 2 on mobile, 3 on desktop) */}
         <div className="order-2 flex items-center gap-4 md:order-3 md:gap-5">
-          <Link to="/shop" className="text-sm font-medium text-white no-underline transition-colors hover:text-indigo-400 md:text-base">Shop</Link>
+          {/* Theme toggle pill */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isDark}
+            aria-label="Toggle theme"
+            onClick={toggleTheme}
+            className="relative flex h-8 w-16 items-center rounded-full border border-slate-200 bg-slate-100 dark:bg-slate-800 p-1 transition-colors duration-300 dark:border-white/10 dark:bg-white/10"
+          >
+            <Sun className="h-4 w-4 text-amber-500" />
+            <Moon className="ml-auto h-4 w-4 text-slate-400 dark:text-blue-300" />
+            <span
+              className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-md transition-all duration-300 ${
+                isDark ? "left-[calc(100%-1.75rem)]" : "left-1"
+              }`}
+            />
+          </button>
+
+          <Link to="/shop" className="text-sm font-medium text-slate-700 dark:text-slate-300 no-underline transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400 md:text-base">Shop</Link>
           {!isAuthenticated && (
             <>
-              <Link to="/login" className="text-sm font-medium text-white no-underline transition-colors hover:text-indigo-400 md:text-base">Login</Link>
-              <Link to="/signup" className="hidden text-sm font-medium text-white no-underline transition-colors hover:text-indigo-400 sm:inline-block md:text-base">Register</Link>
+              <Link to="/login" className="text-sm font-medium text-slate-700 dark:text-slate-300 no-underline transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400 md:text-base">Login</Link>
+              <Link to="/signup" className="hidden text-sm font-medium text-slate-700 dark:text-slate-300 no-underline transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400 sm:inline-block md:text-base">Register</Link>
             </>
           )}
-          <Link to="/cart" className="relative inline-flex items-center text-white transition-colors hover:text-indigo-400">
+          <Link to="/cart" className="relative inline-flex items-center text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400">
             <FiShoppingCart className="h-5 w-5" />
             {itemCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-semibold text-white">
+              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-semibold text-slate-900 dark:text-white">
                 {itemCount}
               </span>
             )}
@@ -86,55 +107,55 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => setIsMenuOpen((open) => !open)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white transition hover:bg-white/20 md:h-9 md:w-9 md:text-sm"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-300 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 md:h-9 md:w-9 md:text-sm"
               >
                 {initials ? initials : <FiUser className="h-4 w-4" />}
               </button>
 
               {isMenuOpen && (
-                <div className="absolute right-0 z-50 mt-3 w-52 rounded-2xl border border-slate-200 bg-white p-2 text-sm text-slate-700 shadow-xl">
+                <div className="absolute right-0 z-50 mt-3 w-52 rounded-2xl border border-slate-200 bg-white dark:bg-slate-900 p-2 text-sm text-slate-700 dark:text-slate-300 shadow-xl dark:border-white/10 dark:bg-slate-800 dark:text-slate-200">
                   {displayUser?.role === "admin" && (
                     <Link
                       to="/admin"
-                      className="block rounded-xl px-3 py-2 font-semibold text-indigo-600 no-underline transition hover:bg-indigo-50 hover:text-indigo-700"
+                      className="block rounded-xl px-3 py-2 font-semibold text-indigo-600 no-underline transition hover:bg-indigo-50 hover:text-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
                     >
                       Admin Dashboard
                     </Link>
                   )}
                   <Link
                     to="/profile"
-                    className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"
+                    className="block rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 no-underline transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     View Profile
                   </Link>
                   <Link
                     to="/profile/edit"
-                    className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"
+                    className="block rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 no-underline transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     Edit Profile
                   </Link>
                   <Link
                     to="/orders"
-                    className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"
+                    className="block rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 no-underline transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     My Orders
                   </Link>
                   <Link
                     to="/wishlist"
-                    className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"
+                    className="block rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 no-underline transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     Wishlist
                   </Link>
                   <Link
                     to="/addresses"
-                    className="block rounded-xl px-3 py-2 text-slate-700 no-underline transition hover:bg-slate-100 hover:text-slate-900"
+                    className="block rounded-xl px-3 py-2 text-slate-700 dark:text-slate-300 no-underline transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     Saved Addresses
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="mt-1 w-full rounded-xl px-3 py-2 text-left font-semibold text-rose-500 transition hover:bg-rose-50"
+                    className="mt-1 w-full rounded-xl px-3 py-2 text-left font-semibold text-rose-500 transition hover:bg-rose-50 dark:hover:bg-rose-500/10"
                   >
                     Logout
                   </button>

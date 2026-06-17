@@ -11,6 +11,12 @@ body {
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
 }
 
+.dark body {
+  background:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.06), transparent 22%),
+    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+}
+
 #root {
   min-height: 100vh;
 }
@@ -46,9 +52,13 @@ body {
 .footer {
   background-color: #111;
   color: white;
-
   text-align: center;
   padding: 20px;
+}
+
+.dark .footer {
+  background-color: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Product Cards */

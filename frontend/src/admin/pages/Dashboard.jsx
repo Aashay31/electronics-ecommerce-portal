@@ -51,10 +51,10 @@ function Dashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-48 rounded bg-slate-200" />
+        <div className="h-8 w-48 rounded bg-[var(--admin-border)]" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-slate-200" />
+            <div key={i} className="h-32 rounded-lg bg-[var(--admin-border)]" />
           ))}
         </div>
       </div>
@@ -64,8 +64,8 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
-        <p className="mt-1 text-sm text-slate-500">Welcome to your admin panel.</p>
+        <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[var(--admin-text-primary)]">Dashboard Overview</h1>
+        <p className="mt-1 text-[13px] text-[var(--admin-text-secondary)]">Welcome to your admin panel.</p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
