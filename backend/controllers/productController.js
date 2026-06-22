@@ -51,9 +51,11 @@ const addProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error in productController.js:", error);
+    console.error("Error in productController.js:", error);
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -199,9 +201,11 @@ const getAllProducts = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error in productController.js:", error);
+    console.error("Error in productController.js:", error);
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -224,9 +228,11 @@ const getSingleProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error in productController.js:", error);
+    console.error("Error in productController.js:", error);
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -338,9 +344,11 @@ const getProductReviews = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error in productController.js:", error);
+    return console.error("Error in productController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -406,9 +414,11 @@ const addReview = async (req, res) => {
       stats,
     });
   } catch (error) {
+    console.error("Error in productController.js:", error);
+    return console.error("Error in productController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -467,9 +477,11 @@ const updateReview = async (req, res) => {
       stats,
     });
   } catch (error) {
+    console.error("Error in productController.js:", error);
+    return console.error("Error in productController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -510,9 +522,11 @@ const deleteReview = async (req, res) => {
       stats,
     });
   } catch (error) {
+    console.error("Error in productController.js:", error);
+    return console.error("Error in productController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -557,9 +571,11 @@ const markReviewHelpful = async (req, res) => {
       isHelpful,
     });
   } catch (error) {
+    console.error("Error in productController.js:", error);
+    return console.error("Error in productController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };

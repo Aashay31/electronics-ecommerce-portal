@@ -13,9 +13,11 @@ const getCart = async (req, res) => {
       cartItems: user.cartItems || [],
     });
   } catch (error) {
+    console.error("Error in cartController.js:", error);
+    return console.error("Error in cartController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -77,9 +79,11 @@ const addToCart = async (req, res) => {
       cartItems: populatedUser.cartItems || [],
     });
   } catch (error) {
+    console.error("Error in cartController.js:", error);
+    return console.error("Error in cartController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -140,9 +144,11 @@ const updateQuantity = async (req, res) => {
       cartItems: populatedUser.cartItems || [],
     });
   } catch (error) {
+    console.error("Error in cartController.js:", error);
+    return console.error("Error in cartController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -163,9 +169,11 @@ const removeFromCart = async (req, res) => {
       cartItems: populatedUser.cartItems || [],
     });
   } catch (error) {
+    console.error("Error in cartController.js:", error);
+    return console.error("Error in cartController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };

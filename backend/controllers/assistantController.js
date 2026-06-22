@@ -115,7 +115,10 @@ const getSession = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in assistantController.js:", error);
+    return console.error("Error in assistantController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -181,7 +184,10 @@ const sendMessage = async (req, res) => {
       message: assistantMessage,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in assistantController.js:", error);
+    return console.error("Error in assistantController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -228,7 +234,10 @@ const clearSession = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in assistantController.js:", error);
+    return console.error("Error in assistantController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -246,7 +255,10 @@ const getOrderSupport = async (req, res) => {
 
     return res.status(200).json({ success: true, orders: mappedOrders });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in assistantController.js:", error);
+    return console.error("Error in assistantController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -301,6 +313,7 @@ const cancelOrderFromAssistant = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error in assistantController.js:", error);
     if (error.assessment && error.order) {
       return res.status(error.statusCode || 400).json({
         success: false,
@@ -310,7 +323,7 @@ const cancelOrderFromAssistant = async (req, res) => {
       });
     }
 
-    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 
@@ -331,7 +344,10 @@ const validateOrderCancellation = async (req, res) => {
       assessment: assessCancellationEligibility(order),
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in assistantController.js:", error);
+    return console.error("Error in assistantController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 

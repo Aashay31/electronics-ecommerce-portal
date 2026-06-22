@@ -109,6 +109,7 @@ const placeOrder = async (req, res) => {
         html: orderTemplate(populatedOrder, user.fullName, orderUrl),
       });
     } catch (err) {
+    console.error("Error in orderController.js:", err);
       console.error("Order confirmation email could not be sent:", err);
     }
 
@@ -161,6 +162,7 @@ const placeOrder = async (req, res) => {
 
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in orderController.js:", socketError);
       console.error("[Socket] Error emitting order:created:", socketError.message);
     }
 
@@ -170,7 +172,10 @@ const placeOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in orderController.js:", error);
+    return console.error("Error in orderController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -192,7 +197,10 @@ const getUserOrders = async (req, res) => {
       orders,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in orderController.js:", error);
+    return console.error("Error in orderController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -217,7 +225,10 @@ const getOrderById = async (req, res) => {
       order,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in orderController.js:", error);
+    return console.error("Error in orderController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -252,6 +263,7 @@ const cancelOrder = async (req, res) => {
 
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in orderController.js:", socketError);
       console.error("[Socket] Error emitting order:cancelled:", socketError.message);
     }
 
@@ -261,6 +273,7 @@ const cancelOrder = async (req, res) => {
       order,
     });
   } catch (error) {
+    console.error("Error in orderController.js:", error);
     if (error.assessment) {
       return res.status(error.statusCode || 400).json({
         success: false,
@@ -269,7 +282,7 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+    return res.status(error.statusCode || 500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 

@@ -122,7 +122,10 @@ const createOrder = async (req, res) => {
       key_id: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in paymentController.js:", error);
+    return console.error("Error in paymentController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -205,6 +208,7 @@ const verifyPayment = async (req, res) => {
         html: orderTemplate(populatedOrder, user.fullName, orderUrl),
       });
     } catch (err) {
+    console.error("Error in paymentController.js:", err);
       console.error("Order confirmation email could not be sent:", err);
     }
 
@@ -248,12 +252,16 @@ const verifyPayment = async (req, res) => {
 
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in paymentController.js:", socketError);
       console.error("[Socket] Error emitting order:created:", socketError.message);
     }
 
     return res.status(200).json({ success: true, order });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in paymentController.js:", error);
+    return console.error("Error in paymentController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -311,7 +319,10 @@ const webhookHandler = async (req, res) => {
     await order.save();
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in paymentController.js:", error);
+    return console.error("Error in paymentController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 

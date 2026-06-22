@@ -20,9 +20,11 @@ const getProfile = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -74,9 +76,11 @@ const updateProfile = async (req, res) => {
       user: safeUser,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -116,9 +120,11 @@ const updatePassword = async (req, res) => {
       message: "Password updated",
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -133,9 +139,11 @@ const getWishlist = async (req, res) => {
       wishlist: user?.wishlistItems || [],
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -171,9 +179,11 @@ const addToWishlist = async (req, res) => {
       wishlist: populated.wishlistItems || [],
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -194,9 +204,11 @@ const removeFromWishlist = async (req, res) => {
       wishlist: populated.wishlistItems || [],
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -210,9 +222,11 @@ const getAddresses = async (req, res) => {
       addresses: user?.savedAddresses || [],
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -258,9 +272,11 @@ const getAddresses = async (req, res) => {
       addresses: user.savedAddresses,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -306,9 +322,11 @@ const updateAddress = async (req, res) => {
       addresses: user.savedAddresses,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -340,9 +358,11 @@ const deleteAddress = async (req, res) => {
       addresses: user.savedAddresses,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -371,9 +391,11 @@ const setDefaultAddress = async (req, res) => {
       addresses: user.savedAddresses,
     });
   } catch (error) {
+    console.error("Error in userController.js:", error);
+    return console.error("Error in userController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };

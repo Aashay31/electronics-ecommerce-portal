@@ -73,6 +73,7 @@ const signup = async (req, res) => {
         html: welcomeTemplate(user.fullName, loginUrl),
       });
     } catch (err) {
+    console.error("Error in authController.js:", err);
       console.error("Email could not be sent:", err);
     }
 
@@ -80,15 +81,24 @@ const signup = async (req, res) => {
     const safeUser = user.toObject();
     delete safeUser.password;
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(201).json({
       success: true,
       token,
       user: safeUser,
     });
   } catch (error) {
+    console.error("Error in authController.js:", error);
+    return console.error("Error in authController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -134,15 +144,24 @@ const login = async (req, res) => {
     const safeUser = user.toObject();
     delete safeUser.password;
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res.status(200).json({
       success: true,
       token,
       user: safeUser,
     });
   } catch (error) {
+    console.error("Error in authController.js:", error);
+    return console.error("Error in authController.js:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Something went wrong. Please try again.",
     });
   }
 };
@@ -177,6 +196,7 @@ const forgotPassword = async (req, res) => {
 
       return res.status(200).json({ success: true, message: "Email sent" });
     } catch (err) {
+    console.error("Error in authController.js:", err);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
@@ -184,7 +204,10 @@ const forgotPassword = async (req, res) => {
       return res.status(500).json({ success: false, message: "Email could not be sent" });
     }
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in authController.js:", error);
+    return console.error("Error in authController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -211,7 +234,10 @@ const resetPassword = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "Password updated successfully" });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in authController.js:", error);
+    return console.error("Error in authController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 

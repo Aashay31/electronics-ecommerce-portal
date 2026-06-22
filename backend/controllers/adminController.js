@@ -66,7 +66,10 @@ const getStats = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -112,7 +115,10 @@ const getProducts = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -151,12 +157,16 @@ const createProduct = async (req, res) => {
       io.emit("product:added", product);
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in adminController.js:", socketError);
       console.error("[Socket] Error emitting product:added:", socketError.message);
     }
 
     return res.status(201).json({ success: true, product });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -205,12 +215,16 @@ const updateProduct = async (req, res) => {
         });
       }
     } catch (socketError) {
+    console.error("Error in adminController.js:", socketError);
       console.error("[Socket] Error emitting product update:", socketError.message);
     }
 
     return res.status(200).json({ success: true, product: updatedProduct });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -228,12 +242,16 @@ const deleteProduct = async (req, res) => {
       io.emit("product:deleted", { productId: req.params.id });
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in adminController.js:", socketError);
       console.error("[Socket] Error emitting product:deleted:", socketError.message);
     }
 
     return res.status(200).json({ success: true, message: "Product deleted" });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -298,7 +316,10 @@ const getOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -345,6 +366,7 @@ const updateOrderStatus = async (req, res) => {
         html: statusTemplate(order, user.fullName, statusUrl),
       });
     } catch (err) {
+    console.error("Error in adminController.js:", err);
       console.error("Order status update email could not be sent:", err);
     }
 
@@ -376,12 +398,16 @@ const updateOrderStatus = async (req, res) => {
 
       emitDashboardStats();
     } catch (socketError) {
+    console.error("Error in adminController.js:", socketError);
       console.error("[Socket] Error emitting order:statusUpdated:", socketError.message);
     }
 
     return res.status(200).json({ success: true, order });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -421,7 +447,10 @@ const getUsers = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -438,7 +467,10 @@ const getUserDetail = async (req, res) => {
 
     return res.status(200).json({ success: true, user });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -462,7 +494,10 @@ const changeUserRole = async (req, res) => {
 
     return res.status(200).json({ success: true, user });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -486,7 +521,10 @@ const toggleBanUser = async (req, res) => {
 
     return res.status(200).json({ success: true, user: safeUser });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -507,7 +545,10 @@ const deleteUser = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "User deleted" });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -615,7 +656,10 @@ const getReviews = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -642,7 +686,10 @@ const deleteReview = async (req, res) => {
 
     return res.status(200).json({ success: true, message: "Review deleted" });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 
@@ -666,7 +713,10 @@ const getReviewAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error in adminController.js:", error);
+    return console.error("Error in adminController.js:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
+    });
   }
 };
 

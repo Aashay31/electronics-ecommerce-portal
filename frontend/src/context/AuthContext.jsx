@@ -8,7 +8,6 @@ import {
 import api from "../utils/api";
 
 const AuthContext = createContext(null);
-const TOKEN_KEY = "authToken";
 const USER_KEY = "authUser";
 
 function getStoredUser() {
@@ -19,42 +18,35 @@ function getStoredUser() {
 
   try {
     return JSON.parse(raw);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() =>
-    window.localStorage.getItem(TOKEN_KEY)
-  );
   const [user, setUser] = useState(getStoredUser);
 
-  const isAuthenticated = Boolean(token);
+  const isAuthenticated = Boolean(user);
 
-  const persistAuth = useCallback((nextToken, nextUser) => {
-    window.localStorage.setItem(TOKEN_KEY, nextToken);
+  const persistAuth = useCallback((nextUser) => {
     window.localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    setToken(nextToken);
     setUser(nextUser);
   }, []);
 
   const clearAuth = useCallback(() => {
-    window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
-    setToken(null);
     setUser(null);
   }, []);
 
   const signup = useCallback(async (payload) => {
     const response = await api.post("/api/auth/signup", payload);
-    persistAuth(response.data.token, response.data.user);
+    persistAuth(response.data.user);
     return response.data.user;
   }, [persistAuth]);
 
   const login = useCallback(async (payload) => {
     const response = await api.post("/api/auth/login", payload);
-    persistAuth(response.data.token, response.data.user);
+    persistAuth(response.data.user);
     return response.data.user;
   }, [persistAuth]);
 
@@ -69,7 +61,6 @@ export function AuthProvider({ children }) {
 
   const value = useMemo(
     () => ({
-      token,
       user,
       isAuthenticated,
       signup,
@@ -77,12 +68,13 @@ export function AuthProvider({ children }) {
       logout,
       updateUser,
     }),
-    [token, user, isAuthenticated, signup, login, logout, updateUser]
+    [user, isAuthenticated, signup, login, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
