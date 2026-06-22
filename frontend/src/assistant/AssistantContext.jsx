@@ -81,12 +81,40 @@ export function AssistantProvider({ children }) {
       );
     };
 
+    const handlePaymentFailed = (data) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) => {
+          if (msg.richContent && msg.richContent.orders) {
+            const updatedOrders = msg.richContent.orders.map((o) => {
+              if (String(o.orderId) === String(data.orderId)) {
+                return {
+                  ...o,
+                  paymentStatus: "Failed",
+                };
+              }
+              return o;
+            });
+            return {
+              ...msg,
+              richContent: {
+                ...msg.richContent,
+                orders: updatedOrders,
+              },
+            };
+          }
+          return msg;
+        })
+      );
+    };
+
     socket.on("order:statusUpdated", handleOrderStatusUpdated);
     socket.on("order:cancelled", handleOrderCancelled);
+    socket.on("order:paymentFailed", handlePaymentFailed);
 
     return () => {
       socket.off("order:statusUpdated", handleOrderStatusUpdated);
       socket.off("order:cancelled", handleOrderCancelled);
+      socket.off("order:paymentFailed", handlePaymentFailed);
     };
   }, [socket]);
 

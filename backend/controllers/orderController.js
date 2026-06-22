@@ -173,7 +173,6 @@ const placeOrder = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in orderController.js:", error);
-    return console.error("Error in orderController.js:", error);
     return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
     });
   }
@@ -198,7 +197,6 @@ const getUserOrders = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in orderController.js:", error);
-    return console.error("Error in orderController.js:", error);
     return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
     });
   }
@@ -226,7 +224,6 @@ const getOrderById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in orderController.js:", error);
-    return console.error("Error in orderController.js:", error);
     return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
     });
   }

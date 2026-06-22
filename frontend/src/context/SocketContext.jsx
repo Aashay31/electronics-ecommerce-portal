@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect } from "react";
-import socket from "../socket";
+import socket, { getTokenFromCookieOrStorage } from "../socket";
 import { useAuth } from "./AuthContext";
 
 const SocketContext = createContext(null);
 
 export function SocketProvider({ children }) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated || !user?._id) {
@@ -13,7 +13,8 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // Connect and join personal room
+    // Refresh token before connecting to avoid stale/wrong-user tokens
+    socket.auth = { token: getTokenFromCookieOrStorage() };
     socket.connect();
 
     const joinRooms = () => {
@@ -32,9 +33,26 @@ export function SocketProvider({ children }) {
     // Rejoin on reconnect
     socket.io.on("reconnect", joinRooms);
 
+    // Error handling
+    const handleConnectError = (err) => {
+      if (err.message === "Authentication required" || err.message === "Invalid or expired token") {
+        logout();
+        socket.disconnect();
+      }
+    };
+
+    const handleError = (err) => {
+      console.error("Socket error:", err.message);
+    };
+
+    socket.on("connect_error", handleConnectError);
+    socket.on("error", handleError);
+
     return () => {
       socket.off("connect", joinRooms);
       socket.io.off("reconnect", joinRooms);
+      socket.off("connect_error", handleConnectError);
+      socket.off("error", handleError);
       socket.disconnect();
     };
   }, [isAuthenticated, user?._id, user?.role]);

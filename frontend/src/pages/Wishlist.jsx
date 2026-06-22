@@ -50,10 +50,11 @@ function Wishlist() {
                 key={product._id}
                 className="rounded-3xl border border-slate-100 bg-white p-5 shadow-md dark:border-white/10 dark:bg-slate-900"
               >
-                <div className="aspect-[4/3] rounded-2xl bg-slate-50 dark:bg-slate-900 p-4 dark:bg-white/5">
+                <div className="h-40 w-full overflow-hidden rounded-2xl bg-white flex items-center justify-center p-3 dark:bg-white/5">
                   <img
                     src={resolveImageUrl(product.imageUrl)}
                     alt={product.productName}
+                    loading="lazy"
                     className="h-full w-full object-contain"
                   />
                 </div>

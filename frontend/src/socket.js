@@ -6,8 +6,18 @@ if (baseURL.includes("localhost") && typeof window !== "undefined" && window.loc
   baseURL = baseURL.replace("localhost", window.location.hostname);
 }
 
+export const getTokenFromCookieOrStorage = () => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|; )token=([^;]*)/);
+  return match ? match[1] : null;
+};
+
 const socket = io(baseURL, {
   autoConnect: false,
+  withCredentials: true,
+  auth: {
+    token: getTokenFromCookieOrStorage(),
+  },
 });
 
 export default socket;

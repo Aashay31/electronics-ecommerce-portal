@@ -9,7 +9,7 @@ function ProductGrid({ products, isLoading }) {
             key={`skeleton-${index}`}
             className="h-80 rounded-2xl border border-slate-100 bg-white p-4 shadow-md dark:border-white/10 dark:bg-slate-900"
           >
-            <div className="h-36 w-full animate-pulse rounded-xl bg-slate-200 dark:bg-slate-700 dark:bg-white/10" />
+            <div className="h-40 w-full animate-pulse rounded-xl bg-slate-200 dark:bg-slate-700 dark:bg-white/10" />
             <div className="mt-4 h-4 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-700 dark:bg-white/10" />
             <div className="mt-3 h-3 w-1/2 animate-pulse rounded bg-slate-200 dark:bg-slate-700 dark:bg-white/10" />
             <div className="mt-6 h-9 w-full animate-pulse rounded-full bg-slate-200 dark:bg-slate-700 dark:bg-white/10" />

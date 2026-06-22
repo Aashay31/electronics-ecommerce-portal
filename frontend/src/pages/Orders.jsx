@@ -49,14 +49,26 @@ function Orders() {
       );
     };
 
+    const handlePaymentFailed = (data) => {
+      setOrders((prev) =>
+        prev.map((o) =>
+          String(o._id) === String(data.orderId)
+            ? { ...o, paymentStatus: "Failed" }
+            : o
+        )
+      );
+    };
+
     socket.on("order:created", handleOrderCreated);
     socket.on("order:statusUpdated", handleOrderStatusUpdated);
     socket.on("order:cancelled", handleOrderCancelled);
+    socket.on("order:paymentFailed", handlePaymentFailed);
 
     return () => {
       socket.off("order:created", handleOrderCreated);
       socket.off("order:statusUpdated", handleOrderStatusUpdated);
       socket.off("order:cancelled", handleOrderCancelled);
+      socket.off("order:paymentFailed", handlePaymentFailed);
     };
   }, [socket, setOrders]);
 

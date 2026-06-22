@@ -31,7 +31,7 @@ function ProductDetails() {
         setErrorMessage("");
         const response = await api.get(`/api/products/${id}`);
         setProduct(response.data.product);
-      } catch (error) {
+      } catch {
         setErrorMessage("Unable to load product details.");
       } finally {
         setIsLoading(false);

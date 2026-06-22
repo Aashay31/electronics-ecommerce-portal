@@ -58,10 +58,11 @@ function ProductCard({ product }) {
         <FiHeart className={isWishlisted ? "fill-current" : ""} />
       </button>
       <Link to={`/products/${product._id}`} className="flex flex-col">
-        <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-900 dark:bg-white/5">
+        <div className="h-40 w-full overflow-hidden rounded-xl bg-white flex items-center justify-center p-3 dark:bg-white/5">
           <img
             src={resolveImageUrl(product.imageUrl)}
             alt={product.productName}
+            loading="lazy"
             className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
           />
         </div>

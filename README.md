@@ -95,10 +95,16 @@ Automated email notifications for critical user actions:
 
 ### 📱 Mobile Responsiveness & UI
 - **Fully Responsive Design**: Fluid layouts that adapt perfectly to mobile, tablet, and desktop screens
+- **Dark Mode Support**: Beautifully crafted dark mode theme for comfortable low-light viewing
+- **Standardized Product Cards**: Consistent image rendering and layout in product grids for a clean, uniform look
 - **Adaptive Navbar**: Navigation bar intelligently wraps and manages vertical space on smaller screens to prevent content overlap
 - **Dynamic Search Bar**: Search bar is context-aware and only visible to authenticated users to maintain a clean landing page
 - **Protected Browsing Experience**: Core shopping pages (Home, Shop, Product Details) are restricted to registered members, with elegant redirects and toast notifications for guests
 - **Local Network Testing Support**: API requests dynamically resolve to the host IP instead of localhost when testing on mobile devices via Wi-Fi
+
+### ⚡ Real-Time Features
+- **Live Notifications**: Instant updates powered by Socket.io
+- **Secure WebSockets**: Authenticated real-time connection ensuring data privacy
 
 ### 🤖 AI Chatbot Assistant
 Intelligent support powered by Groq AI with real-time order management and product expertise:
@@ -173,7 +179,9 @@ Comprehensive analytics and management tools:
 | **Notifications** | React Hot Toast |
 | **Backend Runtime** | Node.js with Express.js 5.2.1 |
 | **Database** | MongoDB with Mongoose 9.6.2 |
+| **Real-time** | Socket.io 4.8.3 |
 | **Authentication** | JWT (JSON Web Tokens) |
+| **Security** | Helmet, Rate Limit, Mongo Sanitize, XSS Clean |
 | **Password Hashing** | bcrypt 5.1.1 |
 | **AI Assistant** | Groq SDK for real-time LLM responses |
 | **Email Service** | Nodemailer with SMTP |
@@ -596,6 +604,13 @@ npm run build
 ### Security Features
 - **JWT Authentication**: Secure token-based session management
 - **Password Hashing**: bcrypt with 10 salt rounds
+- **Advanced API Protection**:
+  - **Rate Limiting**: Defends against brute-force and DDoS attacks
+  - **NoSQL Injection Prevention**: Data sanitization via express-mongo-sanitize
+  - **XSS Protection**: Cleans user input to prevent Cross-Site Scripting
+  - **Security Headers**: Secures HTTP headers using Helmet
+- **Secure WebSockets**: Socket.io connections are authenticated and hardened
+- **Payment Security**: Hardened Razorpay webhook validation with strict signature verification
 - **Protected Routes**: Backend middleware validates JWT tokens
 - **Role-Based Access Control**: Separate permissions for users and admins
 - **User Banning**: Admins can restrict user access
@@ -671,6 +686,11 @@ VITE_API_URL=http://localhost:5000/api
 - mongoose@9.6.2
 - bcrypt@5.1.1
 - jsonwebtoken (JWT handling)
+- socket.io (Real-time communication)
+- helmet (Security headers)
+- express-rate-limit (Rate limiting)
+- express-mongo-sanitize (NoSQL injection prevention)
+- xss-clean (XSS protection)
 - cors (Cross-Origin Resource Sharing)
 - dotenv (Environment variables)
 
@@ -680,6 +700,7 @@ VITE_API_URL=http://localhost:5000/api
 - react-router-dom@7.15.0
 - tailwindcss@3.4.14
 - axios@1.16.1
+- socket.io-client (Real-time client)
 - lucide-react (Icons)
 - react-icons (Icon library)
 - react-hot-toast (Notifications)

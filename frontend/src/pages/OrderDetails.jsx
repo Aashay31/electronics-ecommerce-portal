@@ -72,12 +72,22 @@ function OrderDetails() {
       }
     };
 
+    const handlePaymentFailed = (data) => {
+      if (String(data.orderId) === String(id)) {
+        setOrder((prev) =>
+          prev ? { ...prev, paymentStatus: "Failed" } : prev
+        );
+      }
+    };
+
     socket.on("order:statusUpdated", handleStatusUpdated);
     socket.on("order:cancelled", handleCancelled);
+    socket.on("order:paymentFailed", handlePaymentFailed);
 
     return () => {
       socket.off("order:statusUpdated", handleStatusUpdated);
       socket.off("order:cancelled", handleCancelled);
+      socket.off("order:paymentFailed", handlePaymentFailed);
     };
   }, [socket, id]);
 

@@ -77,7 +77,7 @@ const signup = async (req, res) => {
       console.error("Email could not be sent:", err);
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
     const safeUser = user.toObject();
     delete safeUser.password;
 
@@ -140,7 +140,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
     const safeUser = user.toObject();
     delete safeUser.password;
 

@@ -11,7 +11,7 @@ import api from "../utils/api";
 import { resolveImageUrl } from "../utils/imageUrl";
 
 function Checkout() {
-  const { items, setItems, cartTotal, refreshCart } = useCart();
+  const { items, cartTotal, refreshCart } = useCart();
   const { addresses, selectedDeliveryAddressId, setSelectedDeliveryAddressId } = useProfile();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ function Checkout() {
         const response = await api.post("/api/orders", payload);
 
         if (response.data.success) {
-          navigate("/orders");
+          navigate(`/order-success/${response.data.order._id}`);
           toast.success("Order placed successfully!");
           refreshCart();
           setSelectedDeliveryAddressId("");
@@ -149,7 +149,7 @@ function Checkout() {
             });
 
             if (verifyResponse.data.success) {
-              navigate("/orders");
+              navigate(`/order-success/${verifyResponse.data.order._id}`);
               toast.success("Payment verified successfully!");
               refreshCart();
               setSelectedDeliveryAddressId("");
@@ -227,8 +227,8 @@ function Checkout() {
                         key={address._id}
                         className={`group grid cursor-pointer gap-4 rounded-2xl border p-4 transition sm:grid-cols-[auto_1fr] ${
                           selectedAddress?._id === address._id
-                            ? "border-indigo-500 bg-indigo-50/60 shadow-md ring-1 ring-indigo-500"
-                            : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50"
+                            ? "border-indigo-500 bg-indigo-50/60 shadow-md ring-1 ring-indigo-500 dark:border-blue-400 dark:bg-blue-950/30"
+                            : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-700"
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ function Checkout() {
                             checked={selectedAddress?._id === address._id}
                             onChange={() => setSelectedAddressId(address._id)}
                           />
-                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-700">
+                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-700 dark:text-slate-300 dark:group-hover:text-slate-200">
                             Deliver Here
                           </span>
                         </div>
@@ -247,7 +247,7 @@ function Checkout() {
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-slate-900 dark:text-white">{address.label}</span>
                             {address.isDefault && (
-                              <span className="rounded bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700">
+                              <span className="rounded bg-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700 dark:bg-slate-700 dark:text-slate-300">
                                 Default
                               </span>
                             )}
@@ -285,8 +285,8 @@ function Checkout() {
                     key={method}
                     className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border p-4 text-center transition ${
                       paymentMethod === method
-                        ? "border-emerald-600 bg-emerald-50/50 shadow-sm ring-1 ring-emerald-600"
-                        : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                        ? "border-emerald-600 bg-emerald-50/50 shadow-sm ring-1 ring-emerald-600 dark:border-green-400 dark:bg-green-950/30"
+                        : "border-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-700"
                     }`}
                   >
                     <input
@@ -341,21 +341,21 @@ function Checkout() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 bg-slate-50 dark:bg-slate-900 dark:border-white/10 dark:bg-slate-800 p-5">
+              <div className="border-t border-slate-100 bg-slate-50 dark:border-white/10 dark:bg-slate-800 p-5">
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Subtotal</span>
                     <span className="font-medium text-slate-900 dark:text-white">
                       ₹{cartTotal.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Shipping fee</span>
                     <span className="font-medium text-slate-900 dark:text-white">
                       {shippingCharge === 0 ? "Free" : `₹${shippingCharge.toLocaleString()}`}
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Estimated Tax (18%)</span>
                     <span className="font-medium text-slate-900 dark:text-white">
                       ₹{taxAmount.toLocaleString()}
@@ -371,7 +371,7 @@ function Checkout() {
                   type="button"
                   disabled={isPlacingOrder || isProcessingPayment || !selectedAddress}
                   onClick={handlePlaceOrder}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <FiTruck className="h-4 w-4" />
                   {isPlacingOrder || isProcessingPayment ? "Processing..." : (paymentFailed ? "Try Again" : "Place Order")}

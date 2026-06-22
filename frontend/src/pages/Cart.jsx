@@ -248,7 +248,7 @@ function Cart() {
               ) : (
                 <Link
                   to="/checkout"
-                  className="mt-6 flex w-full justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800"
+                  className="mt-6 flex w-full justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:shadow-white/10 dark:hover:bg-slate-200"
                 >
                   Proceed to Checkout
                 </Link>
