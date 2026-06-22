@@ -45,13 +45,8 @@ app.use(cors({
 
 app.use(helmet());
 app.use(cookieParser());
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
+app.use("/api/payment/webhook", express.raw({ type: "application/json" }));
+app.use(express.json());
 
 // express-mongo-sanitize and xss-clean middlewares are incompatible with Express 5 req.query getter.
 // We apply them manually to body and params.

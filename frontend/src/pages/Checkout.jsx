@@ -20,6 +20,7 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentFailed, setPaymentFailed] = useState(false);
 
   const shippingCharge = cartTotal > 500 ? 0 : 50;
   const taxAmount = cartTotal * 0.18; // 18% GST Example
@@ -74,6 +75,7 @@ function Checkout() {
     };
 
     setIsPlacingOrder(true);
+    setPaymentFailed(false);
     try {
       const orderItems = items.map((item) => ({
         product: item.product._id,
@@ -164,8 +166,7 @@ function Checkout() {
         },
         modal: {
           ondismiss: () => {
-            toast.error("Payment was cancelled");
-            navigate("/payment-failed", { state: { reason: "cancelled" } });
+            toast("Payment was cancelled. Your cart is saved.", { icon: "ℹ️" });
             resetProcessing();
           },
         },
@@ -174,7 +175,7 @@ function Checkout() {
       const razorpay = new window.Razorpay(options);
       razorpay.on("payment.failed", (responsePayload) => {
         toast.error(responsePayload?.error?.description || "Payment failed");
-        navigate("/payment-failed", { state: { reason: "failed" } });
+        setPaymentFailed(true);
         resetProcessing();
       });
       razorpay.open();
@@ -373,7 +374,7 @@ function Checkout() {
                   className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white shadow-lg shadow-indigo-600/30 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <FiTruck className="h-4 w-4" />
-                  {isPlacingOrder || isProcessingPayment ? "Processing..." : "Place Order"}
+                  {isPlacingOrder || isProcessingPayment ? "Processing..." : (paymentFailed ? "Try Again" : "Place Order")}
                 </button>
                 {isProcessingPayment && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-indigo-600">

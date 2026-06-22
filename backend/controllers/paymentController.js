@@ -123,9 +123,7 @@ const createOrder = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in paymentController.js:", error);
-    return console.error("Error in paymentController.js:", error);
-    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
-    });
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 
@@ -144,6 +142,19 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    const bodyStr = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSig = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(bodyStr.toString())
+      .digest("hex");
+
+    if (expectedSig !== razorpay_signature) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Payment verification failed. Invalid signature." 
+      });
+    }
+
     const existingOrder = await Order.findOne({ razorpayOrderId: razorpay_order_id });
     if (existingOrder) {
       if (existingOrder.user.toString() !== req.user.id) {
@@ -159,18 +170,6 @@ const verifyPayment = async (req, res) => {
 
     if (attempt.user.toString() !== req.user.id) {
       return res.status(403).json({ success: false, message: "Not authorized" });
-    }
-
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
-
-    if (expectedSignature !== razorpay_signature) {
-      attempt.status = "failed";
-      attempt.razorpayPaymentId = razorpay_payment_id;
-      await attempt.save();
-      return res.status(400).json({ success: false, message: "Payment verification failed" });
     }
 
     const order = await Order.create({
@@ -208,7 +207,6 @@ const verifyPayment = async (req, res) => {
         html: orderTemplate(populatedOrder, user.fullName, orderUrl),
       });
     } catch (err) {
-    console.error("Error in paymentController.js:", err);
       console.error("Order confirmation email could not be sent:", err);
     }
 
@@ -252,16 +250,13 @@ const verifyPayment = async (req, res) => {
 
       emitDashboardStats();
     } catch (socketError) {
-    console.error("Error in paymentController.js:", socketError);
       console.error("[Socket] Error emitting order:created:", socketError.message);
     }
 
     return res.status(200).json({ success: true, order });
   } catch (error) {
     console.error("Error in paymentController.js:", error);
-    return console.error("Error in paymentController.js:", error);
-    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
-    });
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 
@@ -274,17 +269,16 @@ const webhookHandler = async (req, res) => {
       return res.status(500).json({ success: false, message: "Webhook secret not configured" });
     }
 
-    const payload = req.body;
-    const rawBody = req.rawBody ? req.rawBody : Buffer.from(JSON.stringify(payload));
     const expectedSignature = crypto
       .createHmac("sha256", webhookSecret)
-      .update(rawBody)
+      .update(req.body)
       .digest("hex");
 
     if (expectedSignature !== signature) {
-      return res.status(400).json({ success: false, message: "Invalid webhook signature" });
+      return res.status(400).json({ message: "Invalid webhook signature" });
     }
 
+    const payload = JSON.parse(req.body.toString());
     const event = payload.event;
     const paymentEntity = payload?.payload?.payment?.entity;
     const refundEntity = payload?.payload?.refund?.entity;
@@ -304,11 +298,28 @@ const webhookHandler = async (req, res) => {
       order.paymentStatus = "Paid";
       order.transactionStatus = "captured";
       order.razorpayPaymentId = paymentEntity?.id || order.razorpayPaymentId;
+      if (order.orderStatus === "Pending") {
+        order.orderStatus = "Confirmed";
+      }
+      try {
+        const io = getIO();
+        io.to(`user:${String(order.user)}`).emit("order:statusUpdated", {
+          orderId: order._id,
+          orderStatus: order.orderStatus,
+          paymentStatus: order.paymentStatus
+        });
+      } catch (err) {}
     }
 
     if (event === "payment.failed") {
       order.paymentStatus = "Failed";
       order.transactionStatus = "failed";
+      try {
+        const io = getIO();
+        io.to(`user:${String(order.user)}`).emit("order:paymentFailed", {
+          orderId: order._id,
+        });
+      } catch (err) {}
     }
 
     if (event === "refund.processed") {
@@ -319,10 +330,8 @@ const webhookHandler = async (req, res) => {
     await order.save();
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Error in paymentController.js:", error);
-    return console.error("Error in paymentController.js:", error);
-    return res.status(500).json({ success: false, message: "Something went wrong. Please try again.",
-    });
+    console.error("Error in webhookHandler:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
   }
 };
 
