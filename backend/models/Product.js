@@ -117,6 +117,23 @@ const productSchema = new mongoose.Schema({
     default: 0,
   },
 
+  // ─── Inventory Monitoring Fields ────────────────────────────────────
+  lowStockThreshold: {
+    type: Number,
+    default: Number(process.env.LOW_STOCK_DEFAULT_THRESHOLD) || 5,
+    min: 0,
+  },
+
+  lowStockNotificationSent: {
+    type: Boolean,
+    default: false,
+  },
+
+  lastLowStockNotificationAt: {
+    type: Date,
+    default: null,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,

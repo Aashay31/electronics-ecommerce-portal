@@ -117,9 +117,14 @@ app.get("/", (req, res) => {
   res.send("Backend server is running");
 });
 
+const { startCronJobs } = require("./cron/cronScheduler");
+
 const server = http.createServer(app);
 initSocket(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Start background cron jobs (inventory monitoring, daily summaries)
+  startCronJobs();
 });

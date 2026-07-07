@@ -44,7 +44,7 @@ function ReviewsSection({ productId }) {
       setStats(response.data.stats || defaultStats);
       setPagination(response.data.pagination || { page: 1, pages: 1, total: 0 });
       setUserReview(response.data.userReview || null);
-    } catch (error) {
+    } catch {
       toast.error("Unable to load reviews");
     } finally {
       setIsLoading(false);
@@ -53,6 +53,7 @@ function ReviewsSection({ productId }) {
 
   useEffect(() => {
     if (productId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchReviews(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,7 +109,7 @@ function ReviewsSection({ productId }) {
             : review
         )
       );
-    } catch (error) {
+    } catch {
       toast.error("Unable to update helpful count");
     } finally {
       setIsHelpfulLoading(false);

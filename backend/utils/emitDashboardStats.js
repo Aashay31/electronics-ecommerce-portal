@@ -16,7 +16,13 @@ async function emitDashboardStats() {
     const totalProducts = await Product.countDocuments();
     const totalUsers = await User.countDocuments({ role: "user" });
     const outOfStockProducts = await Product.countDocuments({ stock: { $lte: 0 } });
-    const lowStockProducts = await Product.countDocuments({ stock: { $gt: 0, $lte: 5 } });
+    const lowStockProducts = await Product.countDocuments({
+      $expr: { $lte: ["$stock", { $ifNull: ["$lowStockThreshold", 5] }] },
+      stock: { $gt: 0 },
+    });
+    const criticalStockProducts = await Product.countDocuments({ stock: { $lte: 2, $gt: 0 } });
+    const wellStockedCount = totalProducts - outOfStockProducts - lowStockProducts;
+    const inventoryHealth = totalProducts > 0 ? Math.round((wellStockedCount / totalProducts) * 100) : 100;
 
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ orderStatus: "Pending" });
@@ -61,6 +67,8 @@ async function emitDashboardStats() {
       pendingOrders,
       lowStockProducts,
       outOfStockProducts,
+      criticalStockProducts,
+      inventoryHealth,
       totalReviews: reviewStats.totalReviews,
       averageRating: Number((reviewStats.averageRating || 0).toFixed(2)),
     };

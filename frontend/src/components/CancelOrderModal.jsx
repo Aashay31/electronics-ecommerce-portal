@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiX, FiAlertTriangle } from "react-icons/fi";
 
 const defaultReasons = [
@@ -11,11 +11,14 @@ const defaultReasons = [
 function CancelOrderModal({ isOpen, onClose, onConfirm, isSubmitting }) {
   const [reason, setReason] = useState(defaultReasons[0]);
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setReason(defaultReasons[0]);
     }
-  }, [isOpen]);
+  }
 
   if (!isOpen) return null;
 

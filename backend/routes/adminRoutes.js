@@ -19,6 +19,7 @@ const {
   getReviews,
   deleteReview,
   getReviewAnalytics,
+  getInventoryAlerts,
 } = require("../controllers/adminController");
 
 const router = express.Router();
@@ -28,6 +29,9 @@ router.use(authMiddleware, adminMiddleware);
 
 // Dashboard
 router.get("/stats", getStats);
+
+// Inventory Alerts
+router.get("/inventory/alerts", getInventoryAlerts);
 
 // Products
 router.get("/products", getProducts);

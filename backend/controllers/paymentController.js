@@ -8,6 +8,7 @@ const sendEmail = require("../utils/sendEmail");
 const orderTemplate = require("../templates/orderTemplate");
 const { getIO } = require("../socket");
 const { emitDashboardStats } = require("../utils/emitDashboardStats");
+const { deleteCache, deleteCachePattern } = require("../utils/cache");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -196,6 +197,13 @@ const verifyPayment = async (req, res) => {
     }
 
     await User.findByIdAndUpdate(order.user, { cartItems: [] });
+
+    // Cache invalidation: clear product detail/list caches after stock change
+    for (const item of order.items) {
+      await deleteCache(`products:detail:${item.product}`);
+    }
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
 
     try {
       const populatedOrder = await Order.findById(order._id).populate("items.product");

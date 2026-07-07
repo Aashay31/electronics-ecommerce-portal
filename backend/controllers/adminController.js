@@ -7,6 +7,8 @@ const sendEmail = require("../utils/sendEmail");
 const statusTemplate = require("../templates/statusTemplate");
 const { getIO } = require("../socket");
 const { emitDashboardStats } = require("../utils/emitDashboardStats");
+const { deleteCache, deleteCachePattern } = require("../utils/cache");
+const { resetNotificationFlag, getInventoryStats } = require("../services/inventoryMonitorService");
 
 // ─── Dashboard Stats ────────────────────────────────────────────────
 const getStats = async (req, res) => {
@@ -14,7 +16,13 @@ const getStats = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const totalUsers = await User.countDocuments({ role: "user" });
     const outOfStockProducts = await Product.countDocuments({ stock: { $lte: 0 } });
-    const lowStockProducts = await Product.countDocuments({ stock: { $gt: 0, $lte: 5 } });
+    const lowStockProducts = await Product.countDocuments({
+      $expr: { $lte: ["$stock", { $ifNull: ["$lowStockThreshold", 5] }] },
+      stock: { $gt: 0 },
+    });
+    const criticalStockProducts = await Product.countDocuments({ stock: { $lte: 2, $gt: 0 } });
+    const wellStockedCount = totalProducts - outOfStockProducts - lowStockProducts;
+    const inventoryHealth = totalProducts > 0 ? Math.round((wellStockedCount / totalProducts) * 100) : 100;
 
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ orderStatus: "Pending" });
@@ -61,6 +69,8 @@ const getStats = async (req, res) => {
         pendingOrders,
         lowStockProducts,
         outOfStockProducts,
+        criticalStockProducts,
+        inventoryHealth,
         totalReviews: reviewStats.totalReviews,
         averageRating: Number((reviewStats.averageRating || 0).toFixed(2)),
       },
@@ -161,6 +171,10 @@ const createProduct = async (req, res) => {
       console.error("[Socket] Error emitting product:added:", socketError.message);
     }
 
+    // Cache invalidation: clear product list caches and homepage
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
+
     return res.status(201).json({ success: true, product });
   } catch (error) {
     console.error("Error in adminController.js:", error);
@@ -219,6 +233,25 @@ const updateProduct = async (req, res) => {
       console.error("[Socket] Error emitting product update:", socketError.message);
     }
 
+    // Cache invalidation: clear this product's detail, all list caches, and homepage
+    await deleteCache(`products:detail:${req.params.id}`);
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
+
+    // Reset low stock notification flag if stock replenished above threshold
+    if (updates.stock !== undefined) {
+      const newStock = Number(updates.stock);
+      const threshold = updatedProduct.lowStockThreshold || Number(process.env.LOW_STOCK_DEFAULT_THRESHOLD) || 5;
+      try {
+        const wasReset = await resetNotificationFlag(req.params.id, newStock, threshold);
+        if (wasReset) {
+          console.log(`[Inventory] Notification flag reset for product ${req.params.id} (stock: ${newStock} > threshold: ${threshold})`);
+        }
+      } catch (resetError) {
+        console.error("[Inventory] Failed to reset notification flag:", resetError.message);
+      }
+    }
+
     return res.status(200).json({ success: true, product: updatedProduct });
   } catch (error) {
     console.error("Error in adminController.js:", error);
@@ -245,6 +278,11 @@ const deleteProduct = async (req, res) => {
     console.error("Error in adminController.js:", socketError);
       console.error("[Socket] Error emitting product:deleted:", socketError.message);
     }
+
+    // Cache invalidation: clear this product's detail, all list caches, and homepage
+    await deleteCache(`products:detail:${req.params.id}`);
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
 
     return res.status(200).json({ success: true, message: "Product deleted" });
   } catch (error) {
@@ -350,6 +388,12 @@ const updateOrderStatus = async (req, res) => {
               $inc: { stock: item.quantity },
             });
           }
+          // Cache invalidation: clear product caches after stock restoration
+          for (const item of order.items) {
+            await deleteCache(`products:detail:${item.product}`);
+          }
+          await deleteCachePattern("products:list:*");
+          await deleteCache("homepage:featured");
         }
       }
     }
@@ -720,6 +764,17 @@ const getReviewAnalytics = async (req, res) => {
   }
 };
 
+// ─── Inventory Alerts ───────────────────────────────────────────────
+const getInventoryAlerts = async (req, res) => {
+  try {
+    const stats = await getInventoryStats();
+    return res.status(200).json({ success: true, inventory: stats });
+  } catch (error) {
+    console.error("Error in adminController.js (getInventoryAlerts):", error);
+    return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
+  }
+};
+
 module.exports = {
   getStats,
   getProducts,
@@ -736,4 +791,5 @@ module.exports = {
   getReviews,
   deleteReview,
   getReviewAnalytics,
+  getInventoryAlerts,
 };

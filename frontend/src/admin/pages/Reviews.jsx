@@ -49,6 +49,7 @@ function Reviews() {
 
   useEffect(() => {
     setTimeout(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchReviews(1, "", "");
       fetchAnalytics();
     }, 0);
@@ -56,6 +57,7 @@ function Reviews() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReviews(1, search, rating);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);

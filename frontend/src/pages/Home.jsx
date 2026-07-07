@@ -4,6 +4,8 @@ import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import HomeCategoryGrid from "../components/HomeCategoryGrid";
+import TrustBadges from "../components/TrustBadges";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -18,6 +20,7 @@ function Home() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProducts();
   }, []);
 
@@ -42,6 +45,9 @@ function Home() {
           </Link>
         </section>
 
+        {/* Category Grid */}
+        <HomeCategoryGrid />
+
         {/* Featured Products Section */}
         <section className="max-w-7xl mx-auto px-6 py-12">
           <h2 className="text-3xl font-bold mb-8 text-slate-900 dark:text-white">Featured Products</h2>
@@ -52,6 +58,9 @@ function Home() {
           </div>
         </section>
       </div>
+
+      {/* Trust Badges */}
+      <TrustBadges />
 
       <Footer />
     </div>

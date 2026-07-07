@@ -6,6 +6,7 @@ const orderTemplate = require("../templates/orderTemplate");
 const { cancelOrderForUser } = require("../services/orderCancellationService");
 const { getIO } = require("../socket");
 const { emitDashboardStats } = require("../utils/emitDashboardStats");
+const { deleteCache, deleteCachePattern } = require("../utils/cache");
 
 const normalizeAmount = (value) => {
   const numberValue = Number(value);
@@ -122,6 +123,13 @@ const placeOrder = async (req, res) => {
 
     // Clear user cart
     await User.findByIdAndUpdate(userId, { cartItems: [] });
+
+    // Cache invalidation: clear product detail/list caches after stock change
+    for (const item of orderItems) {
+      await deleteCache(`products:detail:${item.product}`);
+    }
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
 
     // Socket: emit order:created to user room
     try {
@@ -263,6 +271,13 @@ const cancelOrder = async (req, res) => {
     console.error("Error in orderController.js:", socketError);
       console.error("[Socket] Error emitting order:cancelled:", socketError.message);
     }
+
+    // Cache invalidation: clear product detail/list caches after stock restoration
+    for (const item of order.items) {
+      await deleteCache(`products:detail:${item.product}`);
+    }
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
 
     return res.status(200).json({
       success: true,

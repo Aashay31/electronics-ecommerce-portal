@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiShoppingCart, FiUser } from "react-icons/fi";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, PackageSearch } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
@@ -93,6 +93,15 @@ function Navbar() {
               <Link to="/login" className="text-sm font-medium text-slate-700 dark:text-slate-300 no-underline transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400 md:text-base">Login</Link>
               <Link to="/signup" className="hidden text-sm font-medium text-slate-700 dark:text-slate-300 no-underline transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400 sm:inline-block md:text-base">Register</Link>
             </>
+          )}
+          {isAuthenticated && (
+            <Link
+              to="/orders"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 no-underline transition-colors hover:text-indigo-500 dark:text-slate-300 dark:hover:text-indigo-400 md:text-base"
+            >
+              <PackageSearch className="h-4 w-4" />
+              Track Order
+            </Link>
           )}
           <Link to="/cart" className="relative inline-flex items-center text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400">
             <FiShoppingCart className="h-5 w-5" />

@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const { getCache, setCache, deleteCache, deleteCachePattern, TTL } = require("../utils/cache");
 
 const buildRatingStats = (reviews = []) => {
   const totals = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -46,6 +47,10 @@ const addProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
 
+    // Cache invalidation: clear product list caches and homepage
+    await deleteCachePattern("products:list:*");
+    await deleteCache("homepage:featured");
+
     res.status(201).json({
       success: true,
       product,
@@ -64,6 +69,13 @@ const addProduct = async (req, res) => {
 // Get All Products (with search, filters, sort, pagination)
 const getAllProducts = async (req, res) => {
   try {
+    // Build cache key from query params so different filters/pages get their own cache entry
+    const cacheKey = `products:list:${JSON.stringify(req.query)}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const {
       search,
       category,
@@ -188,7 +200,7 @@ const getAllProducts = async (req, res) => {
       count: entry.count,
     }));
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       products,
       categories,
@@ -199,7 +211,12 @@ const getAllProducts = async (req, res) => {
         pages: Math.ceil(filteredCount / safeLimit) || 1,
         limit: safeLimit,
       },
-    });
+    };
+
+    // Save to cache before returning
+    await setCache(cacheKey, responseData, TTL.PRODUCTS_LIST);
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Error in productController.js:", error);
     console.error("Error in productController.js:", error);
@@ -214,6 +231,12 @@ const getAllProducts = async (req, res) => {
 // Get Single Product
 const getSingleProduct = async (req, res) => {
   try {
+    const cacheKey = `products:detail:${req.params.id}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -223,10 +246,14 @@ const getSingleProduct = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       product,
-    });
+    };
+
+    await setCache(cacheKey, responseData, TTL.PRODUCT_DETAIL);
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Error in productController.js:", error);
     console.error("Error in productController.js:", error);

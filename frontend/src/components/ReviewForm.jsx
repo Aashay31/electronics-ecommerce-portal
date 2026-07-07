@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import StarRating from "./StarRating";
 
 function ReviewForm({ initialReview, onSubmit, onCancel, isSubmitting }) {
@@ -7,12 +7,15 @@ function ReviewForm({ initialReview, onSubmit, onCancel, isSubmitting }) {
   const [title, setTitle] = useState(initialReview?.title || "");
   const [comment, setComment] = useState(initialReview?.comment || "");
 
-  useEffect(() => {
+  const [prevInitialReview, setPrevInitialReview] = useState(initialReview);
+
+  if (initialReview !== prevInitialReview) {
+    setPrevInitialReview(initialReview);
     setRating(initialReview?.rating || 0);
     setHoverRating(null);
     setTitle(initialReview?.title || "");
     setComment(initialReview?.comment || "");
-  }, [initialReview]);
+  }
 
   const displayRating = useMemo(() => {
     return hoverRating ?? rating;

@@ -9,9 +9,12 @@ import {
   AlertTriangle,
   Star,
   MessageSquare,
+  ShieldAlert,
+  Activity,
 } from "lucide-react";
 import api from "../../utils/api";
 import StatsCard from "../components/StatsCard";
+import InventoryAlerts from "../components/InventoryAlerts";
 import { useSocket } from "../../context/SocketContext";
 
 function Dashboard() {
@@ -135,6 +138,24 @@ function Dashboard() {
           icon={Star}
           color="amber"
         />
+        <StatsCard
+          title="Critical Stock"
+          value={stats?.criticalStockProducts || 0}
+          icon={ShieldAlert}
+          color="rose"
+        />
+        <StatsCard
+          title="Inventory Health"
+          value={`${stats?.inventoryHealth ?? 100}%`}
+          icon={Activity}
+          color={stats?.inventoryHealth >= 80 ? "emerald" : stats?.inventoryHealth >= 50 ? "amber" : "rose"}
+        />
+      </div>
+
+      {/* Inventory Alerts Widget */}
+      <div>
+        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-[var(--admin-text-primary)] mb-4">Inventory Health</h2>
+        <InventoryAlerts />
       </div>
     </div>
   );

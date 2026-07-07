@@ -106,6 +106,17 @@ Automated email notifications for critical user actions:
 - **Live Notifications**: Instant updates powered by Socket.io
 - **Secure WebSockets**: Authenticated real-time connection ensuring data privacy
 
+### 🚀 Redis Caching
+Performance optimization layer for frequently accessed data:
+- **Product List Caching**: Product search results cached for 5 minutes, keyed by query parameters
+- **Product Detail Caching**: Individual product pages cached for 10 minutes
+- **AI Chat Caching**: Product-related chatbot responses cached for 15 minutes to reduce Groq API calls
+- **Homepage Caching**: Featured products cached for 5 minutes
+- **Smart Invalidation**: Cache automatically cleared when products are created, updated, deleted, or stock changes (orders/cancellations)
+- **Silent Fallback**: If Redis is unavailable, the app falls back to MongoDB seamlessly — no crashes, no errors
+- **Namespaced Keys**: All cache keys use prefixes (`products:`, `chat:`, `homepage:`) to prevent collisions
+- **Never Cached**: Order data, cart data, user profiles, auth responses, and admin dashboard data are never cached
+
 ### 🤖 AI Chatbot Assistant
 Intelligent support powered by Groq AI with real-time order management and product expertise:
 
@@ -185,6 +196,7 @@ Comprehensive analytics and management tools:
 | **Password Hashing** | bcrypt 5.1.1 |
 | **AI Assistant** | Groq SDK for real-time LLM responses |
 | **Email Service** | Nodemailer with SMTP |
+| **Caching** | Redis (ioredis 5.11.1) |
 | **Payment Gateway** | Razorpay integration |
 
 ---
@@ -196,7 +208,8 @@ electronics-ecommerce-portal/
 │
 ├── backend/                          # Node.js + Express API
 │   ├── config/
-│   │   └── database.js              # MongoDB connection configuration
+│   │   ├── database.js              # MongoDB connection configuration
+│   │   └── redis.js                 # Redis client connection and config
 │   ├── controllers/
 │   │   ├── adminController.js       # Admin operations
 │   │   ├── authController.js        # Authentication logic
@@ -253,6 +266,7 @@ electronics-ecommerce-portal/
 │   │   ├── statusTemplate.js        # Order status update email template
 │   │   └── welcomeTemplate.js       # Welcome email template
 │   ├── utils/
+│   │   ├── cache.js                 # Redis cache helpers (get, set, delete, pattern delete)
 │   │   ├── jwt.js                   # JWT token utilities
 │   │   ├── sendEmail.js             # Email sending utility (Nodemailer)
 │   │   └── imageUrl.js              # Image URL resolution utility
@@ -331,8 +345,9 @@ electronics-ecommerce-portal/
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - MongoDB (local or Atlas)
+- Redis (optional — app works without it)
 - npm or yarn
 
 ### Backend Setup
@@ -345,21 +360,37 @@ cd backend
 npm install
 
 # Configure environment variables
-# Create a .env file in the backend directory with:
-# MONGODB_URI=your_mongodb_connection_string
-# JWT_SECRET=your_secret_key
-# PORT=5000
+# Create a .env file in the backend directory (see Environment Variables section below)
 
 # Create the uploads directory (required for product image uploads)
 mkdir uploads
 
-# Start the server (dev mode with nodemon if installed, or standard start)
-npm run dev
-# OR
+# Start the server
 npm start
 
 # (Optional) Create an initial admin user
 node makeAdmin.js
+```
+
+### Redis Setup (Optional)
+
+Redis is used for caching but is fully optional. If Redis is not running, the app silently falls back to MongoDB.
+
+```bash
+# Option 1: Docker (recommended)
+docker run -d --name redis -p 6379:6379 redis
+
+# Option 2: Windows native
+# Download from https://github.com/tporadowski/redis/releases
+# Install and start the Redis service
+
+# Option 3: WSL
+sudo apt install redis-server
+sudo service redis-server start
+
+# Verify Redis is running
+redis-cli ping
+# Expected: PONG
 ```
 
 ### Frontend Setup
@@ -641,6 +672,7 @@ npm run build
 - ✅ **AI-Powered Support**: Smart chatbot for order tracking, cancellation, product recommendations
 - ✅ **Automated Email Notifications**: Order confirmation, status updates, password reset emails
 - ✅ **Razorpay Webhook Integration**: Real-time payment status updates from payment gateway
+- ✅ **Redis Caching**: Additive performance layer with automatic invalidation and silent MongoDB fallback
 
 ---
 
@@ -670,6 +702,11 @@ GROQ_API_KEY=your_groq_api_key
 
 # Frontend URL (for email links)
 FRONTEND_URL=http://localhost:5173
+
+# Redis (optional — app works without it)
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
 ```
 
 ### Frontend (.env)
@@ -693,6 +730,7 @@ VITE_API_URL=http://localhost:5000/api
 - xss-clean (XSS protection)
 - cors (Cross-Origin Resource Sharing)
 - dotenv (Environment variables)
+- ioredis@5.11.1 (Redis client for caching)
 
 ### Frontend
 - react@19.2.6
@@ -727,5 +765,5 @@ For issues or questions, please:
 
 ---
 
-**Last Updated**: May 2026
+**Last Updated**: June 2026
 **Status**: Active Development

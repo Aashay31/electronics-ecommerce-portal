@@ -10,6 +10,17 @@ const {
   assessCancellationEligibility,
 } = require("../services/assistantService");
 const { deriveSessionTitle } = require("../services/orderSupportService");
+const { getCache, setCache, TTL } = require("../utils/cache");
+
+// Detect if message is product-related (cacheable)
+const isProductQuery = (message) => {
+  const keywords = [
+    "recommend", "compare", "best", "suggest",
+    "difference", "vs", "which", "specs", "price",
+    "available", "buy", "under", "cheap", "good",
+  ];
+  return keywords.some((k) => message.toLowerCase().includes(k));
+};
 
 async function hydrateSessionMessages(messages = [], userId) {
   const orderIds = new Set();
@@ -130,11 +141,26 @@ const sendMessage = async (req, res) => {
       return res.status(400).json({ success: false, message: "Message is required" });
     }
 
+    const trimmedMessage = String(message).trim();
+
+    // Check cache for product-related queries only
+    const productQuery = isProductQuery(trimmedMessage);
+    const chatCacheKey = productQuery
+      ? `chat:${trimmedMessage.toLowerCase()}`
+      : null;
+
+    if (chatCacheKey) {
+      const cachedResponse = await getCache(chatCacheKey);
+      if (cachedResponse) {
+        return res.status(200).json(cachedResponse);
+      }
+    }
+
     const session = await getOrCreateSession(req.user.id);
 
     const userMessage = {
       role: "user",
-      content: String(message).trim(),
+      content: trimmedMessage,
       quickReplyAction: quickAction,
       timestamp: new Date(),
       richContent: {
@@ -149,7 +175,7 @@ const sendMessage = async (req, res) => {
 
     const assistantReply = await buildAssistantResponse({
       userId: req.user.id,
-      message: String(message).trim(),
+      message: trimmedMessage,
       quickAction,
       selectedOrderId,
       session,
@@ -175,14 +201,21 @@ const sendMessage = async (req, res) => {
     await session.save();
     const hydratedMessages = await hydrateSessionMessages(session.messages, req.user.id);
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
       session: {
         ...session.toObject(),
         messages: hydratedMessages,
       },
       message: assistantMessage,
-    });
+    };
+
+    // Cache the response for product-related queries
+    if (chatCacheKey) {
+      await setCache(chatCacheKey, responseData, TTL.CHAT_RESPONSE);
+    }
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Error in assistantController.js:", error);
     return console.error("Error in assistantController.js:", error);
