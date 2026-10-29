@@ -2,33 +2,6 @@
 
 A full-featured e-commerce platform for browsing, purchasing, and managing electronic products with comprehensive admin controls and secure authentication.
 
-### 📧 Email System
-Automated email notifications for critical user actions:
-
-#### Email Templates
-- **Order Confirmation Email**: Sent immediately after successful order placement (COD or Razorpay)
-  - Order number and items list
-  - Order total with formatted pricing
-  - Shipping address confirmation
-  - Direct link to order tracking
-  - Professional HTML-formatted template
-
-- **Welcome Email**: Sent on user registration
-- **Password Reset Email**: Sent when user requests password recovery
-- **Order Status Update Email**: Sent when order status changes (Confirmed, Processing, Shipped, Delivered)
-
-#### Email Configuration
-- **Provider**: Nodemailer with SMTP support (Gmail, custom servers, etc.)
-- **Async Delivery**: Non-blocking email sending - failures don't block order processing
-- **Error Handling**: Graceful fallback if email fails; order still completes successfully
-- **Environment Variables**: 
-  - `EMAIL_HOST`: SMTP server hostname
-  - `EMAIL_PORT`: SMTP port (usually 465 for secure, 587 for TLS)
-  - `EMAIL_USER`: Sender email account
-  - `EMAIL_PASS`: Sender email password
-  - `FROM_NAME`: Display name for sender
-  - `FROM_EMAIL`: From email address
-
 ---
 
 ## 📋 Table of Contents
@@ -39,6 +12,11 @@ Automated email notifications for critical user actions:
 - [API Endpoints](#-api-endpoints)
 - [Database Models](#-database-models)
 - [Authentication & Security](#-authentication--security)
+- [Key Business Logic](#-key-business-logic)
+- [Environment Variables](#-environment-variables)
+- [Dependencies](#-dependencies)
+- [Contributing](#-contributing)
+- [Support](#-support)
 
 ---
 
@@ -105,6 +83,32 @@ Automated email notifications for critical user actions:
 ### ⚡ Real-Time Features
 - **Live Notifications**: Instant updates powered by Socket.io
 - **Secure WebSockets**: Authenticated real-time connection ensuring data privacy
+
+### 📧 Email System
+Automated email notifications for critical user actions:
+
+#### Email Templates
+- **Order Confirmation Email**: Sent immediately after successful order placement (COD or Razorpay)
+  - Order number and items list
+  - Order total with formatted pricing
+  - Shipping address confirmation
+  - Direct link to order tracking
+  - Professional HTML-formatted template
+- **Welcome Email**: Sent on user registration
+- **Password Reset Email**: Sent when user requests password recovery
+- **Order Status Update Email**: Sent when order status changes (Confirmed, Processing, Shipped, Delivered)
+
+#### Email Configuration
+- **Provider**: Nodemailer with SMTP support (Gmail, custom servers, etc.)
+- **Async Delivery**: Non-blocking email sending - failures don't block order processing
+- **Error Handling**: Graceful fallback if email fails; order still completes successfully
+- **Environment Variables**:
+  - `EMAIL_HOST`: SMTP server hostname
+  - `EMAIL_PORT`: SMTP port (usually 465 for secure, 587 for TLS)
+  - `EMAIL_USER`: Sender email account
+  - `EMAIL_PASS`: Sender email password
+  - `FROM_NAME`: Display name for sender
+  - `FROM_EMAIL`: From email address
 
 ### 🚀 Redis Caching
 Performance optimization layer for frequently accessed data:
@@ -180,24 +184,24 @@ Comprehensive analytics and management tools:
 
 ## 🛠️ Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Frontend Framework** | React 19.2.6 with Vite 8.0.12 |
-| **Routing** | React Router DOM 7.15.0 |
-| **Styling** | Tailwind CSS 3.4.14 |
-| **HTTP Client** | Axios 1.16.1 |
-| **UI Components** | Lucide React, React Icons |
-| **Notifications** | React Hot Toast |
-| **Backend Runtime** | Node.js with Express.js 5.2.1 |
-| **Database** | MongoDB with Mongoose 9.6.2 |
-| **Real-time** | Socket.io 4.8.3 |
-| **Authentication** | JWT (JSON Web Tokens) |
-| **Security** | Helmet, Rate Limit, Mongo Sanitize, XSS Clean |
-| **Password Hashing** | bcrypt 5.1.1 |
-| **AI Assistant** | Groq SDK for real-time LLM responses |
-| **Email Service** | Nodemailer with SMTP |
-| **Caching** | Redis (ioredis 5.11.1) |
-| **Payment Gateway** | Razorpay integration |
+| Category               | Technology                                    |
+| ---------------------- | --------------------------------------------- |
+| **Frontend Framework** | React 19.2.6 with Vite 8.0.12                 |
+| **Routing**            | React Router DOM 7.15.0                       |
+| **Styling**            | Tailwind CSS 3.4.14                           |
+| **HTTP Client**        | Axios 1.16.1                                  |
+| **UI Components**      | Lucide React, React Icons                     |
+| **Notifications**      | React Hot Toast                               |
+| **Backend Runtime**    | Node.js with Express.js 5.2.1                 |
+| **Database**           | MongoDB with Mongoose 9.6.2                   |
+| **Real-time**          | Socket.io 4.8.3                               |
+| **Authentication**     | JWT (JSON Web Tokens)                         |
+| **Security**           | Helmet, Rate Limit, Mongo Sanitize, XSS Clean |
+| **Password Hashing**   | bcrypt 5.1.1                                  |
+| **AI Assistant**       | Groq SDK for real-time LLM responses          |
+| **Email Service**      | Nodemailer with SMTP                          |
+| **Caching**            | Redis (ioredis 5.11.1)                        |
+| **Payment Gateway**    | Razorpay integration                          |
 
 ---
 
@@ -206,90 +210,73 @@ Comprehensive analytics and management tools:
 ```
 electronics-ecommerce-portal/
 │
-├── backend/                          # Node.js + Express API
+├── backend/                                  # Node.js + Express API
 │   ├── config/
-│   │   ├── database.js              # MongoDB connection configuration
-│   │   └── redis.js                 # Redis client connection and config
+│   │   ├── database.js                       # MongoDB connection configuration
+│   │   └── redis.js                          # Redis client connection and config
 │   ├── controllers/
-│   │   ├── adminController.js       # Admin operations
-│   │   ├── authController.js        # Authentication logic
-│   │   ├── cartController.js        # Cart management
-│   │   ├── orderController.js       # Order operations
-│   │   ├── paymentController.js     # Razorpay payment operations
-│   │   ├── productController.js     # Product operations
-│   │   └── userController.js        # User profile operations
+│   │   ├── adminController.js                # Admin operations
+│   │   ├── assistantController.js            # AI chatbot controller
+│   │   ├── authController.js                 # Authentication logic
+│   │   ├── cartController.js                 # Cart management
+│   │   ├── orderController.js                # Order operations
+│   │   ├── paymentController.js              # Razorpay payment operations
+│   │   ├── productController.js              # Product operations
+│   │   └── userController.js                 # User profile operations
 │   ├── middleware/
-│   │   ├── adminMiddleware.js       # Admin role verification
-│   │   ├── authMiddleware.js        # Token validation
-│   │   └── upload.js                # Multer image upload configuration
+│   │   ├── adminMiddleware.js                # Admin role verification
+│   │   ├── authMiddleware.js                 # Token validation
+│   │   ├── optionalAuth.js                   # Optional token validation
+│   │   └── upload.js                         # Multer image upload configuration
 │   ├── models/
-│   │   ├── User.js                  # User schema
-│   │   ├── Product.js               # Product schema
-│   │   ├── Order.js                 # Order schema
-│   │   └── PaymentAttempt.js        # Razorpay payment attempt schema
+│   │   ├── ChatSession.js                    # AI chat session schema
+│   │   ├── Order.js                          # Order schema
+│   │   ├── PaymentAttempt.js                 # Razorpay payment attempt schema
+│   │   ├── Product.js                        # Product schema
+│   │   └── User.js                           # User schema
 │   ├── routes/
-│   │   ├── adminRoutes.js           # Admin endpoints
-│   │   ├── assistantRoutes.js       # AI chatbot endpoints
-│   │   ├── authRoutes.js            # Auth endpoints
-│   │   ├── cartRoutes.js            # Cart endpoints
-│   │   ├── orderRoutes.js           # Order endpoints
-│   │   ├── paymentRoutes.js         # Razorpay endpoints
-│   │   ├── productRoutes.js         # Product endpoints
-│   │   └── userRoutes.js            # User endpoints
-│   ├── models/
-│   │   ├── ChatSession.js           # AI chat session schema
-│   │   ├── User.js                  # User schema
-│   │   ├── Product.js               # Product schema
-│   │   ├── Order.js                 # Order schema
-│   │   └── PaymentAttempt.js        # Razorpay payment attempt schema
-│   ├── middleware/
-│   │   ├── adminMiddleware.js       # Admin role verification
-│   │   ├── authMiddleware.js        # Token validation
-│   │   ├── optionalAuth.js          # Optional token validation
-│   │   └── upload.js                # Multer image upload configuration
+│   │   ├── adminRoutes.js                    # Admin endpoints
+│   │   ├── assistantRoutes.js                # AI chatbot endpoints
+│   │   ├── authRoutes.js                     # Auth endpoints
+│   │   ├── cartRoutes.js                     # Cart endpoints
+│   │   ├── orderRoutes.js                    # Order endpoints
+│   │   ├── paymentRoutes.js                  # Razorpay endpoints
+│   │   ├── productRoutes.js                  # Product endpoints
+│   │   └── userRoutes.js                     # User endpoints
 │   ├── services/
-│   │   ├── assistantService.js      # AI chatbot logic and utilities
-│   │   ├── orderCancellationService.js  # Order cancellation logic
-│   │   └── orderSupportService.js   # Order support utilities and snapshots
-│   ├── controllers/
-│   │   ├── adminController.js       # Admin operations
-│   │   ├── assistantController.js   # AI chatbot controller
-│   │   ├── authController.js        # Authentication logic
-│   │   ├── cartController.js        # Cart management
-│   │   ├── orderController.js       # Order operations
-│   │   ├── paymentController.js     # Razorpay payment operations
-│   │   ├── productController.js     # Product operations
-│   │   └── userController.js        # User profile operations
+│   │   ├── assistantService.js               # AI chatbot logic and utilities
+│   │   ├── orderCancellationService.js       # Order cancellation logic
+│   │   └── orderSupportService.js            # Order support utilities and snapshots
 │   ├── templates/
-│   │   ├── orderTemplate.js         # Order confirmation email template
-│   │   ├── resetPasswordTemplate.js # Password reset email template
-│   │   ├── statusTemplate.js        # Order status update email template
-│   │   └── welcomeTemplate.js       # Welcome email template
+│   │   ├── orderTemplate.js                  # Order confirmation email template
+│   │   ├── resetPasswordTemplate.js          # Password reset email template
+│   │   ├── statusTemplate.js                 # Order status update email template
+│   │   └── welcomeTemplate.js                # Welcome email template
 │   ├── utils/
-│   │   ├── cache.js                 # Redis cache helpers (get, set, delete, pattern delete)
-│   │   ├── jwt.js                   # JWT token utilities
-│   │   ├── sendEmail.js             # Email sending utility (Nodemailer)
-│   │   └── imageUrl.js              # Image URL resolution utility
+│   │   ├── cache.js                          # Redis cache helpers (get, set, delete, pattern delete)
+│   │   ├── imageUrl.js                       # Image URL resolution utility
+│   │   ├── jwt.js                            # JWT token utilities
+│   │   └── sendEmail.js                      # Email sending utility (Nodemailer)
 │   ├── uploads/
-│   │   └── products/                # Uploaded product images directory
-│   ├── server.js                    # Express server setup
-│   ├── makeAdmin.js                 # Admin creation utility
+│   │   └── products/                         # Uploaded product images directory
+│   ├── server.js                             # Express server setup
+│   ├── makeAdmin.js                          # Admin creation utility
 │   └── package.json
 │
-├── frontend/                         # React + Vite application
-│   ├── public/                       # Static assets
+├── frontend/                                 # React + Vite application
+│   ├── public/                               # Static assets
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── CategoryCard.jsx      # Category navigation card
-│   │   │   ├── FilterSidebar.jsx     # Shop filtering sidebar
-│   │   │   ├── Footer.jsx            # Application footer
-│   │   │   ├── GuestRoute.jsx        # Guest-only route protection
-│   │   │   ├── Navbar.jsx            # Navigation bar
-│   │   │   ├── ProductCard.jsx       # Product display card
-│   │   │   ├── ProductGrid.jsx       # Responsive grid for products
-│   │   │   ├── ProtectedRoute.jsx    # User route protection
-│   │   │   ├── SearchBar.jsx         # Search input component
-│   │   │   └── SortDropdown.jsx      # Product sorting component
+│   │   │   ├── CategoryCard.jsx              # Category navigation card
+│   │   │   ├── FilterSidebar.jsx             # Shop filtering sidebar
+│   │   │   ├── Footer.jsx                    # Application footer
+│   │   │   ├── GuestRoute.jsx                # Guest-only route protection
+│   │   │   ├── Navbar.jsx                    # Navigation bar
+│   │   │   ├── ProductCard.jsx               # Product display card
+│   │   │   ├── ProductGrid.jsx               # Responsive grid for products
+│   │   │   ├── ProtectedRoute.jsx            # User route protection
+│   │   │   ├── SearchBar.jsx                 # Search input component
+│   │   │   └── SortDropdown.jsx              # Product sorting component
 │   │   ├── admin/
 │   │   │   ├── components/
 │   │   │   │   ├── AdminLayout.jsx
@@ -299,45 +286,45 @@ electronics-ecommerce-portal/
 │   │   │   │   ├── ConfirmModal.jsx
 │   │   │   │   └── StatsCard.jsx
 │   │   │   └── pages/
-│   │   │       ├── Dashboard.jsx     # Admin dashboard
-│   │   │       ├── Orders.jsx        # Order management
-│   │   │       ├── Products.jsx      # Product management
-│   │   │       └── Users.jsx         # User management
+│   │   │       ├── Dashboard.jsx             # Admin dashboard
+│   │   │       ├── Orders.jsx                # Order management
+│   │   │       ├── Products.jsx              # Product management
+│   │   │       └── Users.jsx                 # User management
 │   │   ├── context/
-│   │   │   ├── AuthContext.jsx       # Authentication state
-│   │   │   ├── CartContext.jsx       # Shopping cart state
-│   │   │   ├── ProfileContext.jsx    # User profile state
-│   │   │   └── SearchContext.jsx     # Global search state
+│   │   │   ├── AuthContext.jsx               # Authentication state
+│   │   │   ├── CartContext.jsx               # Shopping cart state
+│   │   │   ├── ProfileContext.jsx            # User profile state
+│   │   │   └── SearchContext.jsx             # Global search state
 │   │   ├── pages/
-│   │   │   ├── Landing.jsx           # Welcome/landing page
-│   │   │   ├── Home.jsx              # Product listing
-│   │   │   ├── ProductDetails.jsx    # Product detail page
-│   │   │   ├── Login.jsx             # Login page
-│   │   │   ├── Signup.jsx            # Registration page
-│   │   │   ├── Cart.jsx              # Shopping cart
-│   │   │   ├── Checkout.jsx          # Order checkout
-│   │   │   ├── OrderSuccess.jsx      # Order confirmation
-│   │   │   ├── Orders.jsx            # Order history
-│   │   │   ├── OrderDetails.jsx      # Order details page
-│   │   │   ├── Profile.jsx           # User profile
-│   │   │   ├── EditProfile.jsx       # Profile editing
-│   │   │   ├── Addresses.jsx         # Address management
-│   │   │   └── Wishlist.jsx          # Wishlist page
+│   │   │   ├── Landing.jsx                   # Welcome/landing page
+│   │   │   ├── Home.jsx                      # Product listing
+│   │   │   ├── ProductDetails.jsx            # Product detail page
+│   │   │   ├── Login.jsx                     # Login page
+│   │   │   ├── Signup.jsx                    # Registration page
+│   │   │   ├── Cart.jsx                      # Shopping cart
+│   │   │   ├── Checkout.jsx                  # Order checkout
+│   │   │   ├── OrderSuccess.jsx              # Order confirmation
+│   │   │   ├── Orders.jsx                    # Order history
+│   │   │   ├── OrderDetails.jsx              # Order details page
+│   │   │   ├── Profile.jsx                   # User profile
+│   │   │   ├── EditProfile.jsx               # Profile editing
+│   │   │   ├── Addresses.jsx                 # Address management
+│   │   │   └── Wishlist.jsx                  # Wishlist page
 │   │   ├── utils/
-│   │   │   ├── api.js                # API configuration
-│   │   │   └── imageUrl.js           # Dynamic image path resolver
-│   │   ├── App.jsx                   # Root component
-│   │   ├── main.jsx                  # Application entry
-│   │   ├── App.css                   # Global styles
-│   │   └── index.css                 # Base styles
-│   ├── vite.config.js                # Vite configuration
-│   ├── tailwind.config.js            # Tailwind CSS config
-│   ├── postcss.config.js             # PostCSS configuration
-│   ├── eslint.config.js              # ESLint rules
+│   │   │   ├── api.js                        # API configuration
+│   │   │   └── imageUrl.js                   # Dynamic image path resolver
+│   │   ├── App.jsx                           # Root component
+│   │   ├── main.jsx                          # Application entry
+│   │   ├── App.css                           # Global styles
+│   │   └── index.css                         # Base styles
+│   ├── vite.config.js                        # Vite configuration
+│   ├── tailwind.config.js                    # Tailwind CSS config
+│   ├── postcss.config.js                     # PostCSS configuration
+│   ├── eslint.config.js                      # ESLint rules
 │   ├── package.json
 │   └── README.md
 │
-└── README.md                         # This file
+└── README.md                                 # This file
 ```
 
 ---
@@ -419,87 +406,87 @@ npm run build
 ## 📡 API Endpoints
 
 ### Authentication Routes (`/api/auth`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/signup` | Register new user |
-| POST | `/auth/login` | Login user and get JWT token |
+| Method | Endpoint       | Description                  |
+| ------ | -------------- | ---------------------------- |
+| POST   | `/auth/signup` | Register new user            |
+| POST   | `/auth/login`  | Login user and get JWT token |
 
 ### Product Routes (`/api/products`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/products` | Get all products (with pagination & filters) |
-| GET | `/products/:id` | Get single product details |
-| POST | `/products/add` | Create new product (Admin only) |
+| Method | Endpoint        | Description                                  |
+| ------ | --------------- | -------------------------------------------- |
+| GET    | `/products`     | Get all products (with pagination & filters) |
+| GET    | `/products/:id` | Get single product details                   |
+| POST   | `/products/add` | Create new product (Admin only)              |
 
 ### Cart Routes (`/api/cart`) - Protected
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/cart` | Get user's cart |
-| POST | `/cart/add` | Add product to cart |
-| PUT | `/cart/:productId` | Update product quantity in cart |
-| DELETE | `/cart/:productId` | Remove product from cart |
+| Method | Endpoint           | Description                     |
+| ------ | ------------------ | ------------------------------- |
+| GET    | `/cart`            | Get user's cart                 |
+| POST   | `/cart/add`        | Add product to cart             |
+| PUT    | `/cart/:productId` | Update product quantity in cart |
+| DELETE | `/cart/:productId` | Remove product from cart        |
 
 ### Order Routes (`/api/orders`) - Protected
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/orders` | Place new order |
-| GET | `/orders/myorders` | Get user's order history |
-| GET | `/orders/:id` | Get specific order details |
-| PUT | `/orders/:id/cancel` | Cancel order |
+| Method | Endpoint             | Description                |
+| ------ | -------------------- | -------------------------- |
+| POST   | `/orders`            | Place new order            |
+| GET    | `/orders/myorders`   | Get user's order history   |
+| GET    | `/orders/:id`        | Get specific order details |
+| PUT    | `/orders/:id/cancel` | Cancel order               |
 
 ### Payment Routes (`/api/payment`) - Protected
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/payment/create-order` | Create Razorpay order (no ecommerce order yet) |
-| POST | `/payment/verify-payment` | Verify payment and create ecommerce order |
-| POST | `/payment/webhook` | Razorpay webhook handler |
+| Method | Endpoint                  | Description                                    |
+| ------ | ------------------------- | ---------------------------------------------- |
+| POST   | `/payment/create-order`   | Create Razorpay order (no ecommerce order yet) |
+| POST   | `/payment/verify-payment` | Verify payment and create ecommerce order      |
+| POST   | `/payment/webhook`        | Razorpay webhook handler                       |
 
 ### User Profile Routes (`/api/users`) - Protected
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/users/me` | Get user profile |
-| PUT | `/users/me` | Update user profile |
-| PUT | `/users/me/password` | Update password |
-| GET | `/users/me/wishlist` | Get wishlist items |
-| POST | `/users/me/wishlist` | Add product to wishlist |
-| DELETE | `/users/me/wishlist/:productId` | Remove from wishlist |
-| GET | `/users/me/addresses` | Get saved addresses |
-| POST | `/users/me/addresses` | Add new address |
-| PUT | `/users/me/addresses/:addressId` | Update address |
-| DELETE | `/users/me/addresses/:addressId` | Delete address |
-| PUT | `/users/me/addresses/:addressId/default` | Set default address |
+| Method | Endpoint                                 | Description             |
+| ------ | ---------------------------------------- | ----------------------- |
+| GET    | `/users/me`                              | Get user profile        |
+| PUT    | `/users/me`                              | Update user profile     |
+| PUT    | `/users/me/password`                     | Update password         |
+| GET    | `/users/me/wishlist`                     | Get wishlist items      |
+| POST   | `/users/me/wishlist`                     | Add product to wishlist |
+| DELETE | `/users/me/wishlist/:productId`          | Remove from wishlist    |
+| GET    | `/users/me/addresses`                    | Get saved addresses     |
+| POST   | `/users/me/addresses`                    | Add new address         |
+| PUT    | `/users/me/addresses/:addressId`         | Update address          |
+| DELETE | `/users/me/addresses/:addressId`         | Delete address          |
+| PUT    | `/users/me/addresses/:addressId/default` | Set default address     |
 
 ### Admin Routes (`/api/admin`) - Protected & Admin Only
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/admin/stats` | Get dashboard statistics |
-| GET | `/admin/products` | Get all products (with filters) |
-| POST | `/admin/products` | Create new product |
-| PUT | `/admin/products/:id` | Update product |
-| DELETE | `/admin/products/:id` | Delete product |
-| GET | `/admin/orders` | Get all orders (with filters) |
-| PUT | `/admin/orders/:userId/:orderId` | Update order status |
-| GET | `/admin/users` | Get all users (with filters & pagination) |
-| GET | `/admin/users/:id` | Get specific user details |
-| PUT | `/admin/users/:id/role` | Change user role |
-| PUT | `/admin/users/:id/ban` | Toggle user ban status |
-| DELETE | `/admin/users/:id` | Delete user |
+| Method | Endpoint                         | Description                               |
+| ------ | -------------------------------- | ----------------------------------------- |
+| GET    | `/admin/stats`                   | Get dashboard statistics                  |
+| GET    | `/admin/products`                | Get all products (with filters)           |
+| POST   | `/admin/products`                | Create new product                        |
+| PUT    | `/admin/products/:id`            | Update product                            |
+| DELETE | `/admin/products/:id`            | Delete product                            |
+| GET    | `/admin/orders`                  | Get all orders (with filters)             |
+| PUT    | `/admin/orders/:userId/:orderId` | Update order status                       |
+| GET    | `/admin/users`                   | Get all users (with filters & pagination) |
+| GET    | `/admin/users/:id`               | Get specific user details                 |
+| PUT    | `/admin/users/:id/role`          | Change user role                          |
+| PUT    | `/admin/users/:id/ban`           | Toggle user ban status                    |
+| DELETE | `/admin/users/:id`               | Delete user                               |
 
 ### AI Assistant Routes (`/api/assistant`) - Protected
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/assistant/chat` | Send message to AI assistant |
-| GET | `/assistant/session` | Get or create chat session |
-| GET | `/assistant/session/messages` | Get session conversation history |
-| DELETE | `/assistant/session` | Clear session |
-| POST | `/assistant/quick-action` | Handle quick action buttons |
+| Method | Endpoint                      | Description                      |
+| ------ | ----------------------------- | -------------------------------- |
+| POST   | `/assistant/chat`             | Send message to AI assistant     |
+| GET    | `/assistant/session`          | Get or create chat session       |
+| GET    | `/assistant/session/messages` | Get session conversation history |
+| DELETE | `/assistant/session`          | Clear session                    |
+| POST   | `/assistant/quick-action`     | Handle quick action buttons      |
 
 ---
 
 ## 🗄️ Database Models
 
 ### User Model
-```
+```javascript
 {
   fullName: String (required)
   email: String (required, unique)
@@ -534,7 +521,7 @@ npm run build
 ```
 
 ### Product Model
-```
+```javascript
 {
   productName: String (required)
   description: String (required)
@@ -549,7 +536,7 @@ npm run build
 ```
 
 ### PaymentAttempt Model
-```
+```javascript
 {
   user: ObjectId (reference to User)
   items: Array of { product: ObjectId, quantity: Number, price: Number }
@@ -567,7 +554,7 @@ npm run build
 ```
 
 ### Order Model
-```
+```javascript
 {
   user: ObjectId (reference to User, required)
   items: Array of {
@@ -599,7 +586,7 @@ npm run build
 ```
 
 ### ChatSession Model (AI Assistant)
-```
+```javascript
 {
   user: ObjectId (reference to User, required)
   messages: Array of {
@@ -679,7 +666,7 @@ npm run build
 ## 📝 Environment Variables
 
 ### Backend (.env)
-```
+```env
 MONGODB_URI=mongodb://username:password@host:port/database
 JWT_SECRET=your_super_secret_key
 PORT=5000
@@ -710,7 +697,7 @@ REDIS_PASSWORD=
 ```
 
 ### Frontend (.env)
-```
+```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
@@ -765,5 +752,5 @@ For issues or questions, please:
 
 ---
 
-**Last Updated**: June 2026
+**Last Updated**: June 2026  
 **Status**: Active Development
